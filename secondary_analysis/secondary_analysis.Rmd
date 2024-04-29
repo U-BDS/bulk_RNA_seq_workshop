@@ -260,7 +260,7 @@ conclude the pipeline has been downloaded successfully.
 So lets start moving to actual data. In order to run the data, its
 important to understand the data a little more before proceeding.
 
-The data comes from the below paper:
+The data comes from the following paper:
 <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6096346/>
 
 The data that we will be analyzing is mouse transplant data. There are
