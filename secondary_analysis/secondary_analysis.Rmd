@@ -12,69 +12,82 @@ editor_options:
 
 An experiment can typically be broken down into 3 different parts:
 
--   Primary Analysis - There can be a bit of a disjoint in the community
-    about what constitutes an analysis. Some consider trimming + initial
-    qc to be part of it. For this workshop, we’re going to consider this
-    analysis to be the steps performed by a sequencing lab and the end
-    result of this will be a demultiplexed fastq. That is very much an
-    oversimplification about what happens at this step, as there is a
-    lot of complexity, and entire workshops could be given (and are
-    given) solely on this step.
+-   **Primary Analysis** - There can be a bit of a disjoint in the
+    community about what constitutes a primary analysis. Some consider
+    trimming + initial qc to be part of it. For this workshop, we’re
+    going to consider this analysis to be the steps performed by a
+    sequencing lab and the end result of this will be a demultiplexed
+    FASTQ. That is very much an oversimplification about what happens at
+    this step, as there is a lot of complexity, and entire workshops
+    could be given (and are given) solely on this step.
 
--   Secondary Analysis - Secondary analysis is the steps in a workflow
-    where fastq files are turned into the files you need for tertiary.
-    The files produced differ depending on what kind of analysis you are
-    performing, a single cell analysis would need a feature-barcode
-    matrix, whole genome analysis would work with variant call files.
-    For bulk rna analyses we are concerned with expression count files
+-   **Secondary Analysis** - Secondary analysis is the steps in a
+    workflow where FASTQ files are turned into the files you need for
+    tertiary. The files produced differ depending on what kind of
+    analysis you are performing, a single cell analysis would need a
+    feature-barcode matrix, whole genome analysis would work with
+    variant call files. For bulk rna analyses we are concerned with
+    expression count files
 
--   Tertiary Analysis - Tertiary analysis takes the output from
+-   **Tertiary Analysis** - Tertiary analysis takes the output from
     secondary and visualizes and interprets the results. Depending on
     your analysis you have a different end goal for what you want to
-    see. For bulk rna-seq, we are looking for differential and
+    see. For bulk RNA-seq, we are looking for differential and
     coregulated expression of genes and to infer their biological
     meaning
 
-Primary analysis goes beyond the scope of this lesson, these lessons
-will focus primarily on secondary and tertiary analysis.
+The purpose of this workshop will be to provide a more in-depth look at
+secondary and tertiary analysis.
 
-## Introduction to Fastq Files
+## Introduction to FASTQ Files
 
-As mentioned previously, secondary analysis starts with a fastq file. A
-fastq file is a standard file format for storing the raw sequences and
+As mentioned previously, secondary analysis starts with a FASTQ file. A
+FASTQ file is a standard file format for storing the raw sequences and
 their qualities obtained from primary analysis.
 
-Taking a look at our fastqs. Taking a quick look at our file extensions,
-we can tell its a fastq because it has the ‘.fq’ file extension, you’ll
-also see ‘.fastq’ among others. They all mean the same thing. The other
-file extension we see are ‘.gz’, this just means our file is gzipped.
-Gzip is a way to compress and minimize the storage space a file takes up
-on a system, this is especially important for fastqs because they can be
-very large uncompressed.
+Taking a quick look at the input files provided with the workshop, we
+can tell its a FASTQ because it has the ‘.fq’ file extension, but you’ll
+also see ‘.fastq’ as an alternative extension. The other file extension
+we see on the files is ‘.gz’. 'gz' indicates that the file is zipped
+using the gzip tool. Gzip is both the name of the tool and the name for
+the file compression algorithm. The reason we compress files is to
+minimize the storage space the file takes up on a file system, and this
+is an especially important for FASTQs because they can be very large
+files.
+
+Lets go ahead and peek at the FASTQ file itself. We'll use `gunzip -c`
+to produce the file contents to stdout, and we'll just look at the first
+10 lines using `head`.
 
 ```         
 gunzip -c <fastq.name> | head
 ```
 
-We can see that there is a sort of pattern that is discernable. Each set
-of four lines is a separate entry. The four lines are:
+We can see that there is a discernible pattern. Each set of four lines
+is considered a single entry. The four lines are:
 
-1.  The sequence identifier. The exact contents of this vary depending
-    on many different factors, but are always unique.
-2.  The sequence. A string of A, T, C, G, and N. (N indicates the base
-    could not be identified)
-3.  A separator. Normally a ‘+’ sign.
-4.  The sequence qualities. These are encoded using characters, but
-    there are ways to get them back to numbers. These indicate the
-    quality for the base at the same position. See the table below for
-    quick guide on what each character means
+1.  The **sequence identifier**. The exact contents of this vary
+    depending on many different factors, but are always unique for each
+    entry.
+2.  The **sequence**. A string of A, T, C, G, and N. (N indicates the
+    base could not be identified)
+3.  A **separator**. Starts with a '+' sign. Sometimes this will also
+    have a quality score identifier that matches the sequence
+    identifier, but its also not uncommon for this to only contain the
+    '+' sign.
+4.  The **sequence qualities**. These indicate the quality for the base
+    at the same position. These are encoded using characters, and there
+    are ways to convert them back into a numerical value. See the table
+    below for quick guide on the character-score translations. The
+    reason these are stored as characters is again to reduce the amount
+    of space the FASTQ takes up on a file system.
 
 ![<https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/>](imgs/q_scores.png)
 
-### QC-ing Fastq Files
+### QC-ing FASTQ Files
 
 So before any analysis begins, there are a couple sanity checks that can
-be run on a fastq file in order to ensure they are correct.
+be run on a FASTQ file in order to ensure they are correct.
 
 #### Checking line count
 
@@ -85,29 +98,29 @@ file
 gunzip -c <fastq_file> \| wc -l
 ```
 
-If you recall, the format of the fastq file is each entry is separated
+If you recall, the format of the FASTQ file is each entry is separated
 into four lines. So a very quick sanity check to perform is making sure
-the number of lines in a fastq is divisible by 4.
+the number of lines in a FASTQ is divisible by 4.
 
 #### Md5 Checks
 
 The second sanity check is a little more complex, but it’s known as an
 md5 check. An md5 is a string of characters and numbers. The important
 note is that the md5 is unique for every file, so two files having the
-same md5 file indicates a high probability the files are the same (we
+same md5 hash indicates a high probability the files are the same (we
 say probability because it is technically possible for two different
 files to have the same md5, however because of how its calculated this
 is an extremely low chance and for the purposes of this course you can
 consider md5’s to be unique to a file)
 
-The reason to perform this check is often fastqs are uploaded and
+The reason to perform this check is often FASTQs are uploaded and
 downloaded from other sources, so the md5 can be computed to determine
 if there is a potential chance for corruption during either the upload
 or download process. If the source does not provide any md5’s, asking
-for the source of the fastq to generate them is a perfectly reasonable
+for the source of the FASTQ to generate them is a perfectly reasonable
 request. Once these are generated you are able to check the md5s of the
-fastqs after they ‘ve been downloaded against the md5’s that the source
-generated, and ensuring these values are equivalent is a good way to
+FASTQs after they‘ve been downloaded against the md5’s that the source
+generated, and ensuring these values are the same is a good way to
 ensure no corruption happened during the download process.
 
 The way to check the md5 of a file is to use the md5sum command
@@ -118,17 +131,19 @@ md5sum fastq.fq.gz
 
 ## Intro to RNASeq
 
-The fastq file on its own doesn’t really net much information. In order
+The FASTQ file on its own doesn’t really net much information. In order
 to move forward with our project, these raw base calls need to be
 converted into raw expression data.
 
 ![<https://nf-co.re/rnaseq/3.14.0>](imgs/nf-core_rnaseq.png)
 
 The rnaseq pipeline developed and published by nf-core is the option
-that this lesson will be using to analyze the fastqs.
+that this lesson will be using to analyze the FASTQs.
 
 The rnaseq pipeline has a lot of tools that are part of it, and you
 don’t normally run all of these tools during an analysis. The pipeline
+allows for a degree of configuration to give the user the choice of
+which tools to run.
 
 RNASeq workflows follows generally the below pattern:
 
@@ -199,10 +214,9 @@ Workflow management systems are also useful as they natively support
 parallelization, portability, and reproducibility. There are other
 workflow languages such as Snakemake or WDL.
 
-Nextflow is is built on top of a programming language known as Groovy.
-The specifics of Groovy are not necessarily important for the lesson,
-but if anyone wishes to develop pipelines using nextflow it will be
-relevant.
+Nextflow is built on top of a programming language known as Groovy. The
+specifics of Groovy are not necessarily important for the lesson, but if
+anyone wishes to develop pipelines using nextflow it will be relevant.
 
 Nf-core is a community-led effort to curate and develop a set of
 analysis pipelines using Nextflow. All pipelines published as part of
@@ -229,23 +243,32 @@ ssh <blazer_id>@cheaha.rc.uab.edu
 In order to run the pipeline with test, we’ll use the following command:
 
 ```         
-nextflow run nf-core/rnaseq -profile test,cheaha --outdir output
+nextflow run nf-core/rnaseq -profile test,cheaha -r 3.14.0 --outdir output
 ```
 
-Breaking the command down: - `nextflow run` is how to run any nextflow
-pipeline. nf-core/rnaseq tells which nf-core pipeline to run, if we were
-running a single-cell pipeline, we’d use nf-core/scrnaseq. -
-`-profile test, cheaha` : Profiles can be thought of as presets for a
-pipeline. The pipeline comes with a lot of defaults, but the profiles
-provide additional defaults for the pipeline. The ‘test’ profile tells
-the pipeline that we are going to use the test data for the pipeline.
-The ‘cheaha’ profile is what called an institutional profile, the one
-for use at UAB is ‘cheaha’, but there are also other institutions and
-you are able to create your own if one doesn’t already exist. The one
-thing to note is that if you pass in multiple profiles, the last one
-takes precedence. - `--outdir output` Finally we are noting where the
-pipeline needs to place all the output files, in this case it will be a
-directory called output.
+Breaking the command down:
+
+-   `nextflow run` is how to run any nextflow pipeline. nf-core/rnaseq
+    tells which nf-core pipeline to run, if we were running a
+    single-cell pipeline, we’d use nf-core/scrnaseq.
+
+-   `-profile test, cheaha` : Profiles can be thought of as presets for
+    a pipeline. The pipeline comes with a lot of defaults, but the
+    profiles provide additional defaults for the pipeline. The ‘test’
+    profile tells the pipeline that we are going to use the test data
+    for the pipeline. The ‘cheaha’ profile is what called an
+    institutional profile, the one for use at UAB is ‘cheaha’, but there
+    are also other institutions and you are able to create your own if
+    one doesn’t already exist. The one thing to note is that if you pass
+    in multiple profiles, the last one takes precedence.
+
+-   The `-r` specifies a version of the pipeline to use. This is an
+    important parameter for reproducibility as we can force rnaseq to
+    run at a specific version.
+
+-   `--outdir output` With this flag we are noting where the pipeline
+    needs to place all the output files, in this case it will be a
+    directory called `output`.
 
 Running the pipeline will yield a status update page. This page will
 show the current progress of the pipeline, completed jobs, failed jobs,
@@ -303,14 +326,14 @@ sample,fastq_1,fastq_2,strandedness
 ```
 
 We’ve put the header into the samplesheet, so let’s save the samplesheet
-because we need to also include the fastqs. The way we will do that is
+because we need to also include the FASTQs. The way we will do that is
 via the commandline.
 
 ```         
 for file in input/downsample/*.fastq.gz; do echo $file; done
 ```
 
-That will output all the fastqs we will be working with. Lets redirect
+That will output all the FASTQs we will be working with. Lets redirect
 the output to the end of the samplesheet
 
 ```         
@@ -318,7 +341,7 @@ For file in input/downsample/*.fastq.gz; do echo $file; done >> samplesheet.csv
 ```
 
 So open up the samplesheet again. So there’s currently a header and a
-list of fastqs. To start modifying it, a sample name needs to be added
+list of FASTQs. To start modifying it, a sample name needs to be added
 with some additional commas.
 
 ```         
@@ -379,13 +402,13 @@ gtf: "/path/to/gtf"
 gencode: true
 ```
 
-Next we’ll provide the required parameters. Input is the path to the
-samplesheet. Fasta and GTF are the paths to the fasta and gtf for the
-analysis. Note that these can be obtained from the GENCODE website at
-<https://www.gencodegenes.org/>. For genomes not available you can also
-find reference files at the ensembl website
+Next we’ll provide the required parameters. `input` is the path to the
+samplesheet. `fasta` and `gtf` are the paths to the FASTA and GTF files
+to be used for the analysis. Note that these can be obtained from the
+GENCODE website at <https://www.gencodegenes.org/>. For genomes not
+available you can also find reference files at the ensembl website
 <https://useast.ensembl.org/index.html>. If you use GENCODE reference
-files, be sure to set the gencode parameter to true.
+files, be sure to set the `gencode` parameter to true.
 
 ```         
 # Read Trimming Options
@@ -396,7 +419,7 @@ extra_trimgalore_args: "--illumina"
 We are going to use trimgalore for the trimmer. RNASeq also provides
 fastp as an option. Neither one of these is necessarily better than the
 other, trim_galore provides a wrapper around an older tool called
-cutadapt and fastqc. Trim_galore will try to guess the adapters it needs
+cutadapt and FASTQC. Trim_galore will try to guess the adapters it needs
 to cut, you can limit this by passing certain parameters. This dataset
 uses the illumina default adapters, so the “--illumina” flag needs to be
 passed to the tool.
@@ -405,23 +428,30 @@ passed to the tool.
 # Alignment Options
 aligner: "star_salmon"
 pseudo_aligner: "salmon"
-#extra_salmon_quant_args: "--seqBias --gcBias"
 ```
 
 The aligner we use is “star_salmon”. For rnaseq, this means STAR will be
-the aligner and salmon will be used for quantification. We can also tell
-it to produce pseudo alignments using salmon. The additional arguments
-to salmon are to help the model it uses to correct for sequence and gc
-bias.
+the aligner and Salmon will be used for quantification. We also instruct
+the pipeline to produce pseudo aligments with Salmon. There's no good
+rule of thumb about when to use STAR mappings over Salmon mappings, as
+it is highly depending on the design of the experiment. For example, if
+you also have genome data being processed you may want to use the STAR
+results as its easier to map the alignments back due to Salmon not
+producing a bam file. We typically execute the pipeline so that both
+types of aligners are run (as demonstrated above), that way the
+situation never arises where the pipeline needs to be rerun just to
+generate the files from the opposite aligner.
 
 ```         
 # Quality Control
 deseq2_vst: true
 ```
 
-We'll also add this parameters for the run. - `deseq2_vst` will use the
-vst transformation over deseq's rlog. This is ideal as vst is faster to
-run and more suitable for larger datsets
+We'll also add this parameters for the run.
+
+-   `deseq2_vst` will use the vst transformation over deseq's rlog. This
+    is ideal as vst is faster to run and more suitable for larger
+    datsets
 
 ### Additional Customization
 
@@ -466,17 +496,27 @@ cd ~/.nextflow/assets/nf-core/rnaseq/
 ```
 
 There’s a lot of files and directories in here, breaking down the
-directories one at a time: - `assets` - Contains images and tool-specfic
-files - `bin` -Contains scripts used by the pipeline - `conf` - Contains
-pipeline configuration files - `docs` - Contains documentation -
-`libs` - Contains groovy libraries for the pipeline to use - `modules` -
-Contains the nextflow process files for individual tools. It is further
-split into ‘local’ modules which are unique to the pipeline and
-‘nf-core’ modules which are files that have been obtained from a central
-repo. - `subworkflows` and `workflows` - Contains the actual workflow
-files themselves. `subworkflows` are parts of a workflow that are
-repeated multiple times so are abstracted out of the main workflow to
-alleviate the maintenance burden.
+directories one at a time:
+
+-    `assets` - Contains images and tool-specfic files
+
+-   `bin` -Contains scripts used by the pipeline
+
+-   `conf` - Contains pipeline configuration files
+
+-   `docs` - Contains documentation
+
+-   `libs` - Contains groovy libraries for the pipeline to use
+
+-   `modules` - Contains the nextflow process files for individual
+    tools. It is further split into ‘local’ modules which are unique to
+    the pipeline and ‘nf-core’ modules which are files that have been
+    obtained from a central repo.
+
+-   `subworkflows` and `workflows` - Contains the actual workflow files
+    themselves. `subworkflows` are parts of a workflow that are repeated
+    multiple times so are abstracted out of the main workflow to
+    alleviate the maintenance burden.
 
 There are additional files in the pipeline directory, but most of these
 are used for either documentation or for the pipeline template. For the
@@ -529,10 +569,10 @@ withName: ‘.*:SALMON_QUANT’{
 
 So what the lines will do is when salmon is ran, two additional flags
 will be added. The flags themselves tell salmon to correct for gc and
-sequence bias. We use withName to limit the additions to only the salmon
-process, we don’t want to run it for everything. Since withName respects
-regular expressions we use the .\* to act as a catchall for all salmon
-jobs.
+sequence bias. We use `withName` to limit the additions to only the
+salmon process, we don’t want to run it for everything. Since `withName`
+respects regular expressions we use the .\* to act as a catchall for all
+salmon jobs.
 
 There are additional ways you can use this config, controlling whether
 nextflow processes are run with Singularity or Docker, further
@@ -561,10 +601,6 @@ You can see we add some additional flags form the test run.
     pipeline run itself, nothing specific to data. We’ll review them
     more in-depth later in the lesson.
 
--   The `-r` specifies a version of the pipeline to use. This is an
-    important parameter for reproducibility as we can force rnaseq to
-    run at a specific version.
-
 -   Finally we add in the files we have just created in the previous
     steps with their respective parameters
 
@@ -588,7 +624,11 @@ The timeline file provides a timeline of when each process was executed.
 This is especially useful in being able to estimate how long a pipeline
 may take and to identify long running tools.
 
-### Pipeline MultiQC Report
+### Secondary Outputs
+
+#### File Outputs
+
+#### MultiQC Report
 
 The first point of review for the pipeline is the multiqc report.
 MultiQC is a very useful tool that aggregates a number of different
@@ -597,7 +637,7 @@ quality of the data and determine any potential concerns about the data.
 
 The first table in the multiqc report is the General Statistics Table.
 This provides a high level overview of various metrics, from read counts
-in the bam to read counts in the fastq. Its a lot of statistics, but can
+in the bam to read counts in the FASTQ. Its a lot of statistics, but can
 be good to see if there are any large amount of filtering to occur.
 
 ![multiqc report](imgs/multiqc_1.png)
@@ -632,7 +672,7 @@ of a good 'normal' plot for this metric.
 There are a couple variations of bam metrics. Samtools is a common tool
 with a number of subtools that provide useful metrics for your bam. The
 key things to look for are mapping rates, unique mappings, (and properly
-paired in the case of paired fastqs) as those are expected to be high
+paired in the case of paired FASTQs) as those are expected to be high
 regardless of dataset, though the degree varies based on species.
 
 ![multiqc report](imgs/multiqc_12.png) ![multiqc
@@ -655,7 +695,7 @@ we just need to make sure they are not the overwhelming majority.
 
 ![multiqc report](imgs/multiqc_18_true.png)
 
-FastQC is a very common tool used for providing metrics for Fastq files.
+FastQC is a very common tool used for providing metrics for FASTQ files.
 There is also a FastQC report that gets generated, but its on a
 per-sample basis and as a result does not aggreate the results like in
 MultiQC.
@@ -672,7 +712,7 @@ as a result.
 report](imgs/multiqc_21.png)
 
 The Per Base Sequence Content is very useful for determing if there is
-any potential issue with the fastq. You'll again notice there are issues
+any potential issue with the FASTQ. You'll again notice there are issues
 at the start and end of the reads and its universal across samples.
 Clicking each row provides a better view of which base is the strongest.
 This is again pretty expected for reasons mentioned earlier, but always
@@ -709,3 +749,5 @@ The workflow summary indicates what parameters and options were used
 during the analysis.
 
 ![multiqc report](imgs/multiqc_31.png)
+
+### Troubleshooting / Work Directory
