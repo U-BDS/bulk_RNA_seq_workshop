@@ -286,14 +286,15 @@ important to understand the data a little more before proceeding.
 The data comes from the following paper:
 <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6096346/>
 
-The data that we will be analyzing is mouse transplant data. There are
-12 samples in total - 4 naive controls, 4 from 2 hours past transplant,
-and 4 from 24 hours past transplant. For this workshop, we will only be
-concerned with the controls and the 2 hour samples. And for the
-secondary portion of the workshop, we will be reviewing results for a
-full pipeline run. However, for testing purposes we are going to run
-down sampled versions of the data, but the steps we will follow will be
-applicable to the full dataset.
+The data that we will be analyzing is mouse transplant data. The
+original paper contains 12 samples in total - 4 naive controls, 4 from 2
+hours past transplant, and 4 from 24 hours past transplant. For this
+workshop, we will only be concerned with the controls and the 24 hour
+samples. We will be using the results from a pipeline run that contained
+only these samples for the tertiary portion, and will be reviewing the
+reports for later in this portion of the lesson. In addition we are
+going to run down sampled versions of the data for testing purposes, but
+the steps we will follow will be largely applicable to the full dataset.
 
 Another thing to note is the paper we are obtaining the data from is a
 beginner’s guide for rnaseq published about 10 years ago. If anyone has
@@ -498,7 +499,7 @@ cd ~/.nextflow/assets/nf-core/rnaseq/
 There’s a lot of files and directories in here, breaking down the
 directories one at a time:
 
--    `assets` - Contains images and tool-specfic files
+-   `assets` - Contains images and tool-specfic files
 
 -   `bin` -Contains scripts used by the pipeline
 
