@@ -1,0 +1,397 @@
+---
+title: "RNASeq_Workshop_part2"
+author: 
+  - name: "Bharat Mishra, Ph.D | bharat26@uab.edu | Senior Bioinformatician"
+  - name: "<https://www.uab.edu/cores/ircp/bds>"
+date: |
+      | Date: `r format(Sys.time(), '%B %d, %Y')`
+
+  output:
+  html_document:
+    code_folding: hide
+    css: "style.css"
+    toc: true
+    toc_float: true
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Note
+
+This data carpentry workshop materials have been borrowed from several resources including:
+1. https://carpentries-incubator.github.io/bioc-rnaseq/index.html
+2. https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
+3. https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html
+4. https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html
+5. U-BDS Team.
+
+We thank the curators and maintainers of all of these resources for their wonderful contributions, compiling the best practices, and easy to follow training guides for beginners. 
+
+## Install these packages
+```{r, eval=FALSE}
+install.packages(c("BiocManager", "remotes"))
+BiocManager::install(c("tidyverse", "SummarizedExperiment",
+                       "ExploreModelMatrix", "AnnotationDbi", "org.Hs.eg.db", 
+                       "org.Mm.eg.db", "csoneson/ConfoundingExplorer",
+                       "DESeq2", "vsn", "ComplexHeatmap", "hgu95av2.db",
+                       "RColorBrewer", "hexbin", "cowplot", "iSEE",
+                       "clusterProfiler", "enrichplot", "kableExtra",
+                       "msigdbr", "gplots", "ggplot2", "simplifyEnrichment",
+                       "apeglm", "microbenchmark", "Biostrings",
+                       "SingleCellExperiment"))
+
+BiocManager::install(c('edgeR','limma','tximport', 'biomaRt',
+                       'Glimma', 'GeneOverlap',
+                       'EnhancedVolcano'))
+
+BiocManager::install(c('clusterProfiler', 'ComplexUpset', 'openxlsx','ggrepel','ggpubr'))
+```
+
+# Packages loaded globabally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+library(tximport)
+library(limma) 
+library(edgeR)
+library(DESeq2)
+library(Glimma)
+library(vsn)
+
+# Mouse annotation package we'll use for gene identifier conversion
+library(biomaRt)
+library(org.Mm.eg.db)
+
+# pathway analysis
+library(clusterProfiler)
+library(msigdbr)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(pheatmap)
+library(EnhancedVolcano)
+library(ComplexUpset)
+library(ComplexHeatmap)
+library(RColorBrewer)
+library(vidger)
+```
+
+### Create `data` and `results` directory
+
+```{r}
+dir.create("./data", recursive = TRUE)
+dir.create("./results", recursive = TRUE) 
+```
+
+# Differential expression analysis
+
+## Input data
+
+```{r}
+dds <- readRDS(file = "./results/dds.rds")
+colData <- readRDS(file = "./results/colData.rds")
+```
+
+
+## Run `DESeq` function
+```{r}
+dds <- DESeq(dds)
+
+# checking coeff by resultsNames(dds):
+
+resultsNames(dds)
+
+# Dispersion plot
+
+pdf("./results/dispersion_plot.pdf")
+plotDispEsts(dds)
+dev.off()
+```
+
+The standard differential expression analysis steps are wrapped into a single function, `DESeq`, described in the Methods section of the DESeq2 publication (Love, Huber, and Anders 2014).
+
+Results tables are generated using the function results, which extracts a results table with `log2 fold changes`, `p values` and `adjusted p values`. With no additional arguments to results, the log2 fold change and Wald test p value will be for the last variable in the design formula, and if this is a factor, the comparison will be the last level of this variable over the reference level (see previous note on factor levels). However, the order of the variables of the design do not matter so long as the user specifies the comparison to build a results table for, using the name or contrast arguments of results.
+
+
+## Make annotation object
+
+We used mm39 (GENCODE release M32) corresponding to Ensembl 109.
+
+```{r annotation_info}
+
+listEnsemblArchives()
+
+# setting the archive path for future runs if needed / to avoid grabbint the latest
+host_url <- "https://feb2023.archive.ensembl.org" 
+
+attributes_to_add <- c("ensembl_gene_id", "external_gene_name","gene_biotype",
+                       "description","chromosome_name","start_position",
+                       "end_position","strand")
+
+# listDatasets(mart=useMart( "ENSEMBL_MART_ENSEMBL",host = host_url)) # list species
+
+species <- "mmusculus_gene_ensembl"
+
+
+ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = species, host = host_url)
+
+listMarts(host=host_url)
+
+# although we filtered counts, will still bring in annot. for all genes
+gene_ids <- rownames(txi$counts)
+gene_ids <- gsub("\\.[0-9]+","",gene_ids) # remove GENCODE gene version
+
+head(gene_ids)
+
+genemap <- getBM(attributes = attributes_to_add,
+                 filters = "ensembl_gene_id",
+                 values = gene_ids,
+                 mart = ensembl,
+                 useCache = FALSE)
+
+head(genemap)
+nrow(genemap)
+
+length(gene_ids) == nrow(genemap)
+
+saveRDS(genemap, file = "./results/genemap.rds")
+
+```
+
+
+## `Transplant_vs_Naive` pair-wise comparision
+
+### Log fold change shrinkage for visualization and ranking
+Shrinkage of effect size (LFC estimates) is useful for visualization and ranking of genes. To shrink the LFC, we pass the dds object to the function `lfcShrink`. Below we specify to use the `apeglm` method for effect size shrinkage (Zhu, Ibrahim, and Love 2018), which improves on the previous estimator.
+
+
+#### Alternative shrinkage estimators options:
+
+. `apeglm` is the adaptive t prior shrinkage estimator from the apeglm package (Zhu, Ibrahim, and Love 2018). As of version 1.28.0, it is the default estimator.
+. `ashr` is the adaptive shrinkage estimator from the ashr package (Stephens 2016). Here DESeq2 uses the ashr option to fit a mixture of Normal distributions to form the prior, with method="shrinkage".
+. `normal` is the the original DESeq2 shrinkage estimator, an adaptive Normal distribution as prior.
+
+
+```{r lfcShrink}
+#--------------- Transplant_vs_Naive: Condition_Transplant_vs_Naive --------------
+
+dir.create("./results/Transplant_vs_Naive", recursive = TRUE)
+
+# lfcShrink function
+Transplant_vs_Naive <- lfcShrink(dds, coef="Condition_Transplant_vs_Naive", type="apeglm")
+
+Transplant_vs_Naive
+```
+## Explore the DESeq2 result
+
+### P.value histogram plot
+
+```{r}
+p <- hist(Transplant_vs_Naive$pvalue) #distribution of p-vals (always want to plot non-corrected pvals for this)
+png("./results/Transplant_vs_Naive/Pval_histogram_Condition_Transplant_vs_Naive.png", width = 400, height = 400)
+plot(p)
+p
+```
+
+Each bar represents the number of genes with a P value in the given bin (bin size= 0.05).
+
+### MA Plot
+
+We can visualize the results in many ways. A good check is to explore the relationship between log2fold changes, significant DE genes and the genes mean count. `DESeq2` provides a useful function to do so, `plotMA()`.
+
+```{r}
+plotMA(Transplant_vs_Naive)
+```
+
+
+### Summary stat
+
+```{r}
+summary(Transplant_vs_Naive)
+```
+
+### Sort by Adjusted p.value
+
+```{r}
+head(Transplant_vs_Naive[order(Transplant_vs_Naive$padj), ], 5)
+```
+
+
+### Add annotation to DEG list
+
+```{r}
+# add the current gene_ids to new columns 
+
+Transplant_vs_Naive$ensembl_gene_id_version <- rownames(Transplant_vs_Naive)
+Transplant_vs_Naive$ensembl_gene_id <- rownames(Transplant_vs_Naive)
+
+Transplant_vs_Naive$ensembl_gene_id  <- gsub("\\.[0-9]+","",Transplant_vs_Naive$ensembl_gene_id)
+
+# join the DEG list and biomaRt list by "ensembl_gene_id"
+Transplant_vs_Naive_annotated <- plyr::join(as.data.frame(Transplant_vs_Naive), genemap, by = c("ensembl_gene_id"))
+
+rownames(Transplant_vs_Naive_annotated) <- Transplant_vs_Naive_annotated$ensembl_gene_id
+head(Transplant_vs_Naive_annotated, 5)
+
+```
+
+Challenge
+
+```{r}
+# make `external_gene_name` as rowname
+
+rownames(Transplant_vs_Naive_annotated) <- Transplant_vs_Naive_annotated$external_gene_name
+
+head(Transplant_vs_Naive_annotated, 5)
+```
+
+### Write files
+
+Annotated DEG list as csv file
+
+```{r}
+write.csv(Transplant_vs_Naive_annotated, file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv")
+```
+
+Annotated Normalized counts as csv file
+
+```{r}
+normalized_counts <- as.data.frame(counts(dds, normalized = TRUE))
+
+normalized_counts_annotated <- normalized_counts %>% 
+  mutate(ensembl_gene_id_version = rownames(normalized_counts),
+         ensembl_gene_id = rownames(normalized_counts)) %>%
+  mutate(ensembl_gene_id = gsub("\\.[0-9]+","",ensembl_gene_id)) %>%
+  plyr::join(., genemap, by = c("ensembl_gene_id"))
+    
+write.csv(normalized_counts_annotated, file="./results/Transplant_vs_Naive/normalized_counts.csv", row.names = FALSE)
+```
+
+### Visualize selected set of genes
+
+```{r}
+# Get top 1500 DE genes
+genes <- Transplant_vs_Naive_annotated[order(Transplant_vs_Naive_annotated$padj), ] |>
+         head(100) |>
+         rownames()
+
+heatmapData <- normalized_counts[genes, ]
+
+# Scale counts for visualization
+heatmapData <- t(scale(t(heatmapData)))
+
+# Add annotation
+heatmapColAnnot <- data.frame(colData(dds)[, "Condition"])
+heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
+                        top_annotation = heatmapColAnnot,
+                        cluster_rows = TRUE, cluster_columns = TRUE)
+
+DEG_heatmap
+```
+
+Challenge heatmap of 20 genes with gene names
+
+```{r}
+# Get top 20 DE genes
+genes <- Transplant_vs_Naive_annotated[order(Transplant_vs_Naive_annotated$padj), ] |>
+         head(20) |>
+         rownames()
+
+heatmapData <- normalized_counts[genes, ]
+
+# Scale counts for visualization
+heatmapData <- t(scale(t(heatmapData)))
+
+# Add annotation
+heatmapColAnnot <- data.frame(colData(dds)[, "Condition"])
+heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
+                        top_annotation = heatmapColAnnot,
+                        cluster_rows = TRUE, cluster_columns = TRUE)
+
+DEG_heatmap
+```
+
+### Volcano plot
+```{r fig.height=10, fig.width=10}
+EnhancedVolcano(Transplant_vs_Naive,
+                lab = Transplant_vs_Naive_annotated$external_gene_name,
+                x = 'log2FoldChange',
+                y = 'padj',
+                title = 'Transplant_vs_Naive',
+                pCutoff = 0.05,
+                FCcutoff = 1.0,
+                pointSize = 1.0,
+                labSize = 4)
+
+```
+
+### Plot gene
+
+```{r}
+plotCounts(dds, 
+           gene = "ENSMUSG00000040204.7", 
+           intgroup = "Condition",
+           normalized = TRUE)
+```
+## Glimma
+
+Glimma is an interactive R widget for creating plots for differential expression analysis, created using the Vega and htmlwidgets frameworks. The created plots can be embedded in R Markdown, or exported as standalone HTML documents.
+
+### MA Plot
+
+The MA plot is a visualization that plots the log-fold-change between experimental groups (M) against the mean expression across all the samples (A) for each gene.
+
+The Glimma MA plot contains two main components:
+
+1. a plot of summary statistics across all genes that have been tested, and
+2. a plot of gene expression from individual samples for a given gene
+
+The second plot shows gene expression from the last selected sample, which can be selected from the table or directly from the summary plot.
+
+```{r}
+glimmaMA(dds, 
+         counts = counts(dds),
+         groups = colData$Condition
+         )
+```
+
+### Saving widgets
+The plots created are automatically embedded into Rmarkdown reports, but having many interactive plots can significantly slow down the page. It is instead recommended to save the plots using htmlwidgets::saveWidget and linking to it via markdown hyperlinks.
+
+
+```{r}
+# creates ma-plot.html in working directory
+# link to it in Rmarkdown using [MA-plot](ma-plot.html)
+htmlwidgets::saveWidget(glimmaMA(dds, 
+         counts = counts(dds),
+         groups = colData$Condition
+         ), "./results/Transplant_vs_Naive/ma-plot.html")
+```
+
+## session info
+
+```{r}
+sessionInfo()
+```
