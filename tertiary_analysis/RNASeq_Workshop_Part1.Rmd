@@ -64,10 +64,6 @@ library(vsn)
 library(biomaRt)
 library(org.Mm.eg.db)
 
-# pathway analysis
-library(clusterProfiler)
-library(msigdbr)
-
 # We will need them for data handling
 library(magrittr)
 library(ggrepel)
@@ -78,8 +74,6 @@ library(readr)
 # plotting
 library(ggplot2)
 library(pheatmap)
-library(EnhancedVolcano)
-library(ComplexUpset)
 library(ComplexHeatmap)
 library(RColorBrewer)
 library(vidger)
@@ -381,6 +375,7 @@ Useful tools for interactive exploratory data analysis for RNA-seq are [Glimma](
 saveRDS(dds, file = "./results/dds.rds")
 saveRDS(vsd, file = "./results/vsd.rds")
 saveRDS(colData, file = "./results/colData.rds")
+saveRDS(txi, file = "./results/txi.rds")
 ```
 
 ## session info

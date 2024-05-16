@@ -5,13 +5,7 @@ author:
   - name: "<https://www.uab.edu/cores/ircp/bds>"
 date: |
       | Date: `r format(Sys.time(), '%B %d, %Y')`
-
-  output:
-  html_document:
-    code_folding: hide
-    css: "style.css"
-    toc: true
-    toc_float: true
+output: html_document
 ---
 
 
@@ -31,25 +25,6 @@ This data carpentry workshop materials have been borrowed from several resources
 
 We thank the curators and maintainers of all of these resources for their wonderful contributions, compiling the best practices, and easy to follow training guides for beginners. 
 
-## Install these packages
-```{r, eval=FALSE}
-install.packages(c("BiocManager", "remotes"))
-BiocManager::install(c("tidyverse", "SummarizedExperiment",
-                       "ExploreModelMatrix", "AnnotationDbi", "org.Hs.eg.db", 
-                       "org.Mm.eg.db", "csoneson/ConfoundingExplorer",
-                       "DESeq2", "vsn", "ComplexHeatmap", "hgu95av2.db",
-                       "RColorBrewer", "hexbin", "cowplot", "iSEE",
-                       "clusterProfiler", "enrichplot", "kableExtra",
-                       "msigdbr", "gplots", "ggplot2", "simplifyEnrichment",
-                       "apeglm", "microbenchmark", "Biostrings",
-                       "SingleCellExperiment"))
-
-BiocManager::install(c('edgeR','limma','tximport', 'biomaRt',
-                       'Glimma', 'GeneOverlap',
-                       'EnhancedVolcano'))
-
-BiocManager::install(c('clusterProfiler', 'ComplexUpset', 'openxlsx','ggrepel','ggpubr'))
-```
 
 # Packages loaded globabally
 
@@ -69,9 +44,6 @@ library(vsn)
 library(biomaRt)
 library(org.Mm.eg.db)
 
-# pathway analysis
-library(clusterProfiler)
-library(msigdbr)
 
 # We will need them for data handling
 library(magrittr)
@@ -104,6 +76,7 @@ dir.create("./results", recursive = TRUE)
 ```{r}
 dds <- readRDS(file = "./results/dds.rds")
 colData <- readRDS(file = "./results/colData.rds")
+txi <- readRDS(file = "./results/txi.rds")
 ```
 
 
@@ -286,7 +259,7 @@ write.csv(normalized_counts_annotated, file="./results/Transplant_vs_Naive/norma
 ```{r}
 # Get top 1500 DE genes
 genes <- Transplant_vs_Naive_annotated[order(Transplant_vs_Naive_annotated$padj), ] |>
-         head(100) |>
+         head(1500) |>
          rownames()
 
 heatmapData <- normalized_counts[genes, ]
@@ -302,12 +275,14 @@ heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
 # Plot as heatmap
 DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
                         top_annotation = heatmapColAnnot,
-                        cluster_rows = TRUE, cluster_columns = TRUE)
+                        cluster_rows = TRUE, 
+                        cluster_columns = TRUE,
+                        show_row_names = FALSE)
 
 DEG_heatmap
 ```
 
-Challenge heatmap of 20 genes with gene names
+Challenge heatmap of 20 genes with gene ids
 
 ```{r}
 # Get top 20 DE genes
@@ -328,7 +303,48 @@ heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
 # Plot as heatmap
 DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
                         top_annotation = heatmapColAnnot,
-                        cluster_rows = TRUE, cluster_columns = TRUE)
+                        cluster_rows = TRUE, 
+                        cluster_columns = TRUE,
+                        show_row_names = TRUE)
+
+DEG_heatmap
+```
+
+#### Challenges: plot by gene names
+
+```{r}
+Transplant_vs_Naive_annotated_DEGs <- Transplant_vs_Naive_annotated %>%
+    dplyr::filter(padj <= 0.05) %>% # , log2FoldChange <= -1 | log2FoldChange >= 1 THIS IS NOT FILTERED ANALYSIS
+    dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %>%
+    # Filter out the duplicated rows using `dplyr::distinct()`
+    dplyr::distinct(external_gene_name, .keep_all = TRUE)
+
+
+rownames(Transplant_vs_Naive_annotated_DEGs) <- Transplant_vs_Naive_annotated_DEGs$external_gene_name
+
+# Get top 10 DE genes
+genes <- Transplant_vs_Naive_annotated_DEGs[order(Transplant_vs_Naive_annotated_DEGs$padj), ] |>
+         head(10) |>
+         rownames()
+
+rownames(normalized_counts_annotated) <- normalized_counts_annotated$external_gene_name
+
+heatmapData <- normalized_counts[genes, ]
+
+# Scale counts for visualization
+heatmapData <- t(scale(t(heatmapData)))
+
+# Add annotation
+heatmapColAnnot <- data.frame(colData(dds)[, "Condition"])
+heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
+                        top_annotation = heatmapColAnnot,
+                        cluster_rows = TRUE, 
+                        cluster_columns = TRUE,
+                        show_row_names = TRUE)
 
 DEG_heatmap
 ```

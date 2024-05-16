@@ -24,25 +24,6 @@ This data carpentry workshop materials have been borrowed from several resources
 
 We thank the curators and maintainers of all of these resources for their wonderful contributions, compiling the best practices, and easy to follow training guides for beginners. 
 
-## Install these packages
-```{r, eval=FALSE}
-install.packages(c("BiocManager", "remotes"))
-BiocManager::install(c("tidyverse", "SummarizedExperiment",
-                       "ExploreModelMatrix", "AnnotationDbi", "org.Hs.eg.db", 
-                       "org.Mm.eg.db", "csoneson/ConfoundingExplorer",
-                       "DESeq2", "vsn", "ComplexHeatmap", "hgu95av2.db",
-                       "RColorBrewer", "hexbin", "cowplot", "iSEE",
-                       "clusterProfiler", "enrichplot", "kableExtra",
-                       "msigdbr", "gplots", "ggplot2", "simplifyEnrichment",
-                       "apeglm", "microbenchmark", "Biostrings",
-                       "SingleCellExperiment"))
-
-BiocManager::install(c('edgeR','limma','tximport', 'biomaRt',
-                       'Glimma', 'GeneOverlap',
-                       'EnhancedVolcano'))
-
-BiocManager::install(c('clusterProfiler', 'ComplexUpset', 'openxlsx','ggrepel','ggpubr'))
-```
 
 # Packages loaded globabally
 
@@ -51,12 +32,6 @@ BiocManager::install(c('clusterProfiler', 'ComplexUpset', 'openxlsx','ggrepel','
 set.seed(2020)
 
 # Required packages
-library(tximport)
-library(limma) 
-library(edgeR)
-library(DESeq2)
-library(Glimma)
-library(vsn)
 
 # Mouse annotation package we'll use for gene identifier conversion
 library(biomaRt)
@@ -75,8 +50,6 @@ library(readr)
 # plotting
 library(ggplot2)
 library(pheatmap)
-library(EnhancedVolcano)
-library(ComplexUpset)
 library(ComplexHeatmap)
 library(RColorBrewer)
 library(vidger)
@@ -123,6 +96,7 @@ GO and KEGG are the most frequently used for functional analysis. They are typic
 
 Other gene sets include but are not limited to Disease Ontology (`DO`), Disease Gene Network (`DisGeNET`), `wikiPathways`, Molecular Signatures Database (`MSigDb`).
 
+## Gene Ontology (GO)
 
 #Input DEG list
 
@@ -153,7 +127,7 @@ Check for duplicated gene_ids
 any(duplicated(Transplant_vs_Naive_annotated_DEGs$external_gene_name))
 ```
 
-# Gprofiler
+# GO by Gprofiler
 
 ## set to archive linked to Ensembl 109 version.
 
@@ -204,7 +178,7 @@ head(gost_results$result, 5)
 ```
 
 ```{r}
-publish_gosttable(gost_results, highlight_terms = gost_results$result[c(1:2,10,120),],
+publish_gosttable(gost_results, highlight_terms = gost_results$result[c(1:10),],
                         use_colors = TRUE, 
                         show_columns = c("source", "term_name", "term_size", "intersection_size"),
                         filename = NULL)
@@ -214,6 +188,8 @@ Write Gprofiler results to csv
 
 ```{r}
 go_results <- gost_results$result
+
+go_results$parents <- as.character(gost_results$result$parents)
 ```
 
 
