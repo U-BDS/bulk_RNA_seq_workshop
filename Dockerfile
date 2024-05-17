@@ -15,7 +15,3 @@ RUN R --no-restore --no-save -e "BiocManager::install(c('DESeq2', 'edgeR', 'limm
 RUN R --no-restore --no-save -e "install.packages(c('pheatmap','tidyverse', 'openxlsx', 'devtools', 'ComplexUpset', 'gprofiler2', 'readr', \
 'ggrepel', 'RColorBrewer', 'plyr', 'htmlwidgets', 'htmltools', 'kableExtra', 'devtools', 'AER', 'dendextend', 'ggpubr', \
 'rmarkdown', 'tinytex', 'markdown'))"
-
-
-# Install Github dependencies with
-#RUN R --no-restore --no-save -e "devtools::install_github('<package name>', upgrade='never')"

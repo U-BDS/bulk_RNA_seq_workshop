@@ -1,0 +1,18 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+.bash_history
+.config
+.local
+results/*
+figures/*
+packages/*
+#ignore any files not needed for the website:
+docs/src/*
+docs/data/*
+docs/results/*
+docs/figures/*
+docs/packages/*
+docs/Dockerfile
