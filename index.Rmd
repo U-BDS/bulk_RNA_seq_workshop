@@ -33,7 +33,7 @@ This workshop will cover the foundational topics and methods to bulk RNA-seq ana
 
 * Introduction to raw data management and data exploration
 * Secondary analysis with `nf-core/rnaseq`
-* Tertiary analysis topics: quality and control,data normalization and differential gene expression analysis with `DESeq2`, gene annotation, gene enrichment analysis (gene-ontology and gene set enrichment analysis)
+* Tertiary analysis topics: quality and control, data normalization and differential gene expression analysis with `DESeq2`, gene annotation, gene enrichment analysis (gene-ontology and gene set enrichment analysis)
 * Fundamentals of data visualization for transcriptomics
 
 # Authors `r fontawesome::fa("chalkboard", fill = "#295135")`
