@@ -11,18 +11,18 @@ navbar:
     href: installation.html
   - text: "secondary analysis"
     icon: fa-database
-    href: secondary_analysis.html ##TODO: likely need to also add the subdirectory here (to the Rmd for full rendering)
+    href: secondary_analysis.html
   - text: "tertiary analysis"
     icon: fa-chart-simple
     menu:
       - text: "Part 1"
-        href: RNASeq_Workshop_Part1.html
+        href: tertiary_analysis_Part1.html
       - text: "Part 2"
-        href: RNASeq_Workshop_Part2.html
+        href: tertiary_analysis_Part2.html
       - text: "Part 3"
-        href: RNASeq_Workshop_Part3.html
+        href: tertiary_analysisp_Part3.html
       - text: "Part 4"
-        href: RNASeq_Workshop_Part4.html
+        href: tertiary_analysis_Part4.html
 #  - text: "Additional resources" ## TODO
 #    icon: fa-book
 #    href: additional_resouces.html
