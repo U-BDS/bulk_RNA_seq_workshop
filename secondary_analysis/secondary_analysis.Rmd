@@ -23,7 +23,8 @@ An experiment can typically be broken down into 3 different parts:
     differ depending on what kind of analysis you are performing -
     e.g.: a single-cell analysis would need a feature-barcode matrix,
     whole genome analysis would work with variant call files. 
-    For bulk RNA-seq analyses, the quantification represents expression count files.
+    For bulk RNA-seq analyses, the quantification represents expression count 
+    files.
 
 -   **Tertiary Analysis** - Tertiary analysis takes the output from
     secondary for additional analysis, visualization and data interpretation.
@@ -118,11 +119,11 @@ is an extremely low chance and for the purposes of this course you can
 consider md5’s to be unique to a file).
 
 The reason to perform this check is often due to the fact that FASTQs are 
-uploaded and downloaded from other sources, so the md5 can be computed to determine
-if there is a potential chance for corruption during either the upload
+uploaded and downloaded from other sources, so the md5 can be computed to 
+determine if there is a potential chance for corruption during either the upload
 or download process. If the source (e.g.: sequencing core, collaborators etc.)
-does not provide any md5’s, it is worth reaching out to the source with this request.
-Once these are generated you are able to check the md5s of the
+does not provide any md5’s, it is worth reaching out to the source with this 
+request. Once these are generated you are able to check the md5s of the
 FASTQs after they‘ve been downloaded against the md5’s that the source
 generated, and ensuring these values are the same is a good way to
 ensure no corruption happened during the download process.
@@ -208,29 +209,50 @@ and removal of ribosomal rna using `SortMeRNA`.
 ### Alignment
 
 Following trimming is alignment/mapping. With RNA-seq, there is more than one
-approach to alignment, the and nf-core/rnaseq pipelines supports two methods.
+approach to alignment, the and nf-core/rnaseq pipelines supports various methods.
 
 Alignment is the process by which a read is mapped to a reference
 genome. `STAR` is considered the standard aligner for RNA-seq. The reason
 it is used over traditional mappers such as `bwa` is due to `STAR` being a
 splice aware aligner, where exon-exon junctions are taken into account at 
-the mapping stage.
+the mapping stage. `STAR` alignment outputs (BAM files) can be critical
+for use-cases where genome alignment is required such as gene fusion identification,
+or variant-calling/genome-wide/exome data integration.
 
-The second type of alignment/mapping supported is "quasi-mapping". In standard
-<!-- TODO: add reference for further reading on alingment methods/stragegies -->
-alignment you takes read and find where exactly in the reference it
-falls, including information such as how each nucleotide in the read
-matches up to the nucleotide in the reference. Pseudo alignment on the
-other hand, produces a set of sequences a read is compatible with and
-focuses on the statistics for downstream. Nf-core/rnaseq provides both
-salmon and kallisto for this purpose.
+The second type of alignment/mapping supported is "quasi-mapping"/"pseudo-alignment". 
+
+`Salmon` is a quasi-mapper which implements k-mer based indexing of the 
+transcriptome (as opposed to the genome) to perform lightweight mapping to the 
+reference. Similarly, `kallisto` also implements k-mer indexing of the
+transcriptome, but  processes the reads without mapping, and instead identifies 
+k-mers within the reads which are compatible and shared to the index. 
+Thus, a key difference between the tools is that pseudo-alignment relies on 
+shared k-mers between the reference and the reads, while quasi-mapping 
+implements efficient lightweight mapping using the k-mer indexed reference.
+
+Lastly, `Salmon` and `kallisto` are computationally efficient, leading to rapid
+mapping with low memory use.
 
 ### Counting
 
-Once the reads have been aligned, the alignments (or pseudo-alignments)
-are turned into counts files. This step produces an output containing a
-list of features and how many reads are estimated to be apart of that
-feature
+Feature (gene or transcript) quantification is typically the last analytical step
+of an RNA-seq pipeline. Importantly, the outputs of `Salmon` and `kallisto` 
+are quantified counts, as opposed to `STAR` which are mapped data (BAM files),
+where an additional quantification tools is required. 
+In the nf-core/rnaseq pipeline `Salmon` is implemented as the read quantifier
+from a `STAR` alignment.
+
+The count outputs format typically contains a list of features as rows and 
+their relative abundance as columns for each sample.
+
+___
+
+As discussed earlier, the pipeline we will cover also contains several additional
+steps for QC and optional steps dependent on design or analytical needs. The
+primary steps covered in the sections above are the required analytical steps
+across all bulk RNA-seq analysis.
+
+___
 
 ## Executing the nf-core/rnaseq Pipeline
 
@@ -238,47 +260,54 @@ feature
 
 Due to the amount of steps this analysis uses, it is written using a
 workflow management system (or workflow manager) known as Nextflow.
-Workflow management systems allow for the chaining together of tools and
-abstract out and inherently support some of the common checks that a
+Workflow management systems allow for the chaining together of tools
+and inherently support some of the common checks that a
 developer would have to program in, such as checking if a file exists,
 moving output files to a central location, and logging information.
 Workflow management systems are also useful as they natively support
-parallelization, portability, and reproducibility. There are other
-workflow languages such as Snakemake or WDL.
+parallelization, portability, scalability and reproducibility. 
+There are other workflow languages such as Snakemake or WDL.
 
 Nextflow is built on top of a programming language known as Groovy. The
 specifics of Groovy are not necessarily important for the lesson, but if
-anyone wishes to develop pipelines using nextflow it will be relevant.
+anyone wishes to develop pipelines using Nextflow it will be relevant.
 
 Nf-core is a community-led effort to curate and develop a set of
 analysis pipelines using Nextflow. All pipelines published as part of
 nf-core are open source and there are a wide range of pipelines
-published currently supporting analyses such as single-cell or atacseq.
+published currently supporting analyses such as single-cell or ATAC-seq.
 The community itself is not specifically limited to bioinformatics, but
-most pipelines published so far have all been within that field. The
-other thing to note is that the nf-core team has published a lot of
+most pipelines published so far have all been within that field. One point to
+be noted, is that the nf-core team has published a lot of
 standards and tools to create a styling guidelines, and that any
-nextflow pipeline is able to use these standards and tools even if they
-do not wish to publish as part of nf-core.
+Nextflow pipeline is able to use these standards and tools even if they
+do not wish to publish as part of nf-core. To view a list of all pipelines
+(released and in development), please visit <https://nf-co.re/pipelines>.
 
 ### Testing the Pipeline
 
-So we’ll start off by logging in the cluster. One important thing to do
-when trying a new pipeline or tool is to always run through the test
-data. Nf-core requires all pipelines to have downsampled data to be able
+We will be using UAB's HPC cluster to demonstrate the nf-core/rnaseq pipeline,
+since most common use-cases require resources that may not be readily
+available in local computers. Thus as a first step, we will logging in the cluster. 
+
+Importantly, when implementing a novel pipeline or tool, it is critical to 
+always test the pipeline to ensure that it is installed and working properly. 
+Nf-core requires all pipelines to have downsampled data to be able
 to run a test profile.
+
+Login to the cluster:
 
 ```         
 ssh <blazer_id>@cheaha.rc.uab.edu
 ```
 
-In order to run the pipeline with test, we’ll use the following command:
+In order to run the pipeline with test data, we’ll use the following command:
 
 ```         
 nextflow run nf-core/rnaseq -profile test,cheaha -r 3.14.0 --outdir output
 ```
 
-Breaking the command down:
+Breaking the Nextflow command down:
 
 -   `nextflow run` is how to run any nextflow pipeline. nf-core/rnaseq
     tells which nf-core pipeline to run, if we were running a
@@ -286,17 +315,19 @@ Breaking the command down:
 
 -   `-profile test, cheaha` : Profiles can be thought of as presets for
     a pipeline. The pipeline comes with a lot of defaults, but the
-    profiles provide additional defaults for the pipeline. The ‘test’
+    profiles provide additional defaults for the pipeline. The `test`
     profile tells the pipeline that we are going to use the test data
-    for the pipeline. The ‘cheaha’ profile is what called an
-    institutional profile, the one for use at UAB is ‘cheaha’, but there
+    for the pipeline. The `cheaha` profile is what is called an
+    institutional profile, and the one for use at UAB is `cheaha`. But there
     are also other institutions and you are able to create your own if
-    one doesn’t already exist. The one thing to note is that if you pass
-    in multiple profiles, the last one takes precedence.
+    one doesn’t already exist. One point to note is that if you pass
+    in multiple profiles corresponding to the same pipeline parameters,
+    the last one takes precedence.
 
 -   The `-r` specifies a version of the pipeline to use. This is an
     important parameter for reproducibility as we can force rnaseq to
-    run at a specific version.
+    run at a specific version. If you do not use this parameter, the
+    pipeline will default to the latest version.
 
 -   `--outdir output` With this flag we are noting where the pipeline
     needs to place all the output files, in this case it will be a
@@ -312,7 +343,7 @@ conclude the pipeline has been downloaded successfully.
 
 ### Understanding the Dataset
 
-So lets start moving to actual data. In order to run the data, its
+Let's start moving to actual data. In order to run the data, it's
 important to understand the data a little more before proceeding.
 
 The data comes from the following paper:
@@ -324,20 +355,20 @@ hours past transplant, and 4 from 24 hours past transplant. For this
 workshop, we will only be concerned with the controls and the 24 hour
 samples. We will be using the results from a pipeline run that contained
 only these samples for the tertiary portion, and will be reviewing the
-reports for later in this portion of the lesson. In addition we are
+reports for later in this portion of the lesson. In addition, we are
 going to run down sampled versions of the data for testing purposes, but
 the steps we will follow will be largely applicable to the full dataset.
 
-Another thing to note is the paper we are obtaining the data from is a
-beginner’s guide for rnaseq published about 10 years ago. If anyone has
-gone through the paper, you will notice that there are some differences
+Another point to note is that the paper we are obtaining the data from is a
+beginner’s guide for RNA-seq published about 10 years ago. Given the timeline,
+you will note that are some differences
 from the analysis that was done for the paper versus the analysis done
 today. The reason is a lot of the tools used by the paper are considered
-outdated or have been phased out of the field. Bioinformatics as a whole
-is a very fast moving field, and it is very important to ensure that all
-analyses are using correct and modern approaches because it will come
-up. So always take the chance to make sure that the tools you use are
-still being used in more recent papers.
+outdated or have been phased out of the field. Bioinformatics and 
+computational biology are fast-paced domains. Thus, it is important to ensure 
+that all analyses are using correct and modern approaches. In summary, always 
+ensure that the tools and pipelines you apply to your analysis are up to date to 
+what is considered best practice in the RNA-seq domain.
 
 ### Creating the Samplesheet
 
@@ -347,7 +378,17 @@ format of which can be seen here:
 
 <https://nf-co.re/rnaseq/3.14.0/docs/usage>
 
-So let’s start by making a samplesheet.csv. For the workshop, we’ll use
+First, let's go to the directory where we downloaded the raw data using
+Globus (in the cheaha scratch space):
+
+```
+cd $USER_SCRATCH/rnaseq_workshop
+```
+
+Now that we are in our working directory, let’s start by making a samplesheet.csv. 
+
+<!-- See issue #3 with vim -->
+For the workshop, we’ll use
 vim. And we'll go ahead and enter the header
 
 ```         
@@ -370,10 +411,10 @@ That will output all the FASTQs we will be working with. Lets redirect
 the output to the end of the samplesheet
 
 ```         
-For file in input/downsample/*.fastq.gz; do echo $file; done >> samplesheet.csv
+for file in input/downsample/*.fastq.gz; do echo $file; done >> samplesheet.csv
 ```
 
-So open up the samplesheet again. So there’s currently a header and a
+Open up the samplesheet again. You will see the header and a
 list of FASTQs. To start modifying it, a sample name needs to be added
 with some additional commas.
 
@@ -401,16 +442,17 @@ The parameter options for an nf-core can be found on the pipeline
 website, for rnaseq its available here:
 <https://nf-co.re/rnaseq/3.14.0/parameters>
 
-There are a lot of options, its very rare that you will need all of
-these. But these range from everything from required inputs to which
-steps to run in the pipeline. It is encouraged to read through this when
-doing your own analysis to see if there are any flags that may apply, as
+While there are a lot of options, it's very rare that you will need all of
+these as the pipeline authors have set sensible parameters.
+But these range from everything - from required inputs to which
+steps to run in the pipeline. It is **heavily encouraged** to read through this when
+doing your own analysis to evaluate if there are any flags that may apply, as
 well as to note the default flag values as these can have notable impact
 on analyses.
 
 Parameters are able to be passed as flags to the command line or via a
 yaml file. For the workshop, we will use the yaml option in order to
-keep the command a little clean.
+keep the pipeline execution command more straight-forward.
 
 Open up a file called params.yml using vim
 
@@ -424,7 +466,7 @@ email: "atrull@uab.edu"
 multiqc_title: "rnaseq_workshop"
 ```
 
-So the first things to add are our email and the title, we’ll get an
+The first parameters to add are our email and the title. We’ll get an
 email anytime the pipeline fails or succeeds.
 
 ```         
@@ -441,9 +483,11 @@ Next we’ll provide the required parameters. `input` is the path to the
 samplesheet. `fasta` and `gtf` are the paths to the FASTA and GTF files
 to be used for the analysis. Note that these can be obtained from the
 GENCODE website at <https://www.gencodegenes.org/>. For genomes not
-available you can also find reference files at the ensembl website
+available you can also find reference files at the Ensembl website
 <https://useast.ensembl.org/index.html>. If you use GENCODE reference
-files, be sure to set the `gencode` parameter to true.
+files, be sure to set the `gencode` parameter to `true`. For this workshop 
+we have provided the GENCODE reference (version M32) in the data
+downloaded from Globus (`reference` folder).
 
 ```         
 # Read Trimming Options
@@ -451,12 +495,12 @@ trimmer: "trimgalore"
 extra_trimgalore_args: "--illumina"
 ```
 
-We are going to use trimgalore for the trimmer. RNASeq also provides
-fastp as an option. Neither one of these is necessarily better than the
-other, trim_galore provides a wrapper around an older tool called
-cutadapt and FASTQC. Trim_galore will try to guess the adapters it needs
+We are going to use `trim_galore` for the trimmer. The pipeline also provides
+`fastp` as an option. Neither one of these is necessarily better than the
+other, `trim_galore` provides a wrapper around an older tool called
+`cutadapt` and `FASTQC.` Trim_galore will try to guess the adapters it needs
 to cut, you can limit this by passing certain parameters. This dataset
-uses the illumina default adapters, so the “--illumina” flag needs to be
+uses the illumina default adapters, so the `--illumina` flag needs to be
 passed to the tool.
 
 ```         
@@ -465,15 +509,15 @@ aligner: "star_salmon"
 pseudo_aligner: "salmon"
 ```
 
-The aligner we use is “star_salmon”. For rnaseq, this means STAR will be
-the aligner and Salmon will be used for quantification. We also instruct
-the pipeline to produce pseudo aligments with Salmon. There's no good
-rule of thumb about when to use STAR mappings over Salmon mappings, as
-it is highly depending on the design of the experiment. For example, if
-you also have genome data being processed you may want to use the STAR
-results as its easier to map the alignments back due to Salmon not
-producing a bam file. We typically execute the pipeline so that both
-types of aligners are run (as demonstrated above), that way the
+The aligner we use is `star_salmon`. For rnaseq, this means `STAR` will be
+the aligner and `Salmon` will be used for quantification. We also instruct
+the pipeline to produce pseudo aligments with `Salmon`. The choice of which to
+use for your analysis is dependent on factors including experimental
+design, and resource limitations. As previously discussed,
+if you also have genome data being processed you may want to use the `STAR`
+(followed by `Salmon` quantification), since it outputs genomic mapping data. 
+We typically execute the pipeline so that both
+types of aligners are executed (as demonstrated above). This way, the
 situation never arises where the pipeline needs to be rerun just to
 generate the files from the opposite aligner.
 
@@ -490,16 +534,21 @@ We'll also add this parameters for the run.
 
 ### Additional Customization
 
-Parameters are very useful, but can only get so far. An additional route
-of customization is to use the custom configuration files implemented
-within nextflow. Custom configs allow customization of everything from
+Pipeline parameters are very useful, but can only get so far. An additional route
+of customization is to use the custom configuration ("configs") files implemented
+within Nextflow. Custom configs allow customization of everything from
 resource allocations to addition of parameters to specific tools in the
 pipeline.
 
-Lets start by changing the queue. The cheaha profile will pick a queue
+Lets start by changing the queue in a file called `custom.conf`.
+The `cheaha` profile will pick a queue
 based on the profile defaults. Since we’re using donwsampled data,
 everything will run very quickly, in order to facilitate that we’ll make
-it so the default queue is 'express'.
+it so the default queue is 'express':
+
+```         
+vim custom.conf
+```
 
 ```         
 process {
@@ -513,16 +562,17 @@ users can group settings so they apply to specific pieces of the
 pipeline.
 
 The above lines of code set the executor to be slurm, and set the queue
-so that all jobs will be submitted to the 'express' partition on cheaha
+so that all jobs will be submitted to the `express` partition on cheaha
 
 Another item that can be configured via this method is adding parameters
 to specific tools in the pipeline. In order to do that, you will need to
 find the module. For this example, let’s modify the Salmon script. There
-is a way to do this via the pipeline parameters, however, its also a
-great way to show custom configs.
+is a way to do this via the pipeline parameters (with the 
+`extra_salmon_quant_args` parameter), however, this is a good opportunity
+to show custom configuration to pipeline tools.
 
-The first step to do that is to find the name of the process. To do
-that, its important to understand the nf-core directory structure a
+The first step to do that is to find the name of the process. For this step,
+it's important to understand the nf-core directory structure a
 little better. Let’s start by changing into the rnaseq directory that
 was downloaded when the test command was executed.
 
@@ -530,12 +580,20 @@ was downloaded when the test command was executed.
 cd ~/.nextflow/assets/nf-core/rnaseq/
 ```
 
+The directory above contains the copy of the pipeline source code matching
+the version which we specified in the run. This can also be found in GitHub 
+noting that the following links to the same pipeline version used here:
+<https://github.com/nf-core/rnaseq/tree/3.14.0>.
+
+For the purpose of this workshop, we will explore some of the source code from
+our local copy.
+
 There’s a lot of files and directories in here, breaking down the
 directories one at a time:
 
 -   `assets` - Contains images and tool-specfic files
 
--   `bin` -Contains scripts used by the pipeline
+-   `bin` - Contains scripts used by the pipeline
 
 -   `conf` - Contains pipeline configuration files
 
@@ -572,23 +630,23 @@ OR
 grep -rl "salmon" modules/
 ```
 
-The ‘find’ command assumes that there is a file or directory that is
+The `find` command assumes that there is a file or directory that is
 named like the tool, this isn’t always the case so the grep can help in
 the cases where find fails to find anything.
 
 We can see that the salmon module is located at
-`modules/nf-core/salmon/quant`. So lets open up the process file.
+`modules/nf-core/salmon/quant`. Let's open up the process file:
 
 ```         
 vim modules/nf-core/salmon/quant/main.nf
 ```
 
 The name of the process is at the very top of the file, which is what we
-need. Feel free to explore this, but a lot of this nextflow syntax.
+need. Feel free to explore this, but a lot of this is Nextflow syntax.
 Special attention should be paid to the command for the tool which is
 located towards the bottom of the file.
 
-So with the name of the process, let’s go back and open up the custom
+With the name of the process, let’s go back and open up the custom
 configuration file and add the below lines.
 
 ```         
@@ -602,17 +660,18 @@ withName: ‘.*:SALMON_QUANT’{
 }
 ```
 
-So what the lines will do is when salmon is ran, two additional flags
-will be added. The flags themselves tell salmon to correct for gc and
+With this customization, Nextflow will add the two additional flags.
+The flags themselves tell `Salmon` to correct for gc and
 sequence bias. We use `withName` to limit the additions to only the
-salmon process, we don’t want to run it for everything. Since `withName`
-respects regular expressions we use the .\* to act as a catchall for all
+salmon process, as opposed to all other tools. Since `withName`
+respects regular expressions we use the `.*` to act as a catchall for all
 salmon jobs.
 
 There are additional ways you can use this config, controlling whether
-nextflow processes are run with Singularity or Docker, further
+Nextflow processes are run with Singularity or Docker, further
 configurations with processes such as controlling memory or cpus making
-this method a very powerful tool for modifying a pipeline.
+this method a very powerful tool for modifying a pipeline without 
+changing the source code (this is known as modularity).
 
 ### Submitting the pipeline
 
@@ -628,6 +687,13 @@ nextflow run nf-core/rnaseq \
     -c custom.conf
 ```
 
+<!-- TODO: Add a challenge question here asking (to be verbablly solved in class -->
+<!-- but not submitted): -->
+
+<!-- * What would you need to modify to run this job on the full dataset -->
+<!-- * Show solutions by providing all materials needed, highlighting the only -->
+<!-- differences as: 1. samplesheet changes 2. removal of the partition customization -->
+
 ## Reviewing Pipeline Results
 
 ### Pipeline Metrics
@@ -637,14 +703,14 @@ directory that contains the metrics and statistics for the jobs the
 pipeline submitted to the cluster. We are going to review the report and
 timeline files.
 
-![Example snippet from the report](imgs/report.png)
+![](imgs/report.png)
 
 The report file provides details on the resource and timings for each
 process that was executed as part of the pipeline. This is useful in
 helping to narrow down jobs with high memory usage for optimization
 purposes.
 
-![Example snippet from the timeline](imgs/timeline.png)
+![](imgs/timeline.png)
 
 The timeline file provides a detailed timeline noting when each process
 was executed. This is especially useful in being able to estimate how
@@ -652,8 +718,8 @@ long a pipeline may take and to identify long running tools.
 
 ### Secondary Outputs
 
-The rnaseq pipeline produces a lot of output files. A lot of the output
-is for qc and general review of the pipeline user. Due to the amount of
+The rnaseq pipeline produces a lot of output files. Many of them are
+for qc and general review of the pipeline user. Due to the amount of
 files, we will only go over some of the more commonly used files in this
 workshop, but note that this pipeline (along with other nf-core
 pipelines) have dedicated documentation for noting the various output
@@ -665,12 +731,17 @@ be found [here](https://nf-co.re/rnaseq/3.14.0/docs/output).
 The first point of review for the pipeline is the multiqc report.
 MultiQC is a very useful tool that aggregates a number of different
 tools into a single report, providing a quick way of reviewing the
-quality of the data and determine any potential concerns about the data.
+quality of the data to determine if there are any potential concerns.
 
-The first table in the multiqc report is the General Statistics Table.
+The first table in the multiqc report is the "General Statistics Table".
 This provides a high level overview of various metrics, from read counts
-in the bam to read counts in the FASTQ. Its a lot of statistics, but can
-be good to see if there are any large amount of filtering to occur.
+in the BAM to read counts in the FASTQ. It's a lot of metrics, but this is
+useful in the accessing if a large amount of data filtration occur. This is 
+also a good place to check if the samples have sufficient sequencing depth.
+Standard mRNA-sequencing typically requires an average of ~25M reads. This 
+requirement increases for whole-transcriptome (where other RNA species
+are also quantified). For more reading abour sequencing depth consideration,
+please visit [this Illumina resource](https://knowledge.illumina.com/library-preparation/rna-library-prep/library-preparation-rna-library-prep-reference_material-list/000001243).
 
 ![](imgs/multiqc_1.png)
 
@@ -687,7 +758,7 @@ are similar to each other to indicate that.
 
 The next three qc reports are very useful for rnaseq. We expect these
 reads to be from exonic, protein coding regions. These QC's act as good
-sanity checks that our data matches our assumptions
+sanity checks that our data matches our assumptions.
 
 ![](imgs/multiqc_6.png)
 
@@ -695,15 +766,15 @@ sanity checks that our data matches our assumptions
 
 ![](imgs/multiqc_8.png)
 
-RSEQc is tool with a lot of qc's within. In addition to the above, it
-also lets us check for duplication levels. The image below is indicative
-of a good 'normal' plot for this metric.
+`RSeQC` is tool with a lot of quality-control for RNA-seq data. 
+In addition to the above, it also lets us check for duplication levels.
+The image below is indicative of a good 'normal' plot for this metric.
 
 ![](imgs/multiqc_9.png)
 
-There are a couple variations of bam metrics. Samtools is a common tool
-with a number of subtools that provide useful metrics for your bam. The
-key things to look for are mapping rates, unique mappings, (and properly
+There are a couple variations of BAM metrics. `SAMtools` is a common tool
+with a number of subtools that provide useful metrics for your BAM. The
+key points to look for are mapping rates, unique mappings, (and properly
 paired in the case of paired FASTQs) as those are expected to be high
 regardless of dataset, though the degree varies based on species.
 
@@ -725,24 +796,30 @@ count chart can be very useful for ensuring no sample swap has occurred.
 
 ![](imgs/multiqc_17.png)
 
-In addition to samtools, STAR provides its own versions. We again are
+In addition to `SAMtools`, `STAR` provides its own versions. We again are
 looking for high unique mappings. Multi mapped regions are okay though,
 we just need to make sure they are not the overwhelming majority.
 
 ![](imgs/multiqc_18_true.png)
 
-FastQC is a very common tool used for providing metrics for FASTQ files.
-There is also a FastQC report that gets generated, but its on a
+`FastQC` is a very common tool used for providing metrics for FASTQ files.
+There is also a `FastQC` report that gets generated, but its on a
 per-sample basis and as a result does not aggreate the results like in
 MultiQC.
+
+We also note that the `FastQC` plot below also qc duplicate rates from the
+raw data. Bear in mind unless the RNA-seq library preparation protocol implements
+UMI-tagging, duplicates cannot be removed from RNA-seq data (as it is not
+possible to differentiate technical/artifact duplicates from biological duplicates
+derived from the high abundance of RNA molecules / expression.
 
 ![](imgs/multiqc_19.png)
 
 For short read data, we expect the mean quality score to remain well in
-the green section. But its important to note that there are quality
+the green section. But it's important to note that there are quality
 drops at the start and end of the read and this is a result of the
-technology, its normally recommended to trim off the beginning and ends
-as a result.
+technology, and that any low quality reads (based on trimming parameters)
+are removing at the trimming step.
 
 ![](imgs/multiqc_20.png)
 
@@ -753,7 +830,7 @@ any potential issue with the FASTQ. You'll again notice there are issues
 at the start and end of the reads and its universal across samples.
 Clicking each row provides a better view of which base is the strongest.
 This is again pretty expected for reasons mentioned earlier, but always
-worth investigating
+worth investigating.
 
 ![](imgs/multiqc_22.png)
 
@@ -766,8 +843,7 @@ indicate species contamination.
 
 Per Base N Content indicates how many 'N's' were detected in the
 dataset. N's mean the base was unable to be determined, and high levels
-could indicate a potential sequencer error and mean the current data is
-unusable.
+could indicate a potentially significant sequencer error.
 
 ![](imgs/multiqc_25.png)
 
@@ -776,13 +852,20 @@ unusable.
 ![](imgs/multiqc_27.png)
 
 We expect a level of adapters in our data, however note that this is pre
-trimming so this should mostly be clipped out at that step.
+trimmed figure, and that they are removed at the trimming step.
 
 ![](imgs/multiqc_28.png)
 
 Finally there are the pipeline data. Just below the citations, are the
-tool versions. This is useful to know when trying to reproduce analyses
-as you will want to match the versions perfectly.
+tool versions. This is useful for manuscript writing, and for reporting tool-specific
+versions (along with the rnaseq pipeline version). It is also critical to cite
+the pipeline, the nf-core community and the tools' developers at the writing stage 
+(many of these tools have published papers available for citation). 
+
+All nf-core  pipelines contain a `CITATION.md` document listing 
+all tools and proper citation. The `README.md` file contains the method to cite
+the pipeline.
+
 
 ![](imgs/multiqc_30.png)
 
@@ -791,7 +874,7 @@ during the analysis.
 
 ![](imgs/multiqc_31.png)
 
-#### Files for Tertiary
+#### Files for Tertiary Analysis
 
 Due to the way we configured the rnaseq pipeline, there are two set of
 files we can use for tertiary analysis. While we only need to choose one
@@ -805,14 +888,12 @@ quantifying using Salmon.
 
 ##### Salmon Results
 
-The `salmon` results are produced by performing pseudoalignment using
-Salmon. This method will NOT produce any alignment files. This is the
-case of all pseudoalignment tools as such tools do not produce
-alignments, only statistical count files.
+The `salmon` results are produced by performing quasi-mapping using
+`Salmon`. This method will NOT produce any alignment files as discussed earlier.
 
 ### Troubleshooting Nextflow Pipelines
 
-Another useful skill when running nextflow pipelines is the ability to
+Another useful skill when running Nextflow pipelines is the ability to
 troubleshoot pipelines.
 
 We've reviewed the results, but we are still unsure if the arguments we
@@ -832,7 +913,7 @@ number of directories that we don't know what they are for. Nextflow
 hashes all of its processes for memory's sake, however it makes it much
 harder for us to locate information on individual processes.
 
-In order to find our command, we'll need to use the nextflow log command
+In order to find our command, we'll need to use the Nextflow log command:
 
 ```         
 nextflow log
@@ -845,7 +926,7 @@ and even the command that was used to execute the pipeline.
 Its also important to note the output are ordered such that newer runs
 are at the bottom of the list and older runs are at the top. Our test
 run should be the last item in the list (or the only item in the list in
-the case its the only entry).
+the case it's the only entry).
 
 > Discussion Question
 >
@@ -855,14 +936,14 @@ the case its the only entry).
 >
 > `It looks like no pipeline was executed in this folder (or execution history is empty)`
 >
-> The nextflow log command uses a hidden folder called `.nextflow`. This
+> The Nextflow log command uses a hidden folder called `.nextflow`. This
 > directory contains the information for all nextflow runs that have
 > bene executed within that directory. As a result, `nextflow log` is
 > only useful in locations where there have been nextflow runs.
 
-In order to continue, we'll need to obtain the run name for our nextflow
-run. Run names are in the third column of the nextflow log output, and
-for our run it will be in the last row in the output of nextflow log.
+In order to continue, we'll need to obtain the run name for our Nextflow
+run. Run names are in the third column of the Nextflow log output, and
+for our run it will be in the last row in the output of Nextflow log.
 The run name is a randomly generated phrase of two words separated by an
 underscore. For the sake of simplicity, I'll be using the name of my run
 (`thirsty_heisenberg`) in the examples below, but just note that your
@@ -873,7 +954,7 @@ of mine when running the below commands.
 nextflow log thirsty_heisenberg
 ```
 
-This time when we run the nextflow log command, we receive a list of
+This time when we run the Nextflow log command, we receive a list of
 file paths. These paths are the work directories used by the pipeline,
 but they don't really mean anything to us as we still don't know what
 they mean.
@@ -882,7 +963,7 @@ they mean.
 nextflow log thirsty_heisenberg -l
 ```
 
-We need to configure the columns produced by our nextflow line, by
+We need to configure the columns produced by our Nextflow line, by
 running the same command with the `-l` flag we will produce all the
 column names the tool will produce. We are wanting to find the
 `SALMON_QUANT` process and its command, so we'll want the `name` and
@@ -895,7 +976,7 @@ nextflow log thirsty_heisenberg -f name,script
 This produces a lot of output, we can see that it has changed to contain
 the process name and a series of bash commands. However it is a lot to
 go through when we only care about a single process. So let's filter
-down the output
+down the output:
 
 ```         
 nextflow log thirsty_heisenberg -f name,script -filter 'name =~ ".*SALMON_QUANT.*"' 
@@ -923,3 +1004,7 @@ better:
 
 Running this yields a number of results, but we are able to now validate
 that we do see the `--gcBias --seqBias` being added to all commands.
+
+Lastly, the various `work` directories are also useful for troubleshooting the pipeline
+as they contain other "hidden" files (files starting with a `.`) and logs that
+are useful for the the troubleshooting process.
