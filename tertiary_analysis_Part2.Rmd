@@ -1,14 +1,6 @@
 ---
-title: "RNASeq_Workshop_part2"
-author: 
-  - name: "Bharat Mishra, Ph.D | bharat26@uab.edu | Senior Bioinformatician"
-  - name: "<https://www.uab.edu/cores/ircp/bds>"
-date: |
-      | Date: `r format(Sys.time(), '%B %d, %Y')`
-output: html_document
+title: "RNASeq Tertiary Analysis: Part 2"
 ---
-
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

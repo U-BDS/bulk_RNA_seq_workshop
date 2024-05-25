@@ -6,6 +6,8 @@
 .bash_history
 .config
 .local
+.sh_history
+.cache
 results/*
 figures/*
 packages/*

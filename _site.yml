@@ -16,7 +16,7 @@ navbar:
     icon: fa-chart-simple
     menu:
       - text: "Part 1"
-#        href: tertiary_analysis_Part1.html
+        href: tertiary_analysis_Part1.html
       - text: "Part 2"
 #        href: tertiary_analysis_Part2.html
       - text: "Part 3"
