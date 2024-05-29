@@ -1,5 +1,6 @@
 ---
 title: "Installation instructions"
+author: "Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D."
 ---
 
 To participate in the workshop, you will need access to the software as described below.

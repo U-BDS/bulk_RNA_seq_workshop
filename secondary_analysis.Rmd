@@ -1,5 +1,6 @@
 ---
 title: "RNASeq Secondary Analysis"
+author: "Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D."
 ---
 
 # Introduction to Secondary Analysis

@@ -1,5 +1,6 @@
 ---
 title: "RNASeq Tertiary Analysis: Part 2"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
 
 ```{r setup, include=FALSE}
@@ -42,12 +43,6 @@ library(RColorBrewer)
 #library(vidger) # needs fix in container
 ```
 
-### Create `data` and `results` directory
-
-```{r warning=FALSE}
-dir.create("./data", recursive = TRUE)
-dir.create("./results", recursive = TRUE) 
-```
 
 # Differential expression analysis
 

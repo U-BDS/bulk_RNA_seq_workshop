@@ -1,5 +1,6 @@
 ---
 title: "RNASeq Tertiary Analysis: Part 1"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
 
 

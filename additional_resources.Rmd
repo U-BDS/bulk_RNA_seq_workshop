@@ -1,91 +1,75 @@
 ---
-title: "RNASeq_Workshop_Additional_Resources"
-author: 
-  - name: "Bharat Mishra, Ph.D | bharat26@uab.edu | Senior Bioinformatician"
-  - name: "<https://www.uab.edu/cores/ircp/bds>"
-date: |
-      | Date: `r format(Sys.time(), '%B %d, %Y')`
-output: html_document
+title: "RNASeq: Additional resources"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Note
+# Complex designs
 
-This data carpentry workshop materials have been borrowed from several resources including:
-1. https://carpentries-incubator.github.io/bioc-rnaseq/index.html
-2. https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
-3. https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html
-4. https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html
-5. U-BDS Team.
+`DESeq2` also allows for the analysis of complex designs. We heavily encourage trainees 
+to read the entire `DESeq2` vignette to learn more:
 
-## Complex designs
+https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
 
-DESeq2 also allows for the analysis of complex designs. You can explore interactions or ‘the difference of differences’ by specifying for it in the design formula. For example, if you wanted to explore the effect of sex on the treatment effect, you could specify for it in the design formula as follows:
-
-### Sample meta data 
-
-```{r}
-colData <- read.csv("./data/ColData_complex.csv",header=TRUE, row.names=1)
-colData
-str(colData)
-
-# change the condition, group, Time, and Sex to factor
-
-colData$Condition <- as.factor(colData$Condition)
-colData$Group <- as.factor(colData$Group)
-colData$Time <- as.factor(colData$Time)
-colData$Sex <- as.factor(colData$Sex)
-colData
-```
-
-
-```{r}
-# previous tximport dds generation
-
-# dds <- DESeqDataSetFromTximport(txi,
-#                                 colData = colData,
-#                                 design = ~ Condition) # update the design as needed
+Briefly, a few examples may include the need to control for variables, such as
+a batch effect or biological variable (e.g.: sex, age etc.). The standard process
+through which this can be performed in `DESeq2` is by including the additional
+variable(s) as part of the design. For example, the following design would test
+for differences in a variable called `condition`, while controlling for `batch`.
 
 ```
-
-```{r}
-design = ~ Sex + Condition
+design= ~ batch + condition
 ```
 
 Note: Does the order of variables matter?
 
-In short, the order of variables in your design formula will not change the final results (i.e. the coefficients returned are the always the same). Typically, it has been best practice to list the variable that is your main effect in the last position of your design formula. In this way, the default result that is returned to you when using the results() function will be for your main effect.
-
-
-```{r}
-# design changed tximport dds generation
-
-dds <- DESeqDataSetFromTximport(txi,
-                                colData = colData,
-                                design = ~ Sex + Condition) # update the design as needed
-```
-
-## Interactions
-Interaction terms can be added to the design formula, in order to test, for example, if the log2 fold change attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
-
-Adding interactions to the design: The following two plots diagram genotype-specific condition effects, which could be modeled with interaction terms by using a design of `~genotype + condition + genotype:condition`.
-
-The key point to remember about designs with interaction terms is that, unlike for a design `~genotype + condition`, where the condition effect represents the overall effect controlling for differences due to `genotype`, by adding `genotype:condition`, the main condition effect only represents the effect of condition for the reference level of genotype (whichever level was defined by the user as the reference level).
+The best practice for `DESeq2` is to add your variable of interest (to be tested
+for DEG analysis), at the last position in the design (as shown in the example
+above). This order aids in ensuring that default results are pulled from the variable of interest.
 
 ## Time-series experiments
-DESeq2 can be used to analyze time course experiments, for example to find those genes that react in a condition-specific manner over time, compared to a set of baseline samples. An example of analysis is provided in RNA-seq workflow (https://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#time-course-experiments:~:text=9-,Time%20course%20experiments,-DESeq2%20can%20be).
 
-## Other complicated designs
 
-For other complicated design experiments, we recommend `Limma` workflow which can easily handle
+`DESeq2` can be used to analyze time course experiments. [This workflow is a great
+introduction for this type of analysis](https://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#time-course-experiments:~:text=9-,Time%20course%20experiments,-DESeq2%20can%20be).
 
-. Random effects
-. Batch effects
-. Factorial designs
-. Other complex designs
+## Other complex designs
 
-The detailed documentation of `limma` can be found at http://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf.
+While `DESeq2` is a great tool for many RNA-seq analysis, it also has its limitations.
+*One particular limitation to be aware of is that it does not support differential
+expression analysis with random effects*. A great resource for this type of analysis,
+is `limma` (specifically `limma-voom`). While the `limma` vignette can be quite large
+due to its historical role in microarray data, it's well organized and searchable to 
+direct users to RNA-seq data and it's `limma-voom` approach.
+
+See more at: http://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf
+
+# Environment reproducibility
+
+As discussed, secondary analysis with nf-core pipelines already implement what is known as 
+software containers (Docker, Singularity), however tertiary analysis and visualization 
+requires users to build their own custom containers. 
+This can be a critical step in aiding your analysis to be portable and reproducible.
+
+Unfortunately, due to time limitations and workshop scope, we are unable to
+demonstrate how to build your own containers. To learn more about Docker and
+Singularity containers, we encourage all trainees to visit our training website
+for a detailed 3-part tutorial in the "Intro to Docker with RStudio" tab from 
+<https://u-bds.github.io/training_guides/>.
+
+# U-BDS Data Science Office hours
+
+If you have follow-up questions about this workshop or any other data science
+topic which cover domain that U-BDS cover, please attend our office hours.
+
+It is every Thursday from 1:30pm-2:00. The registration link can be found
+[here](https://uab.zoom.us/meeting/register/tZ0rduCuqzotGtHShsawHLyRROqH3Sdz71mf#/registration).
+
+# U-BDS services
+
+If you would like to learn more about the core services please visit our main 
+UAB webpage at: <https://www.uab.edu/cores/ircp/bds>. If you would like to have
+a consultation, please fill out the "Enquiry Form" present on the website.
