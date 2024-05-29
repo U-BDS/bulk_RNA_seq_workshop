@@ -1,23 +1,12 @@
 ---
 title: "RNASeq Tertiary Analysis: Part 3"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# Note
-
-This data carpentry workshop materials have been borrowed from several resources including:
-1. https://carpentries-incubator.github.io/bioc-rnaseq/index.html
-2. https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
-3. https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html
-4. https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html
-5. U-BDS Team.
-
-We thank the curators and maintainers of all of these resources for their wonderful contributions, compiling the best practices, and easy to follow training guides for beginners. 
-
 
 # Packages loaded globabally
 
@@ -46,19 +35,11 @@ library(ggplot2)
 library(pheatmap)
 library(ComplexHeatmap)
 library(RColorBrewer)
-library(vidger)
+#library(vidger) # needs fix in container
 ```
-
-### Create `data` and `results` directory
-
-```{r}
-dir.create("./data", recursive = TRUE)
-dir.create("./results", recursive = TRUE) 
-```
-
 
 # Enrichment Analysis
-After we have obtained a list of differentially expressed (DE) genes, the next question naturally to ask is what biological functions these DE genes may affect.
+After we have obtained a list of DEG genes, the next question naturally to ask is what biological functions these DE genes may affect.
 
 ## Gene sets and pathway
 A gene set is an unordered collection of genes that are functionally related. A pathway can be interpreted as a gene set by ignoring functional relationships among genes.
@@ -90,12 +71,11 @@ GO and KEGG are the most frequently used for functional analysis. They are typic
 
 Other gene sets include but are not limited to Disease Ontology (`DO`), Disease Gene Network (`DisGeNET`), `wikiPathways`, Molecular Signatures Database (`MSigDb`).
 
-## Gene Ontology (GO)
-
-#Input DEG list
+## Input DEG list and DEG filtering
 
 ```{r}
-Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv", row.names = 1)
+Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv",
+                                          row.names = 1)
 
 normalized_counts_annotated <- read.csv(file="./results/Transplant_vs_Naive/normalized_counts.csv")
 ```
@@ -105,13 +85,13 @@ For the pre-ranked filtered analysis, we will execute GSEA using the standard DE
 
 ```{r}
 Transplant_vs_Naive_annotated_DEGs <- Transplant_vs_Naive_annotated %>%
-    dplyr::filter(padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1) %>% # THIS IS FILTERED ANALYSIS
-    dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %>%
-    # Filter out the duplicated rows using `dplyr::distinct()`
-    dplyr::distinct(external_gene_name, .keep_all = TRUE)
+  dplyr::filter(padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1) %>% # THIS IS FILTERED ANALYSIS
+  dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %>%
+  # Filter out the duplicated rows using `dplyr::distinct()`
+  dplyr::distinct(external_gene_name, .keep_all = TRUE)
 ```
 
-Quick look at #of DEGs.
+Quick look at the number of DEGs.
 ```{r}
 nrow(Transplant_vs_Naive_annotated_DEGs)
 ```
@@ -121,9 +101,22 @@ Check for duplicated gene_ids
 any(duplicated(Transplant_vs_Naive_annotated_DEGs$external_gene_name))
 ```
 
-# GO by Gprofiler
+## GO by `gprofiler2`
 
-## set to archive linked to Ensembl 109 version.
+Similarly to prior examples, `gprofiler2` also maintains archived versions based
+on genome versions, specifically Ensembl. Thus, here we also set the archive
+to Ensembl 109 version.
+
+Further, note that although `gprofiler2` accepts Ensembl IDs, 
+most biologists/scientist prefer gene names as they are more interpretable.
+One caveat, is that the use of gene names can can lead to redundancies for cases
+where a name corresponds to more than one id (e.g: haplotypes). However, for the
+most part it is acceptable to use gene names. The example below is executed
+with gene names.
+
+Lastly, note we set the `custom_bg` to the gene names present in our normalized
+counts which is derived from the raw data that was pre-filtered. This is important
+because ... <!-- TODO: briefly touch on why adding a background is important -->
 
 ```{r}
 set_base_url("https://biit.cs.ut.ee/gprofiler_archive3/e109_eg56_p17")
@@ -134,34 +127,24 @@ species <- "mmusculus"
 
 data_sources <- c("GO", "KEGG", "REAC", "MIRNA", "HP", "HPA", "WP")
 
-# although gprofiler2 accepts Ensembl IDs, most users prefer gene ids which can cause redundancy but
-# this is to a minority of genes. Thus, we provide results using both inputs and discuss with user
-# alternatives when using genes ids
-
-# NOTE: by default we run the following with all DEGs. Another strategy if discussed with PI is to
-# split by up/down-regulated.
-
-# You can save URLs for user-friendly way
-
-gost_results <- gost(query = Transplant_vs_Naive_annotated$external_gene_name, 
-         organism = species,
-         ordered_query = FALSE, 
-         multi_query = FALSE,
-         significant = TRUE,
-         exclude_iea = FALSE, 
-         measure_underrepresentation = FALSE, 
-         user_threshold = 0.05,
-         correction_method = "g_SCS", 
-         domain_scope = "custom",
-         custom_bg = normalized_counts_annotated$external_gene_name, # genes names from normalized counts
-         numeric_ns = "",
-         sources = data_sources,
-         as_short_link = FALSE,
-         evcodes = TRUE)
-
+gost_results <- gost(query = Transplant_vs_Naive_annotated_DEGs$external_gene_name, 
+                     organism = species,
+                     ordered_query = FALSE, 
+                     multi_query = FALSE,
+                     significant = TRUE,
+                     exclude_iea = FALSE, 
+                     measure_underrepresentation = FALSE, 
+                     user_threshold = 0.05,
+                     correction_method = "g_SCS", 
+                     domain_scope = "custom",
+                     custom_bg = normalized_counts_annotated$external_gene_name, # genes names from normalized counts
+                     numeric_ns = "",
+                     sources = data_sources,
+                     as_short_link = FALSE,
+                     evcodes = TRUE)
 ```
 
-### Explore Gprofiler results
+### Explore `gprofiler2` results
 
 ```{r}
 gostplot(gost_results, capped = TRUE, interactive = TRUE)
@@ -173,12 +156,12 @@ head(gost_results$result, 5)
 
 ```{r}
 publish_gosttable(gost_results, highlight_terms = gost_results$result[c(1:10),],
-                        use_colors = TRUE, 
-                        show_columns = c("source", "term_name", "term_size", "intersection_size"),
-                        filename = NULL)
+                  use_colors = TRUE, 
+                  show_columns = c("source", "term_name", "term_size", "intersection_size"),
+                  filename = NULL)
 ```
 
-Write Gprofiler results to csv
+Write `gprofiler2` results to csv
 
 ```{r}
 go_results <- gost_results$result
@@ -188,5 +171,9 @@ go_results$parents <- as.character(gost_results$result$parents)
 
 
 ```{r}
-write.csv(go_results, file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_Gprofiler_padj_fc.csv")
+write.csv(go_results,
+          file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_Gprofiler_padj_fc.csv",
+          row.names = FALSE)
 ```
+
+<!-- TODO: add challenge on enabling running `gost` with URL output. Go through output of this in class -->

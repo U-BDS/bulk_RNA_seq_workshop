@@ -1,22 +1,12 @@
 ---
 title: "RNASeq Tertiary Analysis: Part 4"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# Note
-
-This data carpentry workshop materials have been borrowed from several resources including:
-1. https://carpentries-incubator.github.io/bioc-rnaseq/index.html
-2. https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
-3. https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html
-4. https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html
-5. U-BDS Team.
-
-We thank the curators and maintainers of all of these resources for their wonderful contributions, compiling the best practices, and easy to follow training guides for beginners. 
 
 # Packages loaded globabally
 
@@ -44,25 +34,10 @@ library(EnhancedVolcano)
 library(ComplexUpset)
 library(ComplexHeatmap)
 library(RColorBrewer)
-library(vidger)
+#library(vidger) # needs fix in container
 ```
 
-### Create `data` and `results` directory
-
-```{r}
-dir.create("./data", recursive = TRUE)
-dir.create("./results", recursive = TRUE) 
-```
-
-
-# Enrichment Analysis
-After we have obtained a list of differentially expressed (DE) genes, the next question naturally to ask is what biological functions these DE genes may affect.
-
-## Gene sets and pathway
-A gene set is an unordered collection of genes that are functionally related. A pathway can be interpreted as a gene set by ignoring functional relationships among genes.
-
-
-## Gene Set Enrichment Analysis (GSEA)
+# Gene Set Enrichment Analysis (GSEA)
 
 Gene set enrichment analysis (GSEA) evaluates the associations of a list of DE genes to a collection of pre-defined gene sets, where each gene set has a specific biological meaning.
 
@@ -74,11 +49,18 @@ There are three key elements of the GSEA method:
 2. Estimation of Significance Level of ES
 3. Adjustment for Multiple Hypothesis Testing
 
+## GSEA and GO enrichment analysis
+
+<!-- TODO: how are they different? -->
+<!-- Also discuss how GSEA can be executed on the full dataset regardless of cutoff. How is that different? -->
+<!-- [stating that here we will run on DEGs as an example] -->
+
 #Input DEG list
 
 
 ```{r}
-Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv", row.names = 1)
+Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv",
+                                          row.names = 1)
 ```
 
 
@@ -140,6 +122,8 @@ msigdbr(species, category, subcategory)
 
 #### get Hallmark gene set
 
+<!-- TODO: add why would one select Hallmark here -->
+
 ```{r}
 mm_hallmark_sets <- msigdbr(
   species = "Mus musculus", # Replace with species name relevant to your data
@@ -155,24 +139,25 @@ head(mm_hallmark_sets)
 # Run GSEA
 
 gsea_enrichment <- GSEA(
-      geneList = lfc_vector,
-      minGSSize = 25,        #minimum gene set
-      maxGSSize = 500,       #maximum gene set
-      pvalueCutoff = 0.05,
-      eps = 1e-10, # default
-      seed = TRUE,
-      pAdjustMethod = "BH", #change the pAdjustMethod as needed
-      TERM2GENE = dplyr::select(
-        mm_hallmark_sets,
-        gs_name,
-        gene_symbol)
-      )
+  geneList = lfc_vector,
+  minGSSize = 25, # minimum gene set
+  maxGSSize = 500, # maximum gene set
+  pvalueCutoff = 0.05,
+  eps = 1e-10, # default
+  seed = TRUE,
+  pAdjustMethod = "BH", # change the pAdjustMethod as needed
+  TERM2GENE = dplyr::select(
+    mm_hallmark_sets,
+    gs_name,
+    gene_symbol)
+)
 ```
 
 ### Explore GSEA results
 
 ```{r}
-head(gsea_enrichment@result)
+# see head excluding the last collumn for simplicity:
+head(gsea_enrichment@result)[,1:(ncol(gsea_enrichment@result)-1)]
 ```
 
 #### Dot plot
