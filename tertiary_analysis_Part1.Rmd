@@ -75,7 +75,7 @@ dir.create("./results", recursive = TRUE)
 
 ## The `DESeqDataSet`
 
-<!-- See issue #4 on writing practices. Please change the below even if it is less writting -->
+<!-- See issue #4 on writing practices. Please change the below even if it is less writing -->
 
 The object class used by the DESeq2 package to store the read counts and the intermediate estimated quantities during statistical analysis is the DESeqDataSet, which will usually be represented in the code here as an object dds.
 

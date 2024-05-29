@@ -6,18 +6,6 @@ title: "RNASeq Tertiary Analysis: Part 2"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Note
-
-This data carpentry workshop materials have been borrowed from several resources including:
-1. https://carpentries-incubator.github.io/bioc-rnaseq/index.html
-2. https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
-3. https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html
-4. https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html
-5. U-BDS Team.
-
-We thank the curators and maintainers of all of these resources for their wonderful contributions, compiling the best practices, and easy to follow training guides for beginners. 
-
-
 # Packages loaded globabally
 
 ```{r message=FALSE}
@@ -51,12 +39,12 @@ library(EnhancedVolcano)
 library(ComplexUpset)
 library(ComplexHeatmap)
 library(RColorBrewer)
-library(vidger)
+#library(vidger) # needs fix in container
 ```
 
 ### Create `data` and `results` directory
 
-```{r}
+```{r warning=FALSE}
 dir.create("./data", recursive = TRUE)
 dir.create("./results", recursive = TRUE) 
 ```
@@ -64,6 +52,8 @@ dir.create("./results", recursive = TRUE)
 # Differential expression analysis
 
 ## Input data
+
+In case our objects from part 1 are not present in the environment, here we re-load them:
 
 ```{r}
 dds <- readRDS(file = "./results/dds.rds")
@@ -76,7 +66,7 @@ txi <- readRDS(file = "./results/txi.rds")
 ```{r}
 dds <- DESeq(dds)
 
-# checking coeff by resultsNames(dds):
+# checking coefficient by resultsNames(dds):
 
 resultsNames(dds)
 
@@ -87,6 +77,10 @@ plotDispEsts(dds)
 dev.off()
 ```
 
+<!-- See issue #4 on writing. Please change the below -->
+<!--- Specifically below, adding some of the details from ?DESeq would be helpful, including
+information about negative binomial assumptions etc. [and where appropriate quote] -->
+
 The standard differential expression analysis steps are wrapped into a single function, `DESeq`, described in the Methods section of the DESeq2 publication (Love, Huber, and Anders 2014).
 
 Results tables are generated using the function results, which extracts a results table with `log2 fold changes`, `p values` and `adjusted p values`. With no additional arguments to results, the log2 fold change and Wald test p value will be for the last variable in the design formula, and if this is a factor, the comparison will be the last level of this variable over the reference level (see previous note on factor levels). However, the order of the variables of the design do not matter so long as the user specifies the comparison to build a results table for, using the name or contrast arguments of results.
@@ -94,34 +88,77 @@ Results tables are generated using the function results, which extracts a result
 
 ## Make annotation object
 
-We used mm39 (GENCODE release M32) corresponding to Ensembl 109.
+At this point, we will create an annotation object which we will use in the later
+section of this workshop to add annotation information (e.g.: gene names)
+to our results.
+
+Note that in the code below we select mm39 (GENCODE release M32) corresponding 
+to Ensembl 109 since this is the genome / GTF versions we used in secondary 
+analysis. You should always aim to match the genomic version in tertiary analysis
+to what was used in the secondary analysis.
+
+Also note that while there are many ways to annotate your data, the code chunks below
+implements functions from the `biomaRt` package to fetch the annotations.
+
+_____
+
+As a starting point, let's check the available Ensembl versions, to ensure
+we select the correct one for our data:
+
+```{r}
+# check available urls (current and archives):
+listEnsemblArchives()
+```
+
+We can see from the output above, that the url matching the Ensembl 109 version
+is `https://feb2023.archive.ensembl.org`. Thus, we set the hosting url below to
+this specific version.
+
+Further, `biomaRt` provides several attributes you may add to your data
+for annotation. The attributes selected below are some of the most commonly used
+and needed metadata:
+
+<!-- TODO: add the function here where your can view all available attributes -->
+<!-- (in the text, not in the code chunk below) -->
 
 ```{r annotation_info}
-
-listEnsemblArchives()
-
-# setting the archive path for future runs if needed / to avoid grabbint the latest
+# Specify the version specific archive:
 host_url <- "https://feb2023.archive.ensembl.org" 
 
+# attributes
 attributes_to_add <- c("ensembl_gene_id", "external_gene_name","gene_biotype",
                        "description","chromosome_name","start_position",
                        "end_position","strand")
+```
 
-# listDatasets(mart=useMart( "ENSEMBL_MART_ENSEMBL",host = host_url)) # list species
+Next, select the species. If you are unsure on how to properly add your species,
+you can see the options by running 
+`listDatasets(mart=useMart("ENSEMBL_MART_ENSEMBL", host = host_url))`
 
+```{r}
 species <- "mmusculus_gene_ensembl"
+```
 
+With all required parameters set for `biomaRt`, run the code chunk below to:
+  * Connect to the selected BioMart database
+  * Use Ensembl IDs as the input query
+  * Fetch the annotation information
 
+```{r}
 ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = species, host = host_url)
 
 listMarts(host=host_url)
 
-# although we filtered counts, will still bring in annot. for all genes
+# although we filtered counts initially, we
+# fetch the annotation for all genes:
 gene_ids <- rownames(txi$counts)
-gene_ids <- gsub("\\.[0-9]+","",gene_ids) # remove GENCODE gene version
+
+# remove GENCODE gene version to make ids compatible to Ensemvbl:
+gene_ids <- gsub("\\.[0-9]+","",gene_ids) 
 
 head(gene_ids)
 
+# fetch annotations
 genemap <- getBM(attributes = attributes_to_add,
                  filters = "ensembl_gene_id",
                  values = gene_ids,
@@ -134,7 +171,6 @@ nrow(genemap)
 length(gene_ids) == nrow(genemap)
 
 saveRDS(genemap, file = "./results/genemap.rds")
-
 ```
 
 
@@ -161,18 +197,38 @@ Transplant_vs_Naive <- lfcShrink(dds, coef="Condition_Transplant_vs_Naive", type
 
 Transplant_vs_Naive
 ```
+
 ## Explore the DESeq2 result
 
-### P.value histogram plot
+### P-value histogram plot
+
+A good metric to plot is the histogram of the p-values. This is useful 
+to visually check the distribution of your hypothesis (null vs alternative).
+This is also a useful plot to for evaluating if your distribution meets
+the assumption for False Discovery Rate (FDR) correction. While most of the
+time it does, and you should apply FDR correction to control for false positives,
+there can be some cases to carefully consider. 
+
+These edge cases go beyond the scope of this workshop,
+but we encourage trainees to read the following post that nicely summarize 
+data patterns to be aware of:
+<http://varianceexplained.org/statistics/interpreting-pvalue-histogram/>
+
 
 ```{r}
-p <- hist(Transplant_vs_Naive$pvalue) #distribution of p-vals (always want to plot non-corrected pvals for this)
-png("./results/Transplant_vs_Naive/Pval_histogram_Condition_Transplant_vs_Naive.png", width = 400, height = 400)
+# distribution of p-vals (always want to plot non-corrected p-values for this)
+p <- hist(Transplant_vs_Naive$pvalue)
+
+png("./results/Transplant_vs_Naive/Pval_histogram_Condition_Transplant_vs_Naive.png",
+    width = 400,
+    height = 400)
+
 plot(p)
-p
+
+dev.off()
 ```
 
-Each bar represents the number of genes with a P value in the given bin (bin size= 0.05).
+Each bar represents the number of genes with a p-value in the given bin (bin size= 0.05).
 
 ### MA Plot
 
@@ -185,36 +241,60 @@ plotMA(Transplant_vs_Naive)
 
 ### Summary stat
 
+<!-- TODO: add more to what an adjusted p-value here (a little bit added -->
+<!-- in the p-value history), and what is the default method implemented in DESeq2 -->
+<!-- for FDR correction -->
+
 ```{r}
 summary(Transplant_vs_Naive)
 ```
 
+You can customize adjusted p-value cutoff by changing the default parameter:
+
+```{r}
+summary(Transplant_vs_Naive, alpha = 0.05)
+```
+
+At a first glance, this data suggests that there are significant
+transcriptomics alterations based on adjuste p-value < 0.05.
+
+<!-- TODO: challenge question on cutoff to go here  -->
+
 ### Sort by Adjusted p.value
 
 ```{r}
-head(Transplant_vs_Naive[order(Transplant_vs_Naive$padj), ], 5)
+Transplant_vs_Naive <- Transplant_vs_Naive[order(Transplant_vs_Naive$padj),]
+
+head(Transplant_vs_Naive)
 ```
 
 
-### Add annotation to DEG list
+### Add annotation to DEG results
+
+Now that we have the differentially expressed genes (DEG), we can use the annotated
+object created earlier, to add gene metadata to the DEG results:
 
 ```{r}
-# add the current gene_ids to new columns 
+# add the current gene_ids to new columns and remove the GENCODE version
+# Note we add 2 columns (one with GENCODE version and one without it) to preserve
+# version information if needed:
 
 Transplant_vs_Naive$ensembl_gene_id_version <- rownames(Transplant_vs_Naive)
 Transplant_vs_Naive$ensembl_gene_id <- rownames(Transplant_vs_Naive)
 
-Transplant_vs_Naive$ensembl_gene_id  <- gsub("\\.[0-9]+","",Transplant_vs_Naive$ensembl_gene_id)
+Transplant_vs_Naive$ensembl_gene_id  <- gsub("\\.[0-9]+", "", Transplant_vs_Naive$ensembl_gene_id)
 
 # join the DEG list and biomaRt list by "ensembl_gene_id"
-Transplant_vs_Naive_annotated <- plyr::join(as.data.frame(Transplant_vs_Naive), genemap, by = c("ensembl_gene_id"))
+Transplant_vs_Naive_annotated <- dplyr::left_join(x = as.data.frame(Transplant_vs_Naive),
+                                                  y = genemap,
+                                                  by = (c("ensembl_gene_id")))
 
+# add Ensembl IDs as row names:
 rownames(Transplant_vs_Naive_annotated) <- Transplant_vs_Naive_annotated$ensembl_gene_id
 head(Transplant_vs_Naive_annotated, 5)
-
 ```
 
-Challenge
+#### Challenge
 
 ```{r}
 # make `external_gene_name` as rowname
@@ -224,29 +304,39 @@ rownames(Transplant_vs_Naive_annotated) <- Transplant_vs_Naive_annotated$externa
 head(Transplant_vs_Naive_annotated, 5)
 ```
 
-### Write files
+### Save data outputs
 
-Annotated DEG list as csv file
+First, let's save out annotated DEG list as csv file:
 
 ```{r}
-write.csv(Transplant_vs_Naive_annotated, file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv")
+write.csv(Transplant_vs_Naive_annotated, 
+          file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv")
 ```
 
-Annotated Normalized counts as csv file
+Second, let's save the normalized counts as a csv file. This is critical
+output for data visualization as it contain normalized counts per sample:
 
 ```{r}
+# add normalized counts to a new vector:
 normalized_counts <- as.data.frame(counts(dds, normalized = TRUE))
 
+# add annotation
+# NOTE: here we add a new column names using the `mutate` function
+# as an alternative to the approach shown in the DEG results
 normalized_counts_annotated <- normalized_counts %>% 
   mutate(ensembl_gene_id_version = rownames(normalized_counts),
          ensembl_gene_id = rownames(normalized_counts)) %>%
   mutate(ensembl_gene_id = gsub("\\.[0-9]+","",ensembl_gene_id)) %>%
-  plyr::join(., genemap, by = c("ensembl_gene_id"))
-    
-write.csv(normalized_counts_annotated, file="./results/Transplant_vs_Naive/normalized_counts.csv", row.names = FALSE)
+  dplyr::left_join(x = ., y = genemap, by = (c("ensembl_gene_id")))
+
+write.csv(normalized_counts_annotated,
+          file="./results/Transplant_vs_Naive/normalized_counts.csv",
+          row.names = FALSE)
 ```
 
 ### Visualize selected set of genes
+
+<!-- TODO: again see issue #5 with consistancy of the pipe operator (change below) -->
 
 ```{r}
 # Get top 1500 DE genes
@@ -266,15 +356,15 @@ heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
 
 # Plot as heatmap
 DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
-                        top_annotation = heatmapColAnnot,
-                        cluster_rows = TRUE, 
-                        cluster_columns = TRUE,
-                        show_row_names = FALSE)
+                                       top_annotation = heatmapColAnnot,
+                                       cluster_rows = TRUE, 
+                                       cluster_columns = TRUE,
+                                       show_row_names = FALSE)
 
 DEG_heatmap
 ```
 
-Challenge heatmap of 20 genes with gene ids
+#### Challenge heatmap of 20 genes with gene ids
 
 ```{r}
 # Get top 20 DE genes
@@ -333,26 +423,26 @@ heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
 
 # Plot as heatmap
 DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
-                        top_annotation = heatmapColAnnot,
-                        cluster_rows = TRUE, 
-                        cluster_columns = TRUE,
-                        show_row_names = TRUE)
+                                       top_annotation = heatmapColAnnot,
+                                       cluster_rows = TRUE, 
+                                       cluster_columns = TRUE,
+                                       show_row_names = TRUE)
 
 DEG_heatmap
 ```
 
 ### Volcano plot
+
 ```{r fig.height=10, fig.width=10}
 EnhancedVolcano(Transplant_vs_Naive,
                 lab = Transplant_vs_Naive_annotated$external_gene_name,
-                x = 'log2FoldChange',
-                y = 'padj',
-                title = 'Transplant_vs_Naive',
+                x = "log2FoldChange",
+                y = "padj",
+                title = "Transplant_vs_Naive",
                 pCutoff = 0.05,
                 FCcutoff = 1.0,
                 pointSize = 1.0,
                 labSize = 4)
-
 ```
 
 ### Plot gene
@@ -363,6 +453,7 @@ plotCounts(dds,
            intgroup = "Condition",
            normalized = TRUE)
 ```
+
 ## Glimma
 
 Glimma is an interactive R widget for creating plots for differential expression analysis, created using the Vega and htmlwidgets frameworks. The created plots can be embedded in R Markdown, or exported as standalone HTML documents.
@@ -381,8 +472,7 @@ The second plot shows gene expression from the last selected sample, which can b
 ```{r}
 glimmaMA(dds, 
          counts = counts(dds),
-         groups = colData$Condition
-         )
+         groups = colData$Condition)
 ```
 
 ### Saving widgets
