@@ -262,6 +262,15 @@ R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs
 
 The sample name is completely up to the user, so pick something that will help with identification for yourself if there is not an already existent sample name. Strandedness we have set to auto for the purposes of the workshop, if you know if the data is forward or reverse stranded by all means use that instead.
 
+> **Discussion Question**
+>
+> You'll note that we have two commas next to each other in the samplesheet, which means we have left a column empty. The data for this workshop is single-ended, meaning that there is just a single fastq for us to analyze. Its also common for data to be paired end, which for us would result in a pair of fastqs for each sample, known as an read 1 and read 2. 
+> 
+> Can anyone tell me what we would change with this samplesheet if the data was paired end instead of single end?
+>
+> **Solution**
+> We would need to fill in the column that is left blank. The samplesheet headers help guide us in what information needs to be placed in each column. In this case, `fastq_1` would correspond to the read 1 fastq and `fastq_2` would correspond to the read 2 fastq.
+
 ### Adding Pipeline Parameters
 
 One point of customization is the pipeline parameters. The amount of configurability the parameters provide is very dependent on the pipeline and the pipeline authors, so we won’t be able to customize every aspect of the pipeline, but parameters are often based on common requests by users of the pipeline.
