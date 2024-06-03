@@ -144,11 +144,19 @@ As discussed earlier, the pipeline we will cover also contains several additiona
 
 ### Intro to Nextflow / nf-core
 
-Due to the amount of steps this analysis uses, it is written using a workflow management system (or workflow manager) known as Nextflow. Workflow management systems allow for the chaining together of tools and inherently support some of the common checks that a developer would have to program in, such as checking if a file exists, moving output files to a central location, and logging information. Workflow management systems are also useful as they natively support parallelization, portability, scalability and reproducibility. There are other workflow languages such as Snakemake or WDL.
+Due to the amount of steps this analysis uses, it is written using a workflow management system (or workflow manager) known as Nextflow. Workflow management systems allow for the chaining together of tools and inherently support some of the common checks that a developer would have to program in, such as checking if a file exists, moving output files to a central location, and logging information. Workflow management systems are useful as they natively support parallelization, portability, scalability and reproducibility. There are other workflow languages such as Snakemake or WDL.
 
 Nextflow is built on top of a programming language known as Groovy. The specifics of Groovy are not necessarily important for the lesson, but if anyone wishes to develop pipelines using Nextflow it will be relevant.
 
 Nf-core is a community-led effort to curate and develop a set of analysis pipelines using Nextflow. All pipelines published as part of nf-core are open source and there are a wide range of pipelines published currently supporting analyses such as single-cell or ATAC-seq. The community itself is not specifically limited to bioinformatics, but most pipelines published so far have all been within that field. One point to be noted, is that the nf-core team has published a lot of standards and tools to create a styling guidelines, and that any Nextflow pipeline is able to use these standards and tools even if they do not wish to publish as part of nf-core. To view a list of all pipelines (released and in development), please visit <https://nf-co.re/pipelines>.
+
+#### Workflows and Reproducibility
+
+As mentioned previously, one of the important benefits of using workflow management systems, such as Nextflow, is reproducibility. By ensuring that analyses are reproducible, you or any other person is able to run a workflow and receive the exact same results. One of the ways that Nextflow ensures reproducibility is via native support for tools that utilize containers, such as Docker or Singularity.
+
+A container is a packaged up snapshot of code (or software) and all of its dependencies. A container allows the application it encapsulates to run on any machine afterwards. Containers help with the automation of installing all the packages and dependencies and minimizes the chance for error and deviation during the installation process.
+
+It is highly recommended that any code or analysis that is meant to be shared should be encapsulated in a container as that will help in increasing the reproducibility of your work.
 
 ### Testing the Pipeline
 
@@ -181,6 +189,14 @@ Breaking the Nextflow command down:
 Running the pipeline will yield a status update page. This page will show the current progress of the pipeline, completed jobs, failed jobs, etc. The command will also download the version of the pipeline specified so it can be run more easily in the future.
 
 Once everything is completed, move on to the next section as we can conclude the pipeline has been downloaded successfully.
+
+> **NOTE**
+>
+> This section briefly introduces the concept of the institutional profile. The institutional profile is very useful as it allows users to configure nf-core workflows to better utilize the resources at their institution. However, due to the specificity the insitutional profile possesses, it is not recommended to run an instituional profile that does not match the institution you are running the analysis at as their resources may not the be same and can lead to errors or take resources from other users.
+
+> **NOTE**
+>
+> The `cheaha` profile that is used within this lesson has a number of configurations to allow nf-core workflows to make better use of the cheaha supercomputer. It will direct jobs to the correct queue to ensure that jobs have minimal time between being submitted and run. It will also use the module system and native nextflow configuration to ensure that Singularity is used to process containers.
 
 ### Understanding the Dataset
 
