@@ -243,33 +243,32 @@ for file in input/downsample/*.fastq.gz; do echo $file; done
 That will output all the FASTQs we will be working with. Lets redirect the output to the end of the samplesheet
 
 ```         
-for file in input/downsample/*.fastq.gz; do echo $file; done >> samplesheet.csv
+for file in input/downsample_fastqs/*.fastq.gz; do echo $file; done >> samplesheet.csv
 ```
 
 Open up the samplesheet again. You will see the header and a list of FASTQs. To start modifying it, a sample name needs to be added with some additional commas.
 
 ```         
 sample,fastq_1,fastq_2,strandedness
-N01_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328050_SRR7457559.fastq.gz,,forward
-N02_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328049_SRR7457560.fastq.gz,,forward
-N03_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328052_SRR7457557.fastq.gz,,forward
-N04_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328051_SRR7457558.fastq.gz,,forward
-R05_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328058_SRR7457551.fastq.gz,,forward
-R06_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328057_SRR7457552.fastq.gz,,forward
-R07_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328048_SRR7457561.fastq.gz,,forward
-R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328047_SRR7457562.fastq.gz,,forward
+N01_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328050_SRR7457559.fastq.gz,,forward
+N02_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328049_SRR7457560.fastq.gz,,forward
+N03_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328052_SRR7457557.fastq.gz,,forward
+N04_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328051_SRR7457558.fastq.gz,,forward
+R05_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328058_SRR7457551.fastq.gz,,forward
+R06_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328057_SRR7457552.fastq.gz,,forward
+R07_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328048_SRR7457561.fastq.gz,,forward
+R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328047_SRR7457562.fastq.gz,,forward
 ```
 
 The sample name is completely up to the user, so pick something that will help with identification for yourself if there is not an already existent sample name. Strandedness we have set to auto for the purposes of the workshop, if you know if the data is forward or reverse stranded by all means use that instead.
 
 > **Discussion Question**
 >
-> You'll note that we have two commas next to each other in the samplesheet, which means we have left a column empty. The data for this workshop is single-ended, meaning that there is just a single fastq for us to analyze. Its also common for data to be paired end, which for us would result in a pair of fastqs for each sample, known as an read 1 and read 2. 
-> 
+> You'll note that we have two commas next to each other in the samplesheet, which means we have left a column empty. The data for this workshop is single-ended, meaning that there is just a single fastq for us to analyze. Its also common for data to be paired end, which for us would result in a pair of fastqs for each sample, known as an read 1 and read 2.
+>
 > Can anyone tell me what we would change with this samplesheet if the data was paired end instead of single end?
 >
-> **Solution**
-> We would need to fill in the column that is left blank. The samplesheet headers help guide us in what information needs to be placed in each column. In this case, `fastq_1` would correspond to the read 1 fastq and `fastq_2` would correspond to the read 2 fastq.
+> **Solution** We would need to fill in the column that is left blank. The samplesheet headers help guide us in what information needs to be placed in each column. In this case, `fastq_1` would correspond to the read 1 fastq and `fastq_2` would correspond to the read 2 fastq.
 
 ### Adding Pipeline Parameters
 
@@ -345,7 +344,7 @@ vim custom.conf
 ```         
 process {
     executor = 'slurm'
-    queue = ‘express’
+    queue = ‘amdhdr-100’
 }
 ```
 
@@ -435,15 +434,36 @@ nextflow run nf-core/rnaseq \
     -c custom.conf
 ```
 
-<!-- TODO: Add a challenge question here asking (to be verbablly solved in class -->
-
-<!-- but not submitted): -->
-
-<!-- * What would you need to modify to run this job on the full dataset -->
-
-<!-- * Show solutions by providing all materials needed, highlighting the only -->
-
-<!-- differences as: 1. samplesheet changes 2. removal of the partition customization -->
+> **Discussion Question**
+>
+> So we have currently submitted the downsampled data. Can anyone tell me what we would need to change in order to run the full dataset as if we were doing a complete analysis?
+>
+> **Solution**
+>
+> The files that need to be updated are provided below with a description of what needs to be changed.
+>
+> `samplesheet.csv` needs to have the file paths in the `fastq_1` column to point to the full dataset.
+>
+> ``` samplesheet.csv
+> sample,fastq_1,fastq_2,strandedness
+> N01_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328050_SRR7457559.fastq.gz,,forward
+> N02_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328049_SRR7457560.fastq.gz,,forward
+> N03_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328052_SRR7457557.fastq.gz,,forward
+> N04_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328051_SRR7457558.fastq.gz,,forward
+> R05_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328058_SRR7457551.fastq.gz,,forward
+> R06_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328057_SRR7457552.fastq.gz,,forward
+> R07_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328048_SRR7457561.fastq.gz,,forward
+> R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328047_SRR7457562.fastq.gz,,forward
+> ```
+>
+> `custom.conf` would remove the section we added to route all jobs to the `amdhdr-100` queue. We want the jobs to go to the 'correct' queue since we would be processing the full dataset and may require different resources that would better suit a different queue.
+>
+> ``` custom.conf
+> process{
+> withName: ‘.*:SALMON_QUANT’{
+>    ext.args = ‘--gcBias --seqBias’
+> }
+> ```
 
 ## Reviewing Pipeline Results
 
