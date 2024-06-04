@@ -16,10 +16,6 @@ set.seed(2020)
 
 # Required packages
 
-# Mouse annotation package we'll use for gene identifier conversion
-library(biomaRt)
-library(org.Mm.eg.db)
-
 # pathway analysis
 library(gprofiler2)
 
@@ -32,46 +28,57 @@ library(readr)
 
 # plotting
 library(ggplot2)
-library(pheatmap)
 library(ComplexHeatmap)
 library(RColorBrewer)
-#library(vidger) # needs fix in container
 ```
 
-# Enrichment Analysis
-After we have obtained a list of DEG genes, the next question naturally to ask is what biological functions these DE genes may affect.
 
-## Gene sets and pathway
-A gene set is an unordered collection of genes that are functionally related. A pathway can be interpreted as a gene set by ignoring functional relationships among genes.
+# Gene Ontology (GO)
 
-### Gene Ontology (GO)
-Gene Ontology defines concepts/classes used to describe gene function, and relationships between these concepts. It classifies functions along three aspects:
+Gene Ontology (GO) enrichment analysis is a computational method used to identify which biological, cellular, or molecular processes are over-represented (or under-represented) in a given list of genes. It leverages the structured vocabulary of the Gene Ontology to interpret the functions of genes within a larger biological context.
 
-MF: Molecular Function
-    molecular activities of gene products
-CC: Cellular Component
-    where gene products are active
-BP: Biological Process
-    pathways and larger processes made up of the activities of multiple gene products
-GO terms are organized in a directed acyclic graph, where edges between terms represent parent-child relationship.
+How it works:
 
-### Kyoto Encyclopedia of Genes and Genomes (KEGG)
-KEGG is a collection of manually drawn pathway maps representing molecular interaction and reaction networks. These pathways cover a wide range of biochemical processes that can be divided into 7 broad categories:
+. Input: You start with a list of genes of interest, often derived from experimental data like differentially expressed genes (DEGs) from a microarray or RNA-seq experiment.
 
-1. Metabolism
-2. Genetic information processing
-3. Environmental information processing
-4. Cellular processes
-5. Organismal systems
-6. Human diseases
-7. Drug development.
+. Annotation: Each gene in your list is associated with GO terms that describe its known functions.
+
+. Statistical Test: A statistical test (e.g., Fisher's exact test, hypergeometric test) is applied to determine if any GO terms are enriched in your gene list compared to what would be expected by chance.
+
+. Output: The result is a list of GO terms along with their associated p-values (or adjusted p-values). Significantly enriched terms suggest that the biological processes they represent are particularly relevant to your gene list.
+
+**Different Categories of GO Analysis:**
+
+The Gene Ontology is organized into three main categories:
+
+. Biological Process (BP): Represents a series of events accomplished by one or more ordered assemblies of molecular functions (e.g., DNA replication, cell cycle, signal transduction).
+
+. Molecular Function (MF): Describes the elemental activities of a gene product at the molecular level, such as binding or catalysis (e.g., kinase activity, DNA binding, transporter activity).
+
+. Cellular Component (CC): Refers to the location relative to cellular structures in which a gene product performs a function (e.g., nucleus, cytoplasm, plasma membrane).
+Types of GO Enrichment Analysis:
+
+
+** There are two main approaches to GO enrichment analysis:**
+
+. Over-Representation Analysis (ORA): This is the simpler method and focuses on identifying GO terms that are significantly over-represented in your gene list. It is based on the assumption that all genes in the list are independent.
+
+. Functional Class Scoring (FCS): This approach considers the relative ranking of genes in your list (e.g., based on expression levels) and tests if gene sets associated with specific GO terms are enriched towards the top or bottom of the list. This can reveal subtle patterns that ORA might miss.
+
+Interpreting Results:
+
+The enriched GO terms provide valuable insights into the biological functions that are most relevant to your gene list. This can help generate hypotheses about the underlying mechanisms involved and guide further research.
+
+
+#### Kyoto Encyclopedia of Genes and Genomes (KEGG)
+KEGG is a collection of manually drawn pathway maps representing molecular interaction and reaction networks. 
 
 ### Other gene sets
 GO and KEGG are the most frequently used for functional analysis. They are typically the first choice because of their long-standing curation and availability for a wide range of species.
 
-Other gene sets include but are not limited to Disease Ontology (`DO`), Disease Gene Network (`DisGeNET`), `wikiPathways`, Molecular Signatures Database (`MSigDb`).
+Other gene sets include but are not limited to Disease Ontology `DO`, Disease Gene Network `DisGeNET`, `wikiPathways`, Molecular Signatures Database `MSigDb`.
 
-## Input DEG list and DEG filtering
+# Input DEG list and DEG filtering
 
 ```{r}
 Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv",
@@ -85,6 +92,7 @@ For the pre-ranked filtered analysis, we will execute GSEA using the standard DE
 
 ```{r}
 Transplant_vs_Naive_annotated_DEGs <- Transplant_vs_Naive_annotated %>%
+  dplyr::filter(str_trim(external_gene_name) != "") %>%  # Remove empty strings
   dplyr::filter(padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1) %>% # THIS IS FILTERED ANALYSIS
   dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %>%
   # Filter out the duplicated rows using `dplyr::distinct()`
@@ -92,20 +100,32 @@ Transplant_vs_Naive_annotated_DEGs <- Transplant_vs_Naive_annotated %>%
 ```
 
 Quick look at the number of DEGs.
+
 ```{r}
 nrow(Transplant_vs_Naive_annotated_DEGs)
 ```
 
 Check for duplicated gene_ids
+
 ```{r}
 any(duplicated(Transplant_vs_Naive_annotated_DEGs$external_gene_name))
 ```
 
-## GO by `gprofiler2`
+# GO by `gprofiler2`
 
-Similarly to prior examples, `gprofiler2` also maintains archived versions based
-on genome versions, specifically Ensembl. Thus, here we also set the archive
+`gProfiler2` performs functional enrichment analysis, also known as over-representation analysis (ORA) or gene set enrichment analysis, on input gene list. It maps genes to known functional information sources and detects statistically significantly enriched terms.
+
+In other words, `gProfiler2` takes a list of genes and analyzes them to see if they are enriched for certain functions. This can be helpful for understanding the biological processes that the genes are involved in.
+
+Many GO enrichment analysis tools allow you to archive your results for future reference or sharing. `gprofiler2` maintains archived versions based on genome versions used for secondary analysis, specifically Ensembl. Thus, here we also set the archive
 to Ensembl 109 version.
+
+Archiving results is often optional, but it can be a valuable practice for reproducibility and collaboration.
+
+```{r}
+set_base_url("https://biit.cs.ut.ee/gprofiler_archive3/e109_eg56_p17")
+```
+
 
 Further, note that although `gprofiler2` accepts Ensembl IDs, 
 most biologists/scientist prefer gene names as they are more interpretable.
@@ -116,11 +136,18 @@ with gene names.
 
 Lastly, note we set the `custom_bg` to the gene names present in our normalized
 counts which is derived from the raw data that was pre-filtered. This is important
-because ... <!-- TODO: briefly touch on why adding a background is important -->
+because:
+
+. Statistical Significance: The background set defines the universe of genes from which your input list was derived. By comparing the frequency of GO terms in your gene list to their frequency in the background set, `gprofiler2` can calculate p-values that indicate the likelihood of observing such enrichment by chance. Without a proper background set, these p-values would be unreliable.
+
+. Context-Specific Analysis: The choice of background set can dramatically influence the results of your GO analysis. Using the entire genome as the background might not be appropriate if your gene list comes from a specific tissue, cell type, or experimental condition. In such cases, it's often more meaningful to use a custom background set that reflects the relevant biological context.
+
+. Controlling False Positives: A well-defined background set helps control the false positive rate in your analysis. If your background set is too small or biased, you might detect spurious enrichment of GO terms that are not truly relevant to your gene list.
+
+`gprofiler2` offers several options for choosing a background set: Annotated genes, Custom background, and Predefined backgrounds.
 
 ```{r}
-set_base_url("https://biit.cs.ut.ee/gprofiler_archive3/e109_eg56_p17")
-
+# select species
 species <- "mmusculus" 
 
 #select data sources, these are our min. standards:
@@ -144,14 +171,44 @@ gost_results <- gost(query = Transplant_vs_Naive_annotated_DEGs$external_gene_na
                      evcodes = TRUE)
 ```
 
-### Explore `gprofiler2` results
+
+**Challenges: Enable the url option for gost**
+
+<details><summary>Click here for solution</summary>
+
+explore the `gprofiler` results in detail through the url.
+
+```{r}
+gost_results_url <- gost(query = Transplant_vs_Naive_annotated_DEGs$external_gene_name, 
+                     organism = species,
+                     ordered_query = FALSE, 
+                     multi_query = FALSE,
+                     significant = TRUE,
+                     exclude_iea = FALSE, 
+                     measure_underrepresentation = FALSE, 
+                     user_threshold = 0.05,
+                     correction_method = "g_SCS", 
+                     domain_scope = "custom",
+                     custom_bg = normalized_counts_annotated$external_gene_name, # genes names from normalized counts
+                     numeric_ns = "",
+                     sources = data_sources,
+                     as_short_link = TRUE,
+                     evcodes = TRUE)
+
+gost_results_url
+```
+
+</details>
+
+
+# Explore `gprofiler2` results
 
 ```{r}
 gostplot(gost_results, capped = TRUE, interactive = TRUE)
 ```
 
-```{r}
-head(gost_results$result, 5)
+```{r, message=FALSE}
+head(gost_results$result, 1)
 ```
 
 ```{r}
@@ -176,4 +233,3 @@ write.csv(go_results,
           row.names = FALSE)
 ```
 
-<!-- TODO: add challenge on enabling running `gost` with URL output. Go through output of this in class -->
