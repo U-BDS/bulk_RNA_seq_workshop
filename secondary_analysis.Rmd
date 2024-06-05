@@ -214,27 +214,33 @@ So lets work on running the pipeline on actual data. The RNAseq pipeline (like m
 
 <https://nf-co.re/rnaseq/3.14.0/docs/usage>
 
-First, let's go to the directory where we downloaded the raw data using Globus (in the cheaha scratch space):
+To begin, we'll use the interactive file system available through OnDemand Application provided by UAB Research Computing. The link can be found below: 
 
-```         
-cd $USER_SCRATCH/rnaseq_workshop
+`https://rc.uab.edu/pun/sys/dashboard/`
+
+We'll navigate to the directory where we have moved the files downloaded from Globus. Following the install instructions will have placed the files in the directory below (NOTE: The `<blazer_id>` in the path should be replaced with your blazer id):
+
+```
+/scratch/<blazer_id>/rnaseq_workshop
 ```
 
-Now that we are in our working directory, let’s start by making a samplesheet.csv.
+> ** NOTE **
+>
+> For this lesson, we'll be using the onDemand Editor provided by UAB Research Computing in order to edit and create files. However, if you are more comfortable using a software editor such as `vim` or `nano`, that is also acceptable.
 
-<!-- See issue #3 with vim -->
+We will want to start by creating a file called `samplesheet.csv`. In order to create a file, click the `New File` button in the upper right of interactive file system, and in the dialog box type `samplesheet.csv`.
 
-For the workshop, we’ll use vim. And we'll go ahead and enter the header
-
-```         
-vim samplesheet.csv
-```
+Once the file is created, make sure it is highlighted and click the `Edit` button located. In the new window, enter the below text.
 
 ```         
 sample,fastq_1,fastq_2,strandedness
 ```
 
-We’ve put the header into the samplesheet, so let’s save the samplesheet because we need to also include the FASTQs. The way we will do that is via the commandline.
+We’ve put the header into the samplesheet, so let’s save the samplesheet because we need to also include the FASTQs. In order to save the file, we click the `Save` button located in the upper right.
+
+The next step in creating the samplesheet is to populate it with information. The way we will do that is via the commandline available from OnDemand. To access the commandline, click the `Open in Terminal` button located in the upper right of the interactive file system.
+
+In order to get the list of fastqs, we'll run the below command.
 
 ```         
 for file in input/downsample/*.fastq.gz; do echo $file; done
@@ -280,11 +286,7 @@ While there are a lot of options, it's very rare that you will need all of these
 
 Parameters are able to be passed as flags to the command line or via a yaml file. For the workshop, we will use the yaml option in order to keep the pipeline execution command more straight-forward.
 
-Open up a file called params.yml using vim
-
-```         
-vim params.yml
-```
+Inside the `/scratch/<blazer_id>/rnaseq_workshop` directory, we want to create a new file called `params.yml`. Once created, let's open the file up for editing.
 
 ```         
 # names/email
@@ -335,11 +337,7 @@ We'll also add this parameters for the run.
 
 Pipeline parameters are very useful, but can only get so far. An additional route of customization is to use the custom configuration ("configs") files implemented within Nextflow. Custom configs allow customization of everything from resource allocations to addition of parameters to specific tools in the pipeline.
 
-Lets start by changing the queue in a file called `custom.conf`. The `cheaha` profile will pick a queue based on the profile defaults. Since we’re using donwsampled data, everything will run very quickly, in order to facilitate that we’ll make it so the default queue is 'express':
-
-```         
-vim custom.conf
-```
+To demonstrate this, let's start by creating a file called `custom.conf`, and adding the below lines.
 
 ```         
 process {
@@ -350,11 +348,13 @@ process {
 
 Custom configuration works off the idea of scopes – what this means is users can group settings so they apply to specific pieces of the pipeline.
 
-The above lines of code set the executor to be slurm, and set the queue so that all jobs will be submitted to the `express` partition on cheaha
+The above lines of code set the executor to be slurm, and set the queue so that all jobs will be submitted to the `amdhdr-100` partition on cheaha.
 
 Another item that can be configured via this method is adding parameters to specific tools in the pipeline. In order to do that, you will need to find the module. For this example, let’s modify the Salmon script. There is a way to do this via the pipeline parameters (with the `extra_salmon_quant_args` parameter), however, this is a good opportunity to show custom configuration to pipeline tools.
 
 The first step to do that is to find the name of the process. For this step, it's important to understand the nf-core directory structure a little better. Let’s start by changing into the rnaseq directory that was downloaded when the test command was executed.
+
+Open up the OnDemand Terminal and run the below command.
 
 ```         
 cd ~/.nextflow/assets/nf-core/rnaseq/
@@ -404,11 +404,7 @@ vim modules/nf-core/salmon/quant/main.nf
 
 The name of the process is at the very top of the file, which is what we need. Feel free to explore this, but a lot of this is Nextflow syntax. Special attention should be paid to the command for the tool which is located towards the bottom of the file.
 
-With the name of the process, let’s go back and open up the custom configuration file and add the below lines.
-
-```         
-vim custom.conf
-```
+With the name of the process, let’s go back and open up the custom configuration file using the OnDemand Editor and add the below lines.
 
 ```         
 process{
