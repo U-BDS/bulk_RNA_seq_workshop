@@ -160,17 +160,62 @@ It is highly recommended that any code or analysis that is meant to be shared sh
 
 ### Testing the Pipeline
 
-We will be using UAB's HPC cluster to demonstrate the nf-core/rnaseq pipeline, since most common use-cases require resources that may not be readily available in local computers. Thus as a first step, we will logging in the cluster.
+Importantly, when implementing a novel pipeline or tool, it is critical to always test the pipeline to ensure that it is installed and working properly. Nf-core requires all pipelines to have downsampled test data to be able to run a test profile.
 
-Importantly, when implementing a novel pipeline or tool, it is critical to always test the pipeline to ensure that it is installed and working properly. Nf-core requires all pipelines to have downsampled data to be able to run a test profile.
+We will be using UAB's supercomputer (called `Cheaha`) to run the nf-core/rnaseq pipeline, since most common use-cases require resources that are not be readily available in local computers. More specifically, we'll be using the OnDemand application provided by UAB's Research Computing team, which provides an online interface to interact with Cheaha. Thus as a first step, we will need to navigate to the OnDemand website and login using your UAB login. The link can be found below:
 
-Login to the cluster:
+`https://rc.uab.edu/pun/sys/dashboard/`
+
+OnDemand provides an interactive file system that can be accessed by clicking on `Files` in the upper left of the OnDemand homepage, and then clicking `/scratch/<blazer_id>` in the dropdown (NOTE: The `<blazer_id>` in the path should be replaced with your blazer id).
+
+We'll navigate to the directory where we have moved the files downloaded from Globus, which can be done by double clicking on directories. Following the install instructions will have placed the files in the directory below (NOTE: The `<blazer_id>` in the path should be replaced with your blazer id):
 
 ```         
-ssh <blazer_id>@cheaha.rc.uab.edu
+/scratch/<blazer_id>/rnaseq_workshop
 ```
 
-In order to run the pipeline with test data, we’ll use the following command:
+> **NOTE**
+>
+> For this lesson, we'll be using the onDemand Editor provided by UAB Research Computing in order to edit and create files. However, if you are more comfortable using a software editor such as `vim` or `nano`, that is also acceptable.
+
+In order to run the pipeline with test data, we’ll want to create a script in order to submit and run the Nextflow command, so we will start by creating a file called `run_test_rnaseq.sh`. In order to create a file, click the `New File` button in the upper right of interactive file system, and in the dialog box type `run_test_rnaseq.sh`.
+
+> **NOTE**
+>
+> It is considered bad practice to execute any script or command that requires large amounts of resources on the login node of a supercomputer. Not only does it take resources from other users on the login node, but it can cause errors and system failures for the super computer itself, therefore **ALWAYS** ensure you either submit code to the computer OR execute code in an interactive session.
+
+Once the file is created, make sure it is highlighted in the file system window and click the `Edit` button located in the upper left of the screen, below the file path. In the new window, we'll start by entering the below text:
+
+```         
+#!/usr/bin/env bash
+```
+
+This is known as a `shebang`. It is standard practice to put this line at the top of any script you make, as it is used by the computer to assist in determing which language the script will be using. In this case we are letting the computer know that this is `bash` script. Because this script needs to be submitted to Cheaha, it is especially important to place this line in the file. When the job is dispatched to a its own machine, the machine will not know how to execute the script and error immediately.
+
+The next lines we will add are known as slurm directives. Slurm directives are used to define how much resources are needed to execute the job, and define where to place stdout and stderr outputs from the command.
+
+```         
+#SBATCH --job-name=rnaseq_test
+#SBATCH --output=rnaseq_test.out
+#SBATCH --error=rnaseq_test.err
+#SBATCH --time=1:00:00
+#SBATCH --partition=express
+#SBATCH --mem-per-cpu=1000
+#SBATCH --cpus-per-task=1
+```
+
+To break down each line:
+
+-   `--job-name` : Submitting code on the cluster is called a job. The `job-name` flag assigns a user-generated name to the job to allow for easier tracking. Job names should be short and descriptive in order to assist in determining a job. In this case we will be naming out job `rnaseq_test`
+-   `--output` and `--error` : These are for defining files to place the `stdout` and `stderr` output of the command being submitted. Because these jobs are not interactive, if these flags are not defined, the output will be lost.
+-   `--time` : This defines the amount of time you expect a command to run. If a job runs longer than this command, it will be killed my the Cheaha.
+-   `--partition` : There are a number of partitions available on Cheaha. The `express` partition is for jobs you expect to run in less than 2 hours. There are also `short`, `medium`, and `long` queues, which have their own maximum run time that can be found in the Cheaha documentation. It is recommended to choose the partition that best fits the needs of your pipeline, as choosing the wrong one can result in your scripts being killed too soon or causing very long pending times.
+-   `--mem-per-cpu` : This defines how much memory a job will take multiplied by the number of cpus requested. There is not good way to determine the memory a job will take ahead of time, so it is very common for this to take some iteration as the script will be killed if it goes over the memory limit specified in this file.
+-   `--cpus-per-task` : This defines how many CPUs you expect a job to take.
+
+We are specifying pretty low memory and time requirements for this job as because this is downsampled data, it should run very quickly and require very little resources. Its also important to note that submitting this job like this will always require low memory, the reason is we are submitting what is known as the Nextflow runner job. The Nextflow runner's job is to just to submit the steps in the workflow that do the actual work for the pipeline.
+
+With all that completed, we can now place the nextflow command in the file:
 
 ```         
 nextflow run nf-core/rnaseq -profile test,cheaha -r 3.14.0 --outdir output
@@ -186,7 +231,48 @@ Breaking the Nextflow command down:
 
 -   `--outdir output` With this flag we are noting where the pipeline needs to place all the output files, in this case it will be a directory called `output`.
 
-Running the pipeline will yield a status update page. This page will show the current progress of the pipeline, completed jobs, failed jobs, etc. The command will also download the version of the pipeline specified so it can be run more easily in the future.
+In order to save the file, we click the `Save` button located in the upper right of the editor window.
+
+The final step is we need to submit our script to cheaha so it can be executed. The way we will accomplish that is via the commandline available from OnDemand. To access the commandline, click the `Open in Terminal` button located in the upper right of the interactive file system.
+
+We'll need to start by navigating to our `rnaseq_workshop` directory (NOTE: The `<blazer_id>` in the path should be replaced with your blazer id):
+
+```         
+cd /scratch/<blazer_id>/rnaseq_workshop
+```
+
+In order to submit the command we need to run the below command:
+
+```         
+sbatch run_test_rnaseq.sh
+```
+
+Once the command is run, you will see output similar to below:
+
+```         
+Submitted batch job 28085735
+```
+
+The number will be different, but this is giving you the job id, which can be used to query the job for additional information. You can monitor the job by running the below command (NOTE: The `<job_id>` in the command should be replaced with the job id obtained from the previous command):
+
+```         
+seff <job_id>
+```
+
+```         
+Job ID: 28085735
+Cluster: slurm_cluster
+User/Group: atrull/atrull
+State: COMPLETED (exit code 0)
+Cores: 1
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:00:01 core-walltime
+Job Wall-clock time: 00:00:01
+Memory Utilized: 1.62 MB
+Memory Efficiency: 0.16% of 1.00 GB
+```
+
+Running that command will provide some basic information about the job being queried, you can see how much memory the job used, its walltime, and other information. For this workshop, we are mainly just wanting to check the `State` of the job, and determine when it has changed to `COMPLETED` as in the example, as this means the job has completed successfully.
 
 Once everything is completed, move on to the next section as we can conclude the pipeline has been downloaded successfully.
 
@@ -214,19 +300,11 @@ So lets work on running the pipeline on actual data. The RNAseq pipeline (like m
 
 <https://nf-co.re/rnaseq/3.14.0/docs/usage>
 
-To begin, we'll use the interactive file system available through OnDemand Application provided by UAB Research Computing. The link can be found below: 
+We will again want to open the interactive file system from UAB Research Computing's OnDemand application, and navigate to the below directory (NOTE: The `<blazer_id>` in the path should be replaced with your blazer id):
 
-`https://rc.uab.edu/pun/sys/dashboard/`
-
-We'll navigate to the directory where we have moved the files downloaded from Globus. Following the install instructions will have placed the files in the directory below (NOTE: The `<blazer_id>` in the path should be replaced with your blazer id):
-
-```
+```         
 /scratch/<blazer_id>/rnaseq_workshop
 ```
-
-> ** NOTE **
->
-> For this lesson, we'll be using the onDemand Editor provided by UAB Research Computing in order to edit and create files. However, if you are more comfortable using a software editor such as `vim` or `nano`, that is also acceptable.
 
 We will want to start by creating a file called `samplesheet.csv`. In order to create a file, click the `New File` button in the upper right of interactive file system, and in the dialog box type `samplesheet.csv`.
 
@@ -236,7 +314,7 @@ Once the file is created, make sure it is highlighted and click the `Edit` butto
 sample,fastq_1,fastq_2,strandedness
 ```
 
-We’ve put the header into the samplesheet, so let’s save the samplesheet because we need to also include the FASTQs. In order to save the file, we click the `Save` button located in the upper right.
+We’ve put the header into the samplesheet, so let’s save the samplesheet because we need to also include the FASTQs.
 
 The next step in creating the samplesheet is to populate it with information. The way we will do that is via the commandline available from OnDemand. To access the commandline, click the `Open in Terminal` button located in the upper right of the interactive file system.
 
@@ -396,10 +474,10 @@ grep -rl "salmon" modules/
 
 The `find` command assumes that there is a file or directory that is named like the tool, this isn’t always the case so the grep can help in the cases where find fails to find anything.
 
-We can see that the salmon module is located at `modules/nf-core/salmon/quant`. Let's open up the process file:
+We can see that the salmon module is located at `modules/nf-core/salmon/quant`. Let's take a look at the process file:
 
 ```         
-vim modules/nf-core/salmon/quant/main.nf
+cat modules/nf-core/salmon/quant/main.nf
 ```
 
 The name of the process is at the very top of the file, which is what we need. Feel free to explore this, but a lot of this is Nextflow syntax. Special attention should be paid to the command for the tool which is located towards the bottom of the file.
@@ -419,9 +497,17 @@ There are additional ways you can use this config, controlling whether Nextflow 
 
 ### Submitting the pipeline
 
-With all the files created, we can submit the pipeline using the below command:
+With all the files created, we can submit the pipeline. We'll create a `run_rnaseq.sh` file, and put the below lines in it. Note we aren't increasing the resources for the job because we are only submitting the Nextflow runner which requires very minimal resources. In general when submitting the Nextflow runner, the main resource that may need increasing is the `--time` flag as that determines how much time you are allocating for the pipeline to run.
 
 ```         
+#SBATCH --job-name=rnaseq_test
+#SBATCH --output=rnaseq_test.out
+#SBATCH --error=rnaseq_test.err
+#SBATCH --time=1:00:00
+#SBATCH --partition=express
+#SBATCH --mem-per-cpu=1000
+#SBATCH --cpus-per-task=1
+
 nextflow run nf-core/rnaseq \
     --outdir ./subsample_results \
     -profile cheaha \
