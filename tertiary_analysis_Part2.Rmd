@@ -352,6 +352,10 @@ write.csv(normalized_counts_annotated,
           row.names = FALSE)
 ```
 
+```{r}
+T_vs_N_annotated <- Transplant_vs_Naive_annotated
+counts_annotated <- normalized_counts_annotated
+```
 
 # DESeq2 plots
 
@@ -359,7 +363,7 @@ write.csv(normalized_counts_annotated,
 
 ```{r fig.height=10, fig.width=10}
 EnhancedVolcano(Transplant_vs_Naive,
-                lab = Transplant_vs_Naive_annotated$external_gene_name,
+                lab = T_vs_N_annotated$external_gene_name,
                 x = "log2FoldChange",
                 y = "padj",
                 title = "Transplant_vs_Naive",
@@ -375,7 +379,7 @@ EnhancedVolcano(Transplant_vs_Naive,
 Apply standard DEG filters `adj.P.Val <= 0.05, logFC <= -1 | logFC >= 1`.
 
 ```{r}
-Transplant_vs_Naive_annotated_DEGs <- Transplant_vs_Naive_annotated %>%
+T_vs_N_annotated_DEGs <- T_vs_N_annotated %>%
   dplyr::filter(padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1) %>%
   dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %>%
   # Filter out the duplicated rows using `dplyr::distinct()`
@@ -385,7 +389,7 @@ Transplant_vs_Naive_annotated_DEGs <- Transplant_vs_Naive_annotated %>%
 
 ```{r}
 # Get all DE genes
-genes <- Transplant_vs_Naive_annotated_DEGs[order(Transplant_vs_Naive_annotated_DEGs$padj), ] %>%
+genes <- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %>%
          rownames()
 
 heatmapData <- normalized_counts[genes, ]
@@ -413,16 +417,16 @@ DEG_heatmap
 
 <details><summary>Click here for solution</summary>
 
-```{r}
+```{r }
 # Get top 20 DE genes
 # Select top 10 up-regulated genes
-top_up_genes <- Transplant_vs_Naive_annotated_DEGs[order(Transplant_vs_Naive_annotated_DEGs$padj), ] %>%
+top_up_genes <- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %>%
   filter(log2FoldChange > 1) %>%           # Focus on up-regulated (positive log2fc)
   head(20) %>%
   rownames()
 
 # Select top 10 down-regulated genes
-top_down_genes <- Transplant_vs_Naive_annotated_DEGs[order(Transplant_vs_Naive_annotated_DEGs$padj), ] %>%
+top_down_genes <- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %>%
   filter(log2FoldChange < -1) %>%           # Focus on up-regulated (negative log2fc)
   head(20) %>%
   rownames()
@@ -458,28 +462,29 @@ DEG_heatmap
 
 
 ```{r}
-Transplant_vs_Naive_annotated_fil <- Transplant_vs_Naive_annotated[! is.na(normalized_counts_annotated$external_gene_name)
-                                                                   & Transplant_vs_Naive_annotated$external_gene_name !="", ]
+T_vs_N_fil <- T_vs_N_annotated[! is.na(T_vs_N_annotated$external_gene_name)
+                               & T_vs_N_annotated$external_gene_name !="", ]
 
-normalized_counts_annotated_fil <- normalized_counts_annotated[! is.na(normalized_counts_annotated$external_gene_name)
-                                                               & normalized_counts_annotated$external_gene_name !="", ]
+counts_fil <- counts_annotated[! is.na(counts_annotated$external_gene_name)
+                               & counts_annotated$external_gene_name !="", ]
 
-unique_gene_names <- make.unique(Transplant_vs_Naive_annotated_fil$external_gene_name, sep = ".")
+unique_gene_names <- make.unique(T_vs_N_fil$external_gene_name, sep = ".")
 
+unique_gene_names_count <- make.unique(counts_fil$external_gene_name, sep = ".")
 
-rownames(Transplant_vs_Naive_annotated_fil) <- unique_gene_names
+rownames(T_vs_N_fil) <- unique_gene_names
 
-rownames(normalized_counts_annotated_fil) <- unique_gene_names
+rownames(counts_fil) <- unique_gene_names_count
 ```
 
 ```{r}
 
 # Get top 10 DE genes
-genes <- Transplant_vs_Naive_annotated_fil[order(Transplant_vs_Naive_annotated_fil$padj), ] %>%
+genes <- T_vs_N_fil[order(T_vs_N_fil$padj), ] %>%
          head(10) %>%
          rownames()
 
-heatmapData <- normalized_counts_annotated_fil[genes, ]
+heatmapData <- counts_fil[genes, ]
 
 # Scale counts for visualization
 heatmapData <- t(scale(t(heatmapData[, 1:8])))
@@ -509,14 +514,14 @@ DEG_heatmap
 
 ```{r}
 # Define the genes of interest.
-goi <- Transplant_vs_Naive_annotated_fil[order(Transplant_vs_Naive_annotated_fil$padj), ] %>%
+goi <- T_vs_N_fil[order(T_vs_N_fil$padj), ] %>%
          head(10) %>%
          rownames()
 ```
 
 ```{r}
 
-countData <- normalized_counts_annotated_fil[goi, 1:8]
+countData <- counts_fil[goi, 1:8]
 
 tcounts <- t(countData) %>%
   merge(colData(dds), ., by="row.names") %>%

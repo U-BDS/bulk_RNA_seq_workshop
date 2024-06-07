@@ -1,5 +1,5 @@
 ---
-title: "RNASeq Tertiary Analysis: Part 1"
+title: 'RNASeq Tertiary Analysis: Part 1'
 author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
 
@@ -94,11 +94,11 @@ We can import input data by 4 ways to construct a DESeqDataSet, depending on wha
 Given that we have implemented `salmon` quantification in secondary analysis, the recommended approach for tertiary analysis is to import the `salmon` transcript quantification to `DESeq2`, and then quantify gene-level data in `DESeq2` using `tximport`. This same approach can also be applied to other transcript abundance quantifiers such as `kallisto`
 
 
-Employing Salmon, Sailfish, or kallisto for transcript abundance estimation offers several key benefits:
+Employing Salmon or kallisto for transcript abundance estimation offers several key benefits:
 
 Correction for gene length variations: These methods account for potential changes in gene length across samples, which can arise from differential isoform usage. This is crucial for accurate quantification, as gene length directly influences the number of observed reads.
 
-Efficiency: Salmon, Sailfish, and kallisto are notably faster and require less computational resources compared to alignment-based approaches that involve generating and storing BAM files. This is a significant advantage for large-scale studies or when analyzing datasets with limited resources.
+Efficiency: Salmon and kallisto are notably faster and require less computational resources compared to alignment-based approaches that involve generating and storing BAM files. This is a significant advantage for large-scale studies or when analyzing datasets with limited resources.
 
 Increased sensitivity: Unlike traditional methods that discard ambiguously aligning fragments, these tools can leverage information from reads aligning to multiple homologous genes. This increases the sensitivity of transcript quantification, particularly for genes with high sequence similarity.
 

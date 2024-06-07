@@ -207,9 +207,6 @@ gost_results_url
 gostplot(gost_results, capped = TRUE, interactive = TRUE)
 ```
 
-```{r, message=FALSE}
-head(gost_results$result, 1)
-```
 
 ```{r}
 publish_gosttable(gost_results, highlight_terms = gost_results$result[c(1:10),],

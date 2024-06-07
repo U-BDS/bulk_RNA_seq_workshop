@@ -89,10 +89,9 @@ Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/
 
 GSEA can be executed on the full dataset regardless of cutoff. 
 
-GSEA on the Full Dataset: Instead of pre-filtering genes based on a statistical significance threshold (e.g., `p-value` or `fold change`), GSEA can be applied to the entire ranked list of genes. The ranking is usually based on the magnitude and direction of change between the two conditions being compared.The advantages for this approach is Increased Sensitivity, Reduced Bias, and Exploration of Weak Signals. 
-However it has some challenges including Interpretation of results and Statistical Significance of enrichment scores can be more complex when using the full dataset.
+***GSEA on the Full Dataset***: Instead of pre-filtering genes based on a statistical significance threshold (e.g., `p-value` or `fold change`), GSEA can be applied to the entire ranked list of genes. The ranking is usually based on the magnitude and direction of change between the two conditions being compared.The advantages for this approach is Increased Sensitivity, Reduced Bias, and Exploration of Weak Signals. However it has some challenges including Interpretation of results and Statistical Significance of enrichment scores can be more complex when using the full dataset.
 
-GSEA on DEGs (Differential Expression Genes): In this approach, only genes that meet a pre-defined cutoff for differential expression are included in the ranked list. The advantages for this approach is Focus on Strong Signals and Reduced Noise. However this approcach had some disadvantages including Potential Loss of Information and Dependence on Cutoff can significantly influence the results, and there's no universally accepted standard for selecting a cutoff value.
+***GSEA on DEGs (Differential Expression Genes)***: In this approach, only genes that meet a pre-defined cutoff for differential expression are included in the ranked list. The advantages for this approach is Focus on Strong Signals and Reduced Noise. However this approcach had some disadvantages including Potential Loss of Information and Dependence on Cutoff can significantly influence the results, and there's no universally accepted standard for selecting a cutoff value.
 
 ***Choosing the Right Approach***
 
@@ -177,6 +176,8 @@ head(mm_hallmark_sets)
 
 # Run GSEA
 
+Type `?GSEA` to explore the parameters of GSEA. You can change the parameters for the arguments based on your preference and supported values/methods.
+
 ```{r}
 # Run GSEA
 
@@ -229,7 +230,7 @@ ridgeplot(gsea_enrichment,
           decreasing = FALSE)
 ```
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 cnetplot(gsea_enrichment, 
          showCategory = 2, 
          foldChange=lfc_vector, 
@@ -246,7 +247,7 @@ cnetplot(gsea_enrichment,
 
 <details><summary>Click here for solution</summary>
 
-```{r fig.height=7, fig.width=10}
+```{r fig.height=7, fig.width=10, warning=FALSE,message=FALSE}
 cnetplot(gsea_enrichment, 
          showCategory = 2, 
          foldChange=lfc_vector, 
