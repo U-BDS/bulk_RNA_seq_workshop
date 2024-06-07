@@ -90,6 +90,73 @@ In order to download the data, perform the following steps:
 
 The folders will now be transferred to your scratch space on Cheaha. Following this process will match the directory structure that will be used for the first portion of the workshop.
 
+# Installing R and RStudio
+
+[R](https://www.r-project.org) is a programming language that is especially powerful for data exploration, visualization, and statistical analysis. To interact with R, we use [RStudio](https://www.rstudio.com/).
+
+Please follow the instructions at this location:
+
+https://carpentries.github.io/workshop-template/install_instructions/#r-1
+
 # Installing R dependencies
 
-<!-- TODO: see issue #2 -->
+[R](https://www.r-project.org) has a variety of existing and pre-built packages that ease the burden of analysis. We will be using a few of these packages to complete the lesson taught at this workshop.
+
+Please only complete this step **AFTER** successfully installing R and Rstudio above.
+
+1.    Open RStudio
+2.    In the central panel (known as the `Source Code Panel`), type the below commands:
+```
+install.packages(c("BiocManager", "remotes"))
+BiocManager::install(c("DESeq2", "tximport",
+                       "vsn","apeglm", 
+                       "tidyverse", "SummarizedExperiment", "vidger"))
+
+BiocManager::install(c("biomaRt",
+                       "clusterProfiler",
+                       "msigdbr",
+                       "Glimma", 
+                       "simplifyEnrichment"))
+
+BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr",
+                       "ComplexHeatmap","ComplexUpset","EnhancedVolcano",
+                       "RColorBrewer", "hexbin", "cowplot",
+                        "gplots", "ggplot2"))
+
+install.packages(c("gprofiler2", "ggridges", "rmarkdown"))
+
+```
+3.    Run each command by highlighting each line one at a time and clicking the `Run` button that is located near the top-right of the `Source Code Panel` (NOTE: The exact location may differ dependent on the OS you are using, but the button should still be visible around the `Source Code Panel`). Repeat this for each line that was typed in the above step
+4.    Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
+```
+library("DESeq2")
+library("tximport")
+library("vsn")
+library("apeglm")
+library("tidyverse")
+library("SummarizedExperiment")
+library("vidger")
+library("biomaRt")
+library("clusterProfiler")
+library("msigdbr")
+library("Glimma")
+library("simplifyEnrichment")
+library("enrichplot")
+library("kableExtra")
+library("ggrepel")
+library("ggpubr")
+library("ComplexHeatmap")
+library("ComplexUpset")
+library("EnhancedVolcano")
+library("RColorBrewer")
+library("hexbin")
+library("cowplot")
+library("gplots")
+library("ggplot2")
+library("gprofiler2")
+library("ggridges")
+library("rmarkdown")
+```
+5.    Run these commands similar to the steps described above, highlight each line and click the 'Run' button individually for each line.
+6.    If everything worked correctly, you will not see any output from the 'Console' panel located in your RStudio window other than seeing the command copied on each line
+
