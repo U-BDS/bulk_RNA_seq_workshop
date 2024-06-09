@@ -96,7 +96,7 @@ The folders will now be transferred to your scratch space on Cheaha. Following t
 
 Please follow the instructions at this location:
 
-https://carpentries.github.io/workshop-template/install_instructions/#r-1
+<https://carpentries.github.io/workshop-template/install_instructions/#r-1>
 
 # Installing R dependencies
 
@@ -104,9 +104,10 @@ https://carpentries.github.io/workshop-template/install_instructions/#r-1
 
 Please only complete this step **AFTER** successfully installing R and Rstudio above.
 
-1.    Open RStudio
-2.    In the central panel (known as the `Source Code Panel`), type the below commands:
-```
+1.  Open RStudio
+2.  In the central panel (known as the `Source Code Panel`), type the below commands:
+
+```         
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install(c("DESeq2", "tximport",
                        "vsn","apeglm", 
@@ -124,11 +125,12 @@ BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr",
                         "gplots", "ggplot2"))
 
 install.packages(c("gprofiler2", "ggridges", "rmarkdown"))
+```
 
-```
-3.    Run each command by highlighting each line one at a time and clicking the `Run` button that is located near the top-right of the `Source Code Panel` (NOTE: The exact location may differ dependent on the OS you are using, but the button should still be visible around the `Source Code Panel`). Repeat this for each line that was typed in the above step
-4.    Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
-```
+3.  Run each command by highlighting each line one at a time and clicking the `Run` button that is located near the top-right of the `Source Code Panel` (NOTE: The exact location may differ dependent on the OS you are using, but the button should still be visible around the `Source Code Panel`). Repeat this for each line that was typed in the above step
+4.  Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
+
+```         
 library("DESeq2")
 library("tximport")
 library("vsn")
@@ -157,6 +159,6 @@ library("gprofiler2")
 library("ggridges")
 library("rmarkdown")
 ```
-5.    Run these commands similar to the steps described above, highlight each line and click the 'Run' button individually for each line.
-6.    If everything worked correctly, you will not see any output from the 'Console' panel located in your RStudio window other than seeing the command copied on each line
 
+5.  Run these commands similar to the steps described above, highlight each line and click the 'Run' button individually for each line.
+6.  If everything worked correctly, you will not see any output from the 'Console' panel located in your RStudio window other than seeing the command copied on each line
