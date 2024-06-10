@@ -362,7 +362,7 @@ counts_annotated <- normalized_counts_annotated
 ## Volcano plot
 
 ```{r fig.height=10, fig.width=10}
-EnhancedVolcano(Transplant_vs_Naive,
+EnhancedVolcano(T_vs_N_annotated,
                 lab = T_vs_N_annotated$external_gene_name,
                 x = "log2FoldChange",
                 y = "padj",
@@ -589,7 +589,9 @@ head(selected_annotation)
 file_name <- paste0("./results/Transplant_vs_Naive/Glimma_ma_plot.html")
     
 rownames(Transplant_vs_Naive) <- Transplant_vs_Naive$ensembl_gene_id_version
-    
+
+Transplant_vs_Naive <- Transplant_vs_Naive[order(Transplant_vs_Naive$ensembl_gene_id_version, decreasing = FALSE),]
+ 
 print(all(rownames(Transplant_vs_Naive) == rownames(normalized_counts))) # must always be true for glimma reports
     
 # select sig (arbitrary choice of padj < 0.05) - to be highlighted in MA plot
