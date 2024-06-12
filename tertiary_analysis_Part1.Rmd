@@ -26,7 +26,7 @@ vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/do
 # Overview
 
 Tertiary analysis can be long and complex and is heavily dependent on study design.
-This workshop focus on standard tertiary analysis tasks which are split across 4 parts
+This workshop focuses on standard tertiary analysis tasks which are split across 4 parts
 covering: quality and control, data normalization and differential gene expression 
 analysis with `DESeq2`, gene annotation, gene enrichment analysis 
 (gene-ontology and gene  set enrichment analysis), and the fundamentals of data 
@@ -58,7 +58,6 @@ library(readr)
 library(ggplot2)
 library(ComplexHeatmap)
 library(RColorBrewer)
-
 ```
 
 ### Create `data` and `results` directory
@@ -76,10 +75,10 @@ In the `DESeq2` package, the core object for storing read counts and intermediat
 
 The "Ranged" aspect of `DESeqDataSet` signifies that each row of read count data can be linked to specific genomic regions, such as gene exons. This connection allows for seamless integration with other Bioconductor tools, enabling tasks like identifying `ChIP-seq` peaks near differentially expressed genes.
 
-Crucially, a `DESeqDataSet` object requires a `design` formula, which defines the variables considered in the statistical model. This formula typically consists of a tilde (~) followed by variables separated by plus signs. While the design can be modified after object creation, any changes necessitate repeating the differential analysis steps, as this formula influences dispersion estimates and log2 fold change calculations.
+Crucially, a `DESeqDataSet` object requires a `design` formula, which defines the variables considered in the statistical model. This formula typically consists of a tilde (`~`) followed by variables separated by plus signs. While the design can be modified after object creation, any changes necessitate repeating the upstream analytical steps of the DESeq2 pipeline, as changes in the `design` influences the dispersion estimates and log2 fold change calculations.
 
 
-We can import input data by 4 ways to construct a DESeqDataSet, depending on what pipeline was used upstream of DESeq2 to generated counts or estimated counts:
+We can import input data by 4 ways to construct a `DESeqDataSet`, depending on what pipeline was used upstream of DESeq2 to generated counts or estimated counts:
 
 . From `transcript abundance` files and `tximport`
 
@@ -93,18 +92,19 @@ We can import input data by 4 ways to construct a DESeqDataSet, depending on wha
 
 Given that we have implemented `salmon` quantification in secondary analysis, the recommended approach for tertiary analysis is to import the `salmon` transcript quantification to `DESeq2`, and then quantify gene-level data in `DESeq2` using `tximport`. This same approach can also be applied to other transcript abundance quantifiers such as `kallisto`
 
+Employing `salmon` or `kallisto` for transcript abundance estimation offers several key benefits:
 
-Employing Salmon or kallisto for transcript abundance estimation offers several key benefits:
+Correction for gene length variations: These methods account for potential changes in gene length across samples, which can arise from differential isoform usage. 
 
-Correction for gene length variations: These methods account for potential changes in gene length across samples, which can arise from differential isoform usage. This is crucial for accurate quantification, as gene length directly influences the number of observed reads.
-
-Efficiency: Salmon and kallisto are notably faster and require less computational resources compared to alignment-based approaches that involve generating and storing BAM files. This is a significant advantage for large-scale studies or when analyzing datasets with limited resources.
+Efficiency: As discussed in the secondary analysis portion, `salmon` and `kallisto` are notably faster and require less computational resources compared to alignment-based approaches that involve generating and storing BAM files. This is a significant advantage for large-scale studies or when analyzing datasets with limited resources.
 
 Increased sensitivity: Unlike traditional methods that discard ambiguously aligning fragments, these tools can leverage information from reads aligning to multiple homologous genes. This increases the sensitivity of transcript quantification, particularly for genes with high sequence similarity.
 
-**Note : For this workshop, we will import the transcript abundance (quants.sf`) file created by `salmon` in the secondary analysis pipeline (`nf-core`) using `tximport` method. The files are provided to you in the `/data` folder**
+With that being said and as previously discussed in secondary analysis, there can be study design needs where standard splice aware aligners may be more beneficial or complimentary.
 
-**Note: We have renamed the `.sf` files by $sample_names_quants.sf for easier import. Please practice caution while updating the file names.**
+**Note : For this workshop, we will import the transcript abundance (`quant.sf`) file created by `salmon` in the secondary analysis pipeline (`nf-core`) using `tximport` method. The files are provided to you in the `/data` folder**
+
+**Note: For simplicity and organization, we have renamed the `.sf` files by `${sample_names}_quant.sf`. Please practice caution while updating the file names in your own research projects to avoid sample mix-up (tip: changing file names does not alter the md5sum of the file. Thus, this checker can be applied to ensure there has been no sample mix-ups.**
 
 ## salmon, or STAR-salmon files
 
@@ -139,20 +139,23 @@ write.table(Log, file = "./results/Sample_names_tximport.txt",
             quote = FALSE, col.names = FALSE, sep = "\t")
 ```
 
-# tximport
+# `tximport`
 
 We will now import the transcript-level abundances and quantify them into gene-level counts.
 
-Note that we explicitely set the `ignoreTxVersion` parameter to `FALSE` despite it being
-the default value. In this case this parameter can easily change based on the source
-of the reference. We set it to `FALSE` given that we used a GENCODE reference, 
+Note that we explicitly set the `ignoreTxVersion` parameter to `FALSE` despite it being
+the default value. This serves as a reminder to ensure that the parameter has been set
+correctly according to the reference source. 
+In this canse, we set it to `FALSE` given that we used a GENCODE reference, 
 which contains versions associated to each feature which can be seen in the 
 `tx2gene` object. 
 
 ```{r}
-# let's take a peak at the available parameters for the tximport functions
+# First, let's take a peak at the available parameters for the tximport functions
 ?tximport
+```
 
+```{r}
 # with sensible parameters set, run tximport:
 txi <- tximport(myFiles_names,
                 type = "salmon",
@@ -171,6 +174,9 @@ A sample metadata file should contain all relevant metadata known for the sample
 in the study. This typically includes at a minimum the experimental grouping.
 However, it should also include additional factors when they are a part of the study
 (e.g.: sex, age, batch, time-points etc.)
+
+For this particular study, the sample metadata was acquired from the public
+repository containing the raw data:
 
 ```{r}
 # import file containing sample metadata
@@ -223,9 +229,11 @@ By default, `R` automatically assigns a reference level to factors based on alph
 
 To address this, you have two options:
 
-. Explicitly define the comparison: Use the contrast argument in the results function to specify the exact comparison you want to make. This overrides the default reference level.
+1. Explicitly define the comparison: Use the contrast argument in the results function to specify the exact comparison you want to make. This overrides the default reference level.
 
-. Change the factor levels: Explicitly set the factor levels to determine the reference level. This change will be reflected in the results names after running `DESeq` or `nbinomWaldTest`/`nbinomLRT`.
+2. Change the factor levels: Explicitly set the factor levels to determine the reference level. This change will be reflected in the results names after running `DESeq` or `nbinomWaldTest`/`nbinomLRT`.
+
+Below we demonstrate option #2:
 
 ```{r}
 # see current levels:
@@ -253,7 +261,7 @@ In this section, we'll delve into two common approaches for exploratory analysis
 
 ## Filter low abundance genes
 
-Before proceeding, it's important to establish a threshold for `gene expression` detectability. A simple criterion we'll use here is to consider a gene as non-detectable if its total count across all samples doesn't exceed 5. This ensures we focus on genes with sufficient data for meaningful analysis.
+Before proceeding, it's important to establish a threshold for `gene expression` detectability. A simple criterion we'll use here is to consider a gene as non-detectable (or extremely low abundance) if its total count across all samples doesn't exceed 5. This ensures we focus on genes with sufficient data for meaningful analysis.
 
 ```{r}
 #----- Counts Pre-filtering based on rowMeans -------
@@ -282,7 +290,7 @@ Note that there has been a notable drop in the number of genes present in this d
 Comparing raw `read counts` directly between samples with different library sizes can lead to incorrect conclusions about differential gene expression.
 
 `Normalization` by library size adjusts the read counts to make them comparable across samples, removing the technical bias introduced by varying sequencing depths.
-Before proceeding with downstream analysis, it is crucial to compare the library sizes across all samples to identify potential outliers or samples with significantly different sequencing depths
+Before proceeding with downstream analysis, it is crucial to compare the library sizes across all samples to identify potential outliers or samples with significantly different sequencing depths.
 
 
 ```{r}
@@ -301,10 +309,15 @@ libsize_plot <- colData(dds) %>%
          labs(x = "Sample", y = "Total count in millions") + 
          theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
+# let's take a look at the plot:
+libsize_plot
+
+# reminder on how to save figures:
 png("./results/libsize_plot.png")
 plot(libsize_plot)
 dev.off()
 ```
+
 
 Based on the figure above, we can see that there are differences in the raw counts
 across the samples. This is expected, and in the later sections the data will
@@ -353,10 +366,10 @@ Principal component analysis (PCA) is a dimensionality reduction technique that 
 In the plot below, we represent the samples in a two-dimensional principal component space. For each dimension, we indicate the fraction of the total variance represented by that component. By definition, the first principal component (PC1) always captures more variance than subsequent components. The fraction of explained variance measures how much of the 'signal' in the data is retained when projecting samples from the original high-dimensional space to the low-dimensional space for visualization.
 
 Principal component (PC) analysis plot displaying our 8 samples along PC1 and PC2, 
-indicates that there 84% of variance is explained in PC1 and that 4% is explained 
+indicates that there ~83% of variance is explained in PC1 and that ~4% is explained 
 in PC2.
 
-```{r }
+```{r}
 pcaData <- DESeq2::plotPCA(vsd, intgroup = "Condition",
                            returnData = TRUE)
 
@@ -378,7 +391,7 @@ ggplot(pcaData, aes(x = PC1, y = PC2)) +
 > Does it overall display variance that can be biologically relevant?
 
 
-**Challenges: Add names of samples on PCA plot**
+**Challenge: Add names of samples on PCA plot**
 
 
 <details><summary>Click here for solution</summary>
@@ -420,18 +433,17 @@ sampleDists <- dist(t(assay(vsd)))
 colors <- colorRampPalette(brewer.pal(9, "Blues"))(255)
 
 ComplexHeatmap::Heatmap(
-    as.matrix(sampleDists), 
-    col = colors,
-    name = "Euclidean\ndistance",
-    cluster_rows = hclust(sampleDists),
-    cluster_columns = hclust(sampleDists),
-    bottom_annotation = columnAnnotation(
-        condition = vsd$Condition,
-        time = vsd$Time,
-        col = list(condition = c(Naive = "blue", Transplant = "brown"),
-                   time = c("Naive" = "yellow", "24hr" = "forestgreen")))
-)
-
+  as.matrix(sampleDists), 
+  col = colors,
+  name = "Euclidean\ndistance",
+  cluster_rows = hclust(sampleDists),
+  cluster_columns = hclust(sampleDists),
+  bottom_annotation = columnAnnotation(
+    condition = vsd$Condition,
+    time = vsd$Time,
+    col = list(condition = c(Naive = "blue", Transplant = "brown"),
+               time = c("Naive" = "yellow", "24hr" = "forestgreen"))
+    ))
 ```
 
 ## Interactive QC Plots
