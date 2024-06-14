@@ -28,6 +28,14 @@ gene expression analysis with `DESeq2`, gene annotation, gene enrichment analysi
 (gene-ontology and gene set enrichment analysis)
 * Fundamentals of data visualization for transcriptomics
 
+## Docker
+
+While the tertiary analysis portion of the workshop is taught using personal computer (due to time limitations),
+a container with all R depedencies is available at: <https://hub.docker.com/r/uabbds/rnaseq_workshop>
+
+**Note to maintainers/authors**: website rendering should always be performed with the latest version of the container.
+This minimizes differences in the website due to versions among tools.
+
 ## Authors
 
 * Austyn Trull
