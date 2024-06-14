@@ -15,7 +15,7 @@ To participate in the workshop, you will need access to the software as describe
 
 The Cheaha supercomputer is a resource offered by Research Computing to all members of UAB and is a very useful tool for analyzing large datasets.
 
-Please follow the documentation produced by UAB's Research Computing Team available [here](https://docs.rc.uab.edu/account_management/cheaha_account/#creating-a-new-account) in order to create a account to access Cheaha.
+Please follow the documentation produced by UAB's Research Computing Team available [here](https://docs.rc.uab.edu/account_management/cheaha_account/#creating-a-new-account) in order to create an account to access Cheaha.
 
 Once your Cheaha account is successfully created, make sure to test that you can use the Interactive File System and Terminal available on UAB Research Computing's OnDemand Application. In order to do that, follow the below steps:
 
@@ -28,7 +28,7 @@ Performing those steps will ensure that your account has been setup correctly.
 
 # Environment Setup
 
-In order to setup the environment to run the pipeline on Cheaha we will be using a tool called Anaconda. Anaconda is a package manager and allows for easy and quick installation of tools. We will be using Anaconda in order to install the tools needed for the initial parts of the workshop.
+In order to setup the environment to run the pipeline on Cheaha we will be using a tool called Anaconda. Anaconda is a package manager and allows for easy and quick installation of tools. We will be using Anaconda to install the tools needed for the initial parts of the workshop.
 
 1.  Login to the UAB Research Computing OnDemand Application located at the following url: <https://rc.uab.edu/pun/sys/dashboard/>
 2.  In the upper left, click the `Files` button
