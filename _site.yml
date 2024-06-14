@@ -1,0 +1,35 @@
+name: "U-BDS bulk RNA-seq workshop"
+output_dir: "docs"
+navbar:
+  title: "U-BDS bulk RNA-seq workshop"
+  left:
+  - text: "Home"
+    icon: fa-home
+    href: index.html
+  - text: "Install instructions"
+    icon: fa-computer
+    href: installation.html
+  - text: "secondary analysis"
+    icon: fa-database
+    href: secondary_analysis.html
+  - text: "tertiary analysis"
+    icon: fa-chart-simple
+    menu:
+      - text: "Part 1"
+        href: tertiary_analysis_Part1.html
+      - text: "Part 2"
+        href: tertiary_analysis_Part2.html
+      - text: "Part 3"
+        href: tertiary_analysis_Part3.html
+      - text: "Part 4"
+        href: tertiary_analysis_Part4.html
+  - text: "Additional resources"
+    icon: fa-book
+    href: additional_resources.html
+
+output:
+  html_document:
+    css: "style.css"
+    toc: true
+    toc_float: true
+    theme: cosmo

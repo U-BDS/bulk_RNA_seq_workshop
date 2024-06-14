@@ -1,0 +1,75 @@
+---
+title: "RNASeq: Additional resources"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Complex designs
+
+`DESeq2` also allows for the analysis of complex designs. We heavily encourage trainees 
+to read the entire `DESeq2` vignette to learn more:
+
+https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
+
+Briefly, a few examples may include the need to control for variables, such as
+a batch effect or biological variable (e.g.: sex, age etc.). The standard process
+through which this can be performed in `DESeq2` is by including the additional
+variable(s) as part of the design. For example, the following design would test
+for differences in a variable called `condition`, while controlling for `batch`.
+
+```
+design= ~ batch + condition
+```
+
+Note: Does the order of variables matter?
+
+The best practice for `DESeq2` is to add your variable of interest (to be tested
+for DEG analysis), at the last position in the design (as shown in the example
+above). This order aids in ensuring that default results are pulled from the variable of interest.
+
+## Time-series experiments
+
+
+`DESeq2` can be used to analyze time course experiments. [This workflow is a great
+introduction for this type of analysis](https://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#time-course-experiments:~:text=9-,Time%20course%20experiments,-DESeq2%20can%20be).
+
+## Other complex designs
+
+While `DESeq2` is a great tool for many RNA-seq analysis, it also has its limitations.
+*One particular limitation to be aware of is that it does not support differential
+expression analysis with random effects*. A great resource for this type of analysis,
+is `limma` (specifically `limma-voom`). While the `limma` vignette can be quite large
+due to its historical role in microarray data, it's well organized and searchable to 
+direct users to RNA-seq data and it's `limma-voom` approach.
+
+See more at: http://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf
+
+# Environment reproducibility
+
+As discussed, secondary analysis with nf-core pipelines already implement what is known as 
+software containers (Docker, Singularity), however tertiary analysis and visualization 
+requires users to build their own custom containers. 
+This can be a critical step in aiding your analysis to be portable and reproducible.
+
+Unfortunately, due to time limitations and workshop scope, we are unable to
+demonstrate how to build your own containers. To learn more about Docker and
+Singularity containers, we encourage all trainees to visit our training website
+for a detailed 3-part tutorial in the "Intro to Docker with RStudio" tab from 
+<https://u-bds.github.io/training_guides/>.
+
+# U-BDS Data Science Office hours
+
+If you have follow-up questions about this workshop or any other data science
+topic which cover domain that U-BDS cover, please attend our office hours.
+
+It is every Thursday from 1:30pm-2:00. The registration link can be found
+[here](https://uab.zoom.us/meeting/register/tZ0rduCuqzotGtHShsawHLyRROqH3Sdz71mf#/registration).
+
+# U-BDS services
+
+If you would like to learn more about the core services please visit our main 
+UAB webpage at: <https://www.uab.edu/cores/ircp/bds>. If you would like to have
+a consultation, please fill out the "Enquiry Form" present on the website.

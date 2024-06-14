@@ -1,0 +1,481 @@
+---
+title: 'RNASeq Tertiary Analysis: Part 1'
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In addition to U-BDS's best practices and code written by U-BDS, sections of the
+teaching material for this workshop (especially tertiary analysis), contains
+materials which have been adapted or modified from the following sources 
+(*we thank the curators and maintainers of all of these resources for their
+wonderful contributions, compiling the best practices, and easy to follow
+training guides for beginners*):
+
+* Beta phase of carpentries meterial: <https://carpentries-incubator.github.io/bioc-rnaseq/index.html>
+* Love MI, Huber W, Anders S (2014). “Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2.” Genome Biology, 15, 550. doi:10.1186/s13059-014-0550-8 ; 
+vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html>
+* Additional references and materials: 
+  * <https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html>
+  * <https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html>
+
+
+# Overview
+
+Tertiary analysis can be long and complex and is heavily dependent on study design.
+This workshop focuses on standard tertiary analysis tasks which are split across 4 parts
+covering: quality and control, data normalization and differential gene expression 
+analysis with `DESeq2`, gene annotation, gene enrichment analysis 
+(gene-ontology and gene  set enrichment analysis), and the fundamentals of data 
+visualization for transcriptomics.
+
+# Packages loaded globabally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+library(tximport)
+library(DESeq2)
+library(Glimma)
+library(vsn)
+
+# Mouse annotation package we'll use for gene identifier conversion
+library(biomaRt)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(ComplexHeatmap)
+library(RColorBrewer)
+```
+
+### Create `data` and `results` directory
+
+```{r warning=FALSE}
+dir.create("./data", recursive = TRUE)
+dir.create("./results", recursive = TRUE) 
+```
+
+# Input data
+
+## The `DESeqDataSet`
+
+In the `DESeq2` package, the core object for storing read counts and intermediate calculations during RNA-seq analysis is the `DESeqDataSet`. This object, often referred to as dds in code examples, is derived from the `RangedSummarizedExperiment` class within the `SummarizedExperiment` package.
+
+The "Ranged" aspect of `DESeqDataSet` signifies that each row of read count data can be linked to specific genomic regions, such as gene exons. This connection allows for seamless integration with other Bioconductor tools, enabling tasks like identifying `ChIP-seq` peaks near differentially expressed genes.
+
+Crucially, a `DESeqDataSet` object requires a `design` formula, which defines the variables considered in the statistical model. This formula typically consists of a tilde (`~`) followed by variables separated by plus signs. While the design can be modified after object creation, any changes necessitate repeating the upstream analytical steps of the DESeq2 pipeline, as changes in the `design` influences the dispersion estimates and log2 fold change calculations.
+
+
+We can import input data by 4 ways to construct a `DESeqDataSet`, depending on what pipeline was used upstream of DESeq2 to generated counts or estimated counts:
+
+. From `transcript abundance` files and `tximport`
+
+. From a `count matrix`
+
+. From `htseq-count` files
+
+. From a `SummarizedExperiment` object
+
+## Transcript abundance files and tximport / tximeta
+
+Given that we have implemented `salmon` quantification in secondary analysis, the recommended approach for tertiary analysis is to import the `salmon` transcript quantification to `DESeq2`, and then quantify gene-level data in `DESeq2` using `tximport`. This same approach can also be applied to other transcript abundance quantifiers such as `kallisto`
+
+Employing `salmon` or `kallisto` for transcript abundance estimation offers several key benefits:
+
+Correction for gene length variations: These methods account for potential changes in gene length across samples, which can arise from differential isoform usage. 
+
+Efficiency: As discussed in the secondary analysis portion, `salmon` and `kallisto` are notably faster and require less computational resources compared to alignment-based approaches that involve generating and storing BAM files. This is a significant advantage for large-scale studies or when analyzing datasets with limited resources.
+
+Increased sensitivity: Unlike traditional methods that discard ambiguously aligning fragments, these tools can leverage information from reads aligning to multiple homologous genes. This increases the sensitivity of transcript quantification, particularly for genes with high sequence similarity.
+
+With that being said and as previously discussed in secondary analysis, there can be study design needs where standard splice aware aligners may be more beneficial or complimentary.
+
+**Note : For this workshop, we will import the transcript abundance (`quant.sf`) file created by `salmon` in the secondary analysis pipeline (`nf-core`) using `tximport` method. The files are provided to you in the `/data` folder**
+
+**Note: For simplicity and organization, we have renamed the `.sf` files by `${sample_names}_quant.sf`. Please practice caution while updating the file names in your own research projects to avoid sample mix-up (tip: changing file names does not alter the md5sum of the file. Thus, this checker can be applied to ensure there has been no sample mix-ups.**
+
+## salmon, or STAR-salmon files
+
+Locate all the transcript abundance file and prepare them to be imported to `DESeq2`.
+
+```{r prep data for tximport}
+tx2gene <- read.table("./data/tx2gene.tsv", sep = '\t', header = FALSE)
+
+head(tx2gene)
+
+# Importing quant.sf file from secondary outputs within data:
+
+myFiles <- dir("./data", ".sf$", full.names = TRUE)
+myFiles
+
+# Adding names for columns:
+
+myFiles_names <- c()
+
+for (i in myFiles) {
+    result <- gsub("_quant.sf","",i)
+    result <- basename(result)
+    myFiles_names[result] <- i
+}
+
+all(file.exists(myFiles_names))
+
+# Making a log of the col names from full names:
+Log <- as.matrix(myFiles_names)
+
+write.table(Log, file = "./results/Sample_names_tximport.txt",
+            quote = FALSE, col.names = FALSE, sep = "\t")
+```
+
+# `tximport`
+
+We will now import the transcript-level abundances and quantify them into gene-level counts.
+
+Note that we explicitly set the `ignoreTxVersion` parameter to `FALSE` despite it being
+the default value. This serves as a reminder to ensure that the parameter has been set
+correctly according to the reference source. 
+In this canse, we set it to `FALSE` given that we used a GENCODE reference, 
+which contains versions associated to each feature which can be seen in the 
+`tx2gene` object. 
+
+```{r}
+# First, let's take a peak at the available parameters for the tximport functions
+?tximport
+```
+
+```{r}
+# with sensible parameters set, run tximport:
+txi <- tximport(myFiles_names,
+                type = "salmon",
+                tx2gene = tx2gene,
+                txOut = FALSE,
+                ignoreTxVersion=FALSE)
+
+names(txi)
+head(txi$counts, 5)
+head(txi$abundance, 5)
+```
+
+# Sample meta data
+
+A sample metadata file should contain all relevant metadata known for the samples
+in the study. This typically includes at a minimum the experimental grouping.
+However, it should also include additional factors when they are a part of the study
+(e.g.: sex, age, batch, time-points etc.)
+
+For this particular study, the sample metadata was acquired from the public
+repository containing the raw data:
+
+```{r}
+# import file containing sample metadata
+colData <- read.csv("./data/ColData.csv", header=TRUE, row.names=1)
+colData
+str(colData)
+
+# change the condition, group, and time to factor
+
+colData$Condition <- as.factor(colData$Condition)
+colData$Group <- as.factor(colData$Group)
+colData$Time <- as.factor(colData$Time)
+
+colData
+```
+
+# Build a DESeq2DataSet
+
+The `DESeqDataSet` class, derived from `RangedSummarizedExperiment`, serves as the central data container in `DESeq2` for storing input data, intermediate calculations, and differential expression analysis results. It enforces the use of non-negative integer values in the counts matrix, the first element in its assay list. Moreover, a `design` formula defining the experimental setup is mandatory.
+
+Constructor functions facilitate the creation of `DESeqDataSet` objects from diverse sources:
+
+. `DESeqDataSet`: Accepts a `RangedSummarizedExperiment` object.
+
+. `DESeqDataSetFromMatrix`: Constructs from a matrix of `counts`.
+
+. `DESeqDataSetFromHTSeqCount`: Creates from `HTSeq` count files generated by the Python package.
+
+. `DESeqDataSetFromTximport`: Builds from a list object returned by the `tximport` function.
+
+The `design` parameter plays a pivotal role in modeling samples based on the experimental design. In our workshop dataset, where only the condition varies, a simple  `~ Condition` model suffices. 
+
+However, `DESeq2` accommodates complex designs involving batch correction, interactions, and time-series analysis. Refer to the "additional_resources" section of this workshop and the `DESeq2` vignette for more elaborate design examples.
+
+```{r}
+# tximport dds generation
+
+dds <- DESeqDataSetFromTximport(txi,
+                                colData = colData,
+                                design = ~ Condition) # update the design as needed
+
+dds
+
+head(counts(dds), 5)
+```
+
+## Note on factor levels
+
+By default, `R` automatically assigns a reference level to factors based on alphabetical order. If you don't specify a different reference level (e.g., indicating the `control` group) when using `DESeq2` functions, comparisons will be made based on this alphabetical order.
+
+To address this, you have two options:
+
+1. Explicitly define the comparison: Use the contrast argument in the results function to specify the exact comparison you want to make. This overrides the default reference level.
+
+2. Change the factor levels: Explicitly set the factor levels to determine the reference level. This change will be reflected in the results names after running `DESeq` or `nbinomWaldTest`/`nbinomLRT`.
+
+Below we demonstrate option #2:
+
+```{r}
+# see current levels:
+dds$Condition
+```
+
+In the output above, we can see that `Naive` is already set as the reference 
+level by alphabetical order. However, it is still best practice to include 
+the code chunk in your analysis and not rely on alphabetical order 
+as it can easily change across experiments.
+
+```{r}
+# set reference to Naive
+
+dds$Condition <- relevel(dds$Condition, ref = "Naive")
+
+dds$Condition
+```
+
+# Quality Control
+
+Exploratory analysis is an essential step in `RNA-seq` data analysis for quality control and understanding the underlying patterns. It can reveal issues like quality problems, sample swaps, or contamination, while also highlighting the most prominent trends in the dataset.
+
+In this section, we'll delve into two common approaches for exploratory analysis of RNA-seq data: `clustering` and `principal component analysis (PCA)`. These methods aren't exclusive to RNA-seq but are widely applicable. However, certain aspects of count data require specific considerations when applying these techniques.
+
+## Filter low abundance genes
+
+Before proceeding, it's important to establish a threshold for `gene expression` detectability. A simple criterion we'll use here is to consider a gene as non-detectable (or extremely low abundance) if its total count across all samples doesn't exceed 5. This ensures we focus on genes with sufficient data for meaningful analysis.
+
+```{r}
+#----- Counts Pre-filtering based on rowMeans -------
+message(paste0("Number of genes before pre-filtering: ",  nrow(counts(dds))))
+
+# here we do rowMeans, other approaches are rowSums or min. per sample
+keep <- rowMeans(counts(dds)) >= 5 
+dds <- dds[keep,]
+
+message(paste0("Number of genes after filtering: ",  nrow(counts(dds))))
+```
+
+Note that there has been a notable drop in the number of genes present in this dataset.
+
+> **Discussion Question**
+>
+> Given the drop from ~55k genes to 15k genes. Is this expected for this
+> species (mouse) and tissue type (lung-derived cells)? How many genes are typically
+> expressed in mammalian genomes?
+
+# QC Plots
+
+## Library size differences
+
+`Library size` refers to the total number of reads assigned to genes for a given sample.
+Comparing raw `read counts` directly between samples with different library sizes can lead to incorrect conclusions about differential gene expression.
+
+`Normalization` by library size adjusts the read counts to make them comparable across samples, removing the technical bias introduced by varying sequencing depths.
+Before proceeding with downstream analysis, it is crucial to compare the library sizes across all samples to identify potential outliers or samples with significantly different sequencing depths.
+
+
+```{r}
+# Add in the sum of all counts
+
+dds$libSize <-  colSums(counts(dds))
+
+# Plot the libSize by using pipe %>%
+# to extract the colData, turn it into a regular
+# data frame then send to ggplot:
+
+libsize_plot <- colData(dds) %>% 
+  as.data.frame() %>% 
+  ggplot(aes(x = rownames(colData), y = libSize / 1e6, fill = Condition)) + 
+         geom_bar(stat = "identity") + theme_bw() + 
+         labs(x = "Sample", y = "Total count in millions") + 
+         theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+# let's take a look at the plot:
+libsize_plot
+
+# reminder on how to save figures:
+png("./results/libsize_plot.png")
+plot(libsize_plot)
+dev.off()
+```
+
+
+Based on the figure above, we can see that there are differences in the raw counts
+across the samples. This is expected, and in the later sections the data will
+be normalized to account for this technical artifact.
+
+### Transform the data
+
+The `DESeq2` package provides two main approaches for transforming RNA-seq count data: the variance stabilizing transformation (`vst`) and the regularized log transformation (`rlog`). Both methods aim to produce transformed data on the log2 scale that is normalized for library size or other normalization factors.
+
+. Variance Stabilizing Transformation (vst)
+The `vst` is based on the concept of transforming the data such that the variance becomes independent of the mean expression level. This approach is useful because RNA-seq data often exhibits higher variance for lowly expressed genes compared to highly expressed genes.
+
+. Regularized Log Transformation (rlog)
+The `rlog` is an alternative approach that transforms the count data to the `log2` scale while minimizing differences between samples for rows (genes) with small counts. It incorporates a prior on the sample differences, which acts as a regularization or shrinkage step.
+
+Both `vst` and `rlog` produce transformed data on the `log2` scale, normalized for `library size` or other factors. The choice between the two transformations may depend on the specific characteristics of the dataset, such as the range of library sizes or the presence of lowly expressed genes
+
+#### Blind dispersion estimation
+
+The `vst` and `rlog` functions in `DESeq2` have an argument blind that determines whether the transformation should be blind to the sample information specified by the design formula. When `blind` is set to `TRUE` (the default), the functions will re-estimate the dispersion using only an intercept, ensuring that the transformation is unbiased by any information about the experimental groups.
+
+If `blind` is set to `FALSE`, the functions will use the already estimated dispersion to perform the transformations. If dispersion are not already estimated, they will be calculated using the current `design` formula. It is important to note that even when `blind` is set to `FALSE`, the transformation primarily uses the fitted dispersion estimates from the mean-dispersion trend line, which reflects the global dependence of dispersion on the mean for the entire experiment. 
+Therefore, setting `blind` to `FALSE` still largely avoids using specific information about which samples belong to which experimental groups during the transformation
+
+
+```{r}
+meanSdPlot(assay(dds), ranks = FALSE)
+```
+
+
+```{r}
+vsd <- vst(dds, blind=FALSE)
+vsd
+```
+
+
+```{r}
+meanSdPlot(assay(vsd), ranks = FALSE)
+```
+
+
+## PCA Plot 
+
+Principal component analysis (PCA) is a dimensionality reduction technique that projects samples into a lower-dimensional space. This reduced representation can be used for visualization or as input for other analytical methods. PCA is unsupervised, meaning it does not incorporate external information about the samples, such as treatment conditions.
+
+In the plot below, we represent the samples in a two-dimensional principal component space. For each dimension, we indicate the fraction of the total variance represented by that component. By definition, the first principal component (PC1) always captures more variance than subsequent components. The fraction of explained variance measures how much of the 'signal' in the data is retained when projecting samples from the original high-dimensional space to the low-dimensional space for visualization.
+
+Principal component (PC) analysis plot displaying our 8 samples along PC1 and PC2, 
+indicates that there ~83% of variance is explained in PC1 and that ~4% is explained 
+in PC2.
+
+```{r}
+pcaData <- DESeq2::plotPCA(vsd, intgroup = "Condition",
+                           returnData = TRUE)
+
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+ggplot(pcaData, aes(x = PC1, y = PC2)) +
+  geom_point(aes(color = Condition), size = 5) +
+  xlab(paste0("PC1: ", percentVar[1], "% variance")) +
+  ylab(paste0("PC2: ", percentVar[2], "% variance")) +
+  coord_fixed() +
+  theme(text = element_text(size=20)) +
+  theme_bw(base_size = 16) +
+  scale_y_continuous(limits = c(-6, 6)) 
+```
+
+> **Discussion Question**
+>
+> What is your interpratation from the PCA plot above.
+> Does it overall display variance that can be biologically relevant?
+
+
+**Challenge: Add names of samples on PCA plot**
+
+
+<details><summary>Click here for solution</summary>
+
+```{r}
+ggplot(pcaData, aes(x = PC1, y = PC2)) +
+  geom_point(aes(color = Condition), size = 5) +
+  coord_fixed() + 
+  theme_minimal() +
+  xlab(paste0("PC1: ", percentVar[1], "% variance")) +
+  ylab(paste0("PC2: ", percentVar[2], "% variance")) +
+  theme(text = element_text(size=20)) +
+  theme_bw(base_size = 16) +
+  scale_y_continuous(limits = c(-6, 6)) +
+  geom_text_repel(data = pcaData, 
+                  mapping = aes(label = name), 
+                  size = 2,
+                  fontface = 'bold.italic', 
+                  color = 'black',
+                  box.padding = unit(0.2, "lines"),
+                  point.padding = unit(0.2, "lines"))
+```
+
+</details>
+
+
+## Euclidean distance heatmap
+
+`Euclidean distance` is a measure of the straight-line distance between two points. In the context of sample clustering, it can be used to assess the similarity of gene expression patterns between samples. Longer `Euclidean distances` indicate greater differences in expression.
+
+One straightforward approach to `cluster` samples based on their expression patterns is to calculate the Euclidean distance between all possible sample pairs. These distances can then be visually represented using both a branching `dendrogram` and a `heatmap`, where color intensity corresponds to the magnitude of the distance. 
+
+From this, we infer that all samples are clustered based on the `Groups`.
+
+```{r}
+# dist computes distance with Euclidean method
+sampleDists <- dist(t(assay(vsd))) 
+
+colors <- colorRampPalette(brewer.pal(9, "Blues"))(255)
+
+ComplexHeatmap::Heatmap(
+  as.matrix(sampleDists), 
+  col = colors,
+  name = "Euclidean\ndistance",
+  cluster_rows = hclust(sampleDists),
+  cluster_columns = hclust(sampleDists),
+  bottom_annotation = columnAnnotation(
+    condition = vsd$Condition,
+    time = vsd$Time,
+    col = list(condition = c(Naive = "blue", Transplant = "brown"),
+               time = c("Naive" = "yellow", "24hr" = "forestgreen"))
+    ))
+```
+
+## Interactive QC Plots
+
+Often it is useful to look at interactive plots to directly explore different experimental factors or get insights from someone without coding experience.(particularly useful when there are covariate etc.)
+
+Some useful tools for interactive exploratory data analysis for RNA-seq are [Glimma](https://bioconductor.org/packages/release/bioc/html/Glimma.html) and [iSEE](https://bioconductor.org/packages/release/bioc/html/iSEE.html)
+
+While we will not cover them at this time, we encourage trainees to explore the
+resources above in the future.
+
+# save data
+
+We will save the analyzed datasets for other parts of this workshop.
+
+```{r}
+saveRDS(dds, file = "./results/dds.rds")
+saveRDS(vsd, file = "./results/vsd.rds")
+saveRDS(colData, file = "./results/colData.rds")
+saveRDS(txi, file = "./results/txi.rds")
+```
+
+## session info
+
+R's `sessionInfo()` captures the version of all packages loaded in the current
+environment. You may save this to an external file with the following command:
+
+`writeLines(capture.output(sessionInfo()), "./results/sessionInfo.txt")`
+
+In this case, we are displaying it as part of our lesson:
+
+```{r}
+sessionInfo()
+```
+

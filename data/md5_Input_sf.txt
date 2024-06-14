@@ -1,0 +1,8 @@
+2103c610c986850f6baaa083fe42d727  N01_AM_Naive_quant.sf
+3735f69bbfbac2e1b4a4b6bbd014bfd6  N02_AM_Naive_quant.sf
+5b8790e0fa67ae99c5abdd6535744307  N03_AM_Naive_quant.sf
+a144becd7cd76cf623d5f5ec728f2434  N04_AM_Naive_quant.sf
+67ba449a18fab9169c3e6fa49f226859  R05_AM_Allo24h_quant.sf
+6af86b8b71af68fa095427e18ff8c699  R06_AM_Allo24h_quant.sf
+84997cbdee62a5956530cbb03f508288  R07_AM_Allo24h_quant.sf
+f1ea78f3cd546e521f28d0cfb3d18843  R08_AM_Allo24h_quant.sf

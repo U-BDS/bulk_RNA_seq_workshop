@@ -1,0 +1,25 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+.bash_history
+.config
+.local
+.sh_history
+.cache
+results/*
+figures/*
+packages/*
+#ignore any files not needed for the website:
+docs/src/*
+docs/data/*
+docs/results/*
+docs/figures/*
+docs/packages/*
+docs/Dockerfile
+docs/rstudio-prefs.json
+docs/LICENSE
+docs/extra/*
+#other files
+rstudio-prefs.json

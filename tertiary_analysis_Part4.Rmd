@@ -1,0 +1,330 @@
+---
+title: "RNASeq Tertiary Analysis: Part 4"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages loaded globabally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+
+# pathway analysis
+library(clusterProfiler)
+library(msigdbr)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(EnhancedVolcano)
+library(ComplexUpset)
+library(ComplexHeatmap)
+library(RColorBrewer)
+```
+
+# Gene Set Enrichment Analysis (GSEA)
+
+Gene Set Enrichment Analysis (GSEA) is a computational method used to determine whether a priori defined sets of genes (representing biological pathways or processes) show statistically significant, concordant differences between two biological states (e.g., phenotypes, experimental conditions).
+
+GSEA is a powerful tool for extracting biological insights from gene expression data. By focusing on gene sets rather than individual genes, it can reveal subtle patterns and coordinated changes in gene expression that might be missed by other methods.
+
+In most cases, gene sets are from public databases where huge efforts from scientific curators have already been made to carefully categorize genes into gene sets with clear biological meanings. Nevertheless, gene sets can also be self-defined from individual studies, such as a set of genes in a network module from a co-expression network analysis, or a set of genes that are up-regulated in a certain disease.
+
+There are three key elements of the GSEA method:
+
+1. Calculation of an Enrichment Score (ES)
+2. Estimation of Significance Level of ES
+3. Adjustment for Multiple Hypothesis Testing
+
+## GSEA and GO enrichment analysis differences
+
+**Gene Ontology (GO) Enrichment Analysis**
+
+* Focus: Identifies which biological processes, molecular functions, or cellular components are over-represented in a set of genes compared to what would be expected by chance.
+
+* Input: A list of genes, often differentially expressed genes from an experiment.
+
+* Methodology: Uses statistical tests to compare the frequency of GO terms associated with the gene list to their frequency in a background set (e.g., expressed genes).
+
+* Outcome: A list of enriched GO terms with their associated p-values, indicating the processes/functions most relevant to the gene list.
+
+* Strengths: Simple to understand and implement, useful for identifying broad biological themes.
+
+* Limitations: Does not consider the magnitude of changes in gene expression, treats all genes in the list equally.
+
+**Gene Set Enrichment Analysis (GSEA)**
+
+* Focus: Determines whether a priori defined sets of genes (representing biological pathways or processes) show statistically significant, concordant differences between two biological states (e.g., phenotypes, experimental conditions).
+
+* Input: A list of genes ranked by their expression level (or other relevant metric), along with a collection of gene sets (e.g., from the Molecular Signatures Database).
+
+* Methodology: Calculates an enrichment score for each gene set based on how the genes in the set are distributed across the ranked list.
+
+* Outcome: A ranked list of gene sets with their enrichment scores and p-values, indicating which pathways/processes are most differentially regulated between the two states.
+
+* Strengths: Takes into account the magnitude of changes in gene expression, can detect subtle but coordinated changes in gene sets.
+
+* Limitations: Requires a priori defined gene sets, can be computationally intensive.
+
+
+# Input DEG list
+
+```{r}
+Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv",
+                                          row.names = 1)
+```
+
+GSEA can be executed on the full dataset regardless of cutoff. 
+
+***GSEA on the Full Dataset***: Instead of pre-filtering genes based on a statistical significance threshold (e.g., `adjusted p-value`, `fold change`), GSEA can be applied to the entire ranked list of genes. The ranking is usually based on the magnitude and direction of change between the two conditions being compared. The advantages for this approach is increased sensitivity, reduced bias, and exploration of weaker signals. However, it has some challenges including interpretation of results and statistical significance of enrichment scores which can be more complex when using the full dataset.
+
+***GSEA on DEGs (Differential Expression Genes)***: In this approach, only genes that meet a pre-defined cutoff for differential expression are included in the ranked list. The advantages for this approach is focus on strong signals and reduced noise. However this approach has some disadvantages including potential loss of information and dependence on arbitrary cutoffs which can significantly influence the results. Since there's no universally accepted standard for selecting a cutoff value to define DEGs, this decision is heavily linked to the analyst best judgement (however, we suggest the use of adjusted p-values and an absolute fold change cutoff).
+
+***Choosing an appropriate approach***
+
+The decision of whether to use the full dataset or a subset of DEGs depends on the *specific research question and the characteristics of the dataset*.
+
+* If you're interested in exploring subtle or coordinated changes in gene expression, or if you have a large dataset with many genes that show small but potentially meaningful changes, GSEA on the full dataset might be a better choice.
+
+* If you want to focus on the most pronounced changes in gene expression or have a smaller dataset, GSEA on DEGs could be more appropriate.
+
+_____
+
+For the purposes of this workshop, we will execute GSEA using the significant DEGs defined by `padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1` to be consistent with GO analysis cutoff.
+
+```{r}
+Transplant_vs_Naive_annotated_DEGs <- Transplant_vs_Naive_annotated %>%
+  dplyr::filter(str_trim(external_gene_name) != "") %>%  # Remove empty strings
+  dplyr::filter(padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1) %>% # THIS IS FILTERED ANALYSIS
+  dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %>%
+  # Filter out the duplicated rows using `dplyr::distinct()`
+  dplyr::distinct(external_gene_name, .keep_all = TRUE)
+```
+
+Quick look at #of DEGs.
+
+```{r}
+nrow(Transplant_vs_Naive_annotated_DEGs)
+```
+
+Check for duplicated gene_ids
+```{r}
+any(duplicated(Transplant_vs_Naive_annotated_DEGs$external_gene_name))
+```
+
+## Create log2Fold change ranked vector
+
+```{r}
+lfc_vector <- Transplant_vs_Naive_annotated_DEGs$log2FoldChange
+names(lfc_vector) <- Transplant_vs_Naive_annotated_DEGs$external_gene_name
+lfc_vector <- sort(lfc_vector, decreasing = TRUE)
+
+head(lfc_vector)
+```
+
+# Get the gene_sets from MSigDB
+
+### MSigDB gene sets
+
+The Molecular Signatures Database (MSigDB) is a meticulously curated collection of gene sets, initially created as a supplement to the groundbreaking Gene Set Enrichment Analysis (GSEA) paper. Since its inception in 2005 with just two collections and 843 gene sets, MSigDB has evolved independently into a powerful resource, boasting over 30,000 gene sets across nine distinct collections in its latest version (`v2023.1.Hs`).
+
+MSigDB organizes its gene sets into several collections, each dedicated to a specific biological theme. Some collections are further subdivided for more refined analysis. While there are various ways to access MSigDB gene sets, the `msigdbr` package offers a convenient solution, supporting numerous organisms through ortholog mapping.
+
+Let’s check which organisms are supported and which gene sets collections it provides.
+
+```{r}
+msigdbr_species()
+```
+
+Look different gene set (gs) collections
+
+```{r}
+msigdbr_collections()
+```
+
+The first column in the above output is the primary category of gene sets. Some gene sets collections may have sub-collections, and they are shown in the second column.
+
+## get Hallmark gene set
+
+The Hallmark gene set represent well-defined biological states or processes and exhibit coherent expression patterns. Hallmark gene sets are designed to be concise summaries of specific biological processes, reducing noise and redundancy often found in larger gene sets. These gene sets are derived by aggregating multiple gene sets from other MSigDB collections and retaining genes that consistently show coordinated expression across various datasets. This rigorous selection process ensures high confidence in their biological relevance. Hallmark gene sets cover a wide range of biological processes, making them suitable for exploring diverse research questions in GSEA.
+
+The function we will use to retrieve gene set is the `msigdbr` which takes as input
+the the following main parameters:
+
+```r
+msigdbr(species, category, subcategory)
+```
+
+As an example we will use the `H` category:
+
+```{r}
+mm_hallmark_sets <- msigdbr(
+  species = "Mus musculus", # Replace with species name relevant to your data
+  category = "H"
+)
+
+head(mm_hallmark_sets)
+```
+
+# Run GSEA
+
+Type `?GSEA` to explore the parameters of GSEA. You can change the parameters for the arguments based on your preference and supported values/methods.
+
+```{r warning=FALSE}
+# Run GSEA
+
+gsea_enrichment <- GSEA(
+  geneList = lfc_vector,
+  minGSSize = 25, # minimum gene set
+  maxGSSize = 500, # maximum gene set
+  pvalueCutoff = 0.05,
+  eps = 1e-10, # default
+  seed = TRUE,
+  pAdjustMethod = "BH", # change the pAdjustMethod as needed
+  TERM2GENE = dplyr::select(
+    mm_hallmark_sets,
+    gs_name,
+    gene_symbol)
+)
+```
+
+## Explore GSEA results
+
+```{r}
+# see head excluding the last collumn for simplicity:
+head(gsea_enrichment@result)[,1:(ncol(gsea_enrichment@result)-1)]
+```
+
+## Dot plot
+
+```{r fig.height=8, fig.width=8}
+dotplot(gsea_enrichment, showCategory=20)
+```
+
+**Challenge: Split the dot plot by activated/suppressed**
+
+<details><summary>Click here for solution</summary>
+
+```{r fig.height=9, fig.width=8}
+dotplot(gsea_enrichment, showCategory=20, split=".sign") + facet_grid(.~.sign)
+```
+
+</details>
+
+## Ridge Plot
+
+```{r}
+ridgeplot(gsea_enrichment,
+          showCategory = 10,
+          fill = "p.adjust",
+          core_enrichment = TRUE,
+          label_format = 30,
+          orderBy = "NES",
+          decreasing = FALSE)
+```
+
+## Additional plots
+
+```{r, warning=FALSE, message=FALSE}
+cnetplot(gsea_enrichment, 
+         showCategory = 2, 
+         foldChange=lfc_vector, 
+         colorEdge = TRUE,
+         cex_category = 1,
+         cex_gene = 1,
+         cex_label_category = 0.5,
+         cex_label_gene = 0.5,
+         circular = FALSE)
+```
+
+
+**Challenge: make the circular network**
+
+<details><summary>Click here for solution</summary>
+
+```{r fig.height=7, fig.width=10, warning=FALSE,message=FALSE}
+cnetplot(gsea_enrichment, 
+         showCategory = 2, 
+         foldChange=lfc_vector, 
+         colorEdge = TRUE,
+         cex_category = 0.5,
+         cex_gene = 0.5,
+         cex_label_category = 0.5,
+         cex_label_gene = 0.5,
+         circular = TRUE)
+```
+
+
+<details>
+
+**Note**: if you would like to display specific hallmakrs in the `cnetplot`, note
+that the `showCategory` parameter also accepts a vector of terms to be displayed.
+
+_____
+
+```{r fig.height=4, fig.width=25}
+heatplot(gsea_enrichment, showCategory = 7, foldChange=lfc_vector)
+```
+
+#### Most Positive NES
+
+```{r}
+gsea_result_df <- data.frame(gsea_enrichment@result)
+
+gsea_result_df %>%
+  # This returns the 3 rows with the largest NES values
+  dplyr::slice_max(NES, n = 3)
+```
+
+```{r fig.height=5, fig.width=6}
+most_positive_nes_plot <- enrichplot::gseaplot(
+  gsea_enrichment,
+  geneSetID = "HALLMARK_G2M_CHECKPOINT",
+  title = "HALLMARK_G2M_CHECKPOINT",
+  color.line = "#0d76ff"
+)
+most_positive_nes_plot
+```
+
+### Most Negative NES
+
+```{r, message=FALSE}
+gsea_result_df %>%
+  # This returns the 3 rows with the largest NES values
+  dplyr::slice_min(NES, n = 3)
+```
+
+```{r fig.height=5, fig.width=6}
+most_negative_nes_plot <- enrichplot::gseaplot(
+  gsea_enrichment,
+  geneSetID = "HALLMARK_ALLOGRAFT_REJECTION",
+  title = "HALLMARK_ALLOGRAFT_REJECTION",
+  color.line = "#0d76ff"
+)
+most_negative_nes_plot
+```
+
+Write GSEA results to csv
+
+```{r}
+write.csv(gsea_enrichment@result, file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_GSEA_hallmark_padj_fc.csv")
+```
+
+## session info
+
+```{r}
+sessionInfo()
+```

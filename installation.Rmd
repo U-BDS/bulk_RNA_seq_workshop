@@ -1,0 +1,164 @@
+---
+title: "Installation instructions"
+author: "Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D."
+---
+
+To participate in the workshop, you will need access to the software as described below. In addition, you will need an up-to-date web browser.
+
+------------------------------------------------------------------------
+
+`r fontawesome::fa("triangle-exclamation", fill = "#d40808")` If you have any questions or issues regarding any of the below issues, please feel free to attend the Data Science Office Hours hosted over Zoom by U-BDS every Thursday from 1:30p.m. - 2:00p.m. Please click [here](https://uab.zoom.us/meeting/register/tZ0rduCuqzotGtHShsawHLyRROqH3Sdz71mf) for the Zoom link.
+
+------------------------------------------------------------------------
+
+# Cheaha Account Registration {#cheaha_account}
+
+The Cheaha supercomputer is a resource offered by Research Computing to all members of UAB and is a very useful tool for analyzing large datasets.
+
+Please follow the documentation produced by UAB's Research Computing Team available [here](https://docs.rc.uab.edu/account_management/cheaha_account/#creating-a-new-account) in order to create an account to access Cheaha.
+
+Once your Cheaha account is successfully created, make sure to test that you can use the Interactive File System and Terminal available on UAB Research Computing's OnDemand Application. In order to do that, follow the below steps:
+
+1.  Login to the OnDemand application located at the following url: <https://rc.uab.edu/pun/sys/dashboard/>
+2.  In the upper left, click the `Files` button
+3.  In the dropdown, click the link that says `/scratch/<blazer_id>/` where `blazer_id` will be your blazer id
+4.  In the new window that appears, click the `Open in Terminal` button in the upper right of the page
+
+Performing those steps will ensure that your account has been setup correctly.
+
+# Environment Setup
+
+In order to setup the environment to run the pipeline on Cheaha we will be using a tool called Anaconda. Anaconda is a package manager and allows for easy and quick installation of tools. We will be using Anaconda to install the tools needed for the initial parts of the workshop.
+
+1.  Login to the UAB Research Computing OnDemand Application located at the following url: <https://rc.uab.edu/pun/sys/dashboard/>
+2.  In the upper left, click the `Files` button
+3.  In the dropdown, click the link that says `/scratch/<blazer_id>/` where `blazer_id` will be your blazer id
+4.  In the new window that appears, click the `Open in Terminal` button in the upper right of the page
+5.  Cheaha comes with a lot of tools and software pre-installed called 'modules'. Anaconda is one of these tools, and we can load it using the below command in the terminal window that appeared:
+    -   `module load Anaconda3`
+6.  Anaconda works by creating isolated environments to install packages into. In order to create one of these environments, use the below command:
+    -   `conda create -p $USER_SCRATCH/conda_envs/rnaseq_workshop`
+
+    -   Type `y` when prompted.
+
+    -   This command will create a new conda enviroment called `rnaseq_workshop` in your scratch space on Cheaha and under a sub-directory called `conda_envs`. It is important to name your environments as something intuitive to help you remember their purpose.
+7.  We now need to activate the environment so we can begin installing packages inside the newly created 'rnaseq_workshop' environment.
+    -   `conda activate $USER_SCRATCH/conda_envs/rnaseq_workshop`
+8.  Inside the environment, install Nextflow and nf-core as these will be needed in order to run the pipeline
+    -   `conda install bioconda::nf-core`
+
+    -   Be sure to type `y` when prompted
+9.  The environment should be created and the packages installed, in order to get back out of the environment, we deactivate it
+    -   `conda deactivate`
+
+# Globus Account Registration {#globus_account}
+
+Globus is a web-based tool that can be used for large data transfers between different locations.
+
+As a member of UAB, you are able to login using your blazer id. In order to login to Globus using UAB, follow the steps below:
+
+1.  Go to the Globus [home page](https://www.globus.org/).
+2.  Click 'Login' in the upper right of the page.
+3.  In the center of the page, click the drop down and search for 'University of Alabama at Birmingham' and click 'Continue'.
+4.  On the next page, enter your blazer id and password for your UAB account.
+
+# Downloading the Data to Cheaha {#data_download}
+
+The data being used for the workshop comes from the paper below:
+
+<https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6096346/>
+
+For this workshop, the data has been pre-downloaded and packaged into a Globus endpoint for ease of transfer. The link for the Globus endpoint can be found [here](https://app.globus.org/file-manager?origin_id=c8838c0b-c94c-4970-9194-c32f20911e28&origin_path=%2F)
+
+If you have never logged into the Globus account, please see the instructions [here](#globus_account)
+
+In order to download the data, perform the following steps:
+
+1.  Login to Globus
+2.  Click on 'File Manager' in the side bar
+3.  In the left pane, click the 'Collection' text box
+4.  Search for 'Cheaha cluster on-campus (UAB DMZ)' and select it
+    -   If you are off campus, use the 'Cheaha cluster off-campus (UAB DMZ)' collection instead
+5.  In the 'Path' text box type `/scratch/your_blazerid` where `your_blazerid` is your blazer id
+6.  Towards the middle, click the 'New Folder' button and type `rnaseq_workshop`.
+    -   This will create a new folder names 'rnaseq_workshop' in your scratch space
+7.  Double click the 'rnaseq_workshop' folder to go inside of it
+8.  In the right pane, click the 'Collection' text box
+9.  Search for 'rnaseq_workshop_data'
+10. In the right pane, click the checkboxes beside the 'input' and 'results' folder that have appeared
+11. In the middle, click the 'Transfer of Sync to...' button.
+
+The folders will now be transferred to your scratch space on Cheaha. Following this process will match the directory structure that will be used for the first portion of the workshop.
+
+# Installing R and RStudio
+
+[R](https://www.r-project.org) is a programming language that is especially powerful for data exploration, visualization, and statistical analysis. To interact with R, we use [RStudio](https://www.rstudio.com/).
+
+Please follow the instructions at this location:
+
+<https://carpentries.github.io/workshop-template/install_instructions/#r-1>
+
+# Installing R dependencies
+
+[R](https://www.r-project.org) has a variety of existing and pre-built packages that ease the burden of analysis. We will be using a few of these packages to complete the lesson taught at this workshop.
+
+Please only complete this step **AFTER** successfully installing R and Rstudio above.
+
+1.  Open RStudio
+2.  In the central panel (known as the `Source Code Panel`), type the below commands:
+
+```         
+install.packages(c("BiocManager", "remotes"))
+BiocManager::install(c("DESeq2", "tximport",
+                       "vsn","apeglm", 
+                       "tidyverse", "SummarizedExperiment", "vidger"))
+
+BiocManager::install(c("biomaRt",
+                       "clusterProfiler",
+                       "msigdbr",
+                       "Glimma", 
+                       "simplifyEnrichment"))
+
+BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr",
+                       "ComplexHeatmap","ComplexUpset","EnhancedVolcano",
+                       "RColorBrewer", "hexbin", "cowplot",
+                        "gplots", "ggplot2"))
+
+install.packages(c("gprofiler2", "ggridges", "rmarkdown"))
+```
+
+3.  Run each command by highlighting each line one at a time and clicking the `Run` button that is located near the top-right of the `Source Code Panel` (NOTE: The exact location may differ dependent on the OS you are using, but the button should still be visible around the `Source Code Panel`). Repeat this for each line that was typed in the above step
+4.  Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
+
+```         
+library("DESeq2")
+library("tximport")
+library("vsn")
+library("apeglm")
+library("tidyverse")
+library("SummarizedExperiment")
+library("vidger")
+library("biomaRt")
+library("clusterProfiler")
+library("msigdbr")
+library("Glimma")
+library("simplifyEnrichment")
+library("enrichplot")
+library("kableExtra")
+library("ggrepel")
+library("ggpubr")
+library("ComplexHeatmap")
+library("ComplexUpset")
+library("EnhancedVolcano")
+library("RColorBrewer")
+library("hexbin")
+library("cowplot")
+library("gplots")
+library("ggplot2")
+library("gprofiler2")
+library("ggridges")
+library("rmarkdown")
+```
+
+5.  Run these commands similar to the steps described above, highlight each line and click the 'Run' button individually for each line.
+6.  If everything worked correctly, you will not see any output from the 'Console' panel located in your RStudio window other than seeing the command copied on each line

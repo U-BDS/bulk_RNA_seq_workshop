@@ -1,0 +1,637 @@
+---
+title: "RNASeq Tertiary Analysis: Part 2"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages loaded globally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+library(tximport)
+library(DESeq2)
+library(Glimma)
+library(vsn)
+
+# Mouse annotation package we'll use for gene identifier conversion
+library(biomaRt)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(EnhancedVolcano)
+library(ComplexUpset)
+library(ComplexHeatmap)
+library(RColorBrewer)
+```
+
+
+# Differential expression analysis
+
+## Input data
+
+In case our objects from part 1 are not present in the environment, here we re-load them:
+
+```{r}
+dds <- readRDS(file = "./results/dds.rds")
+colData <- readRDS(file = "./results/colData.rds")
+txi <- readRDS(file = "./results/txi.rds")
+```
+
+
+## Run `DESeq` function
+
+The standard differential expression analysis steps in `DESeq2` are wrapped into a single function, `DESeq`. This function performs the following key steps:
+
+* Estimation of size factors: `DESeq2` calculates size factors for each sample to `normalize` the count data and account for differences in library size or sequencing depth.
+
+* Estimation of dispersions: `DESeq2` estimates gene-wise dispersions, which model the relationship between the mean and variance of counts across samples. This accounts for the mean-variance dependency often observed in RNA-seq data.
+
+* Fitting the negative binomial generalized linear model: `DESeq2` fits a negative binomial GLM to the count data, using the design formula specified during the creation of the `DESeqDataSet` object.
+
+* Wald statistics: `DESeq2` computes Wald statistics and `p-values` to test for differential expression between conditions or levels of the variables in the design formula. Note that the Wald statistic is the default test approach. `DESeq2` also provides the likelihood ratio test.
+
+In summary, `DESeq2` provides a streamlined workflow for differential expression analysis, incorporating normalization, dispersion estimation, and statistical testing, while allowing users to specify the desired comparisons and extract results tailored to their experimental design
+
+
+```{r, message=FALSE}
+dds <- DESeq(dds)
+
+# checking coefficient by resultsNames(dds):
+
+resultsNames(dds)
+
+# Dispersion plot
+
+plotDispEsts(dds)
+```
+
+
+In a `DESeq2` analysis, the dispersion plot visualizes the relationship between a gene's mean expression level and its dispersion estimate. Dispersion, in this context, quantifies the degree to which the observed count data for a gene varies around its expected value under the negative binomial model.
+
+**Importance for Assumptions**
+
+The dispersion plot is a crucial diagnostic tool for assessing the validity of several key assumptions underlying the `DESeq2` analysis:
+
+* Mean-Variance Relationship: `DESeq2` assumes a specific relationship between a gene's mean expression level and its variance (or dispersion). The dispersion plot helps verify whether this assumed relationship holds true in the data. Typically, genes with lower mean expression exhibit higher dispersion (more variability) than those with higher mean expression.
+
+* Model Fit: The dispersion estimates for each gene should ideally align with the fitted dispersion trend line. Substantial deviations from this trend might indicate that the negative binomial model doesn't adequately capture the variance structure of the data.
+
+* Outliers: The dispersion plot can help identify outlier genes with unusually high dispersion estimates compared to other genes with similar mean expression levels. These outliers might warrant further investigation as they could be indicative of technical artifacts or biological phenomena not accounted for by the model.
+
+A well-behaved dispersion plot should show:
+
+**Overall trend**: A decreasing trend in dispersion as mean expression increases.
+**Fit to the model**: Most gene-wise dispersion estimates should cluster around the fitted trend line.
+**Few outliers**: A small number of points far from the trend line might indicate outliers.
+
+By carefully examining the dispersion plot, researchers can assess whether their data conforms to the assumptions of the `DESeq2` model, identify potential issues, and make informed decisions about downstream analysis steps.
+
+
+## `Transplant_vs_Naive` pair-wise comparision
+
+The `results` function is used to extract a results table containing `log2 fold changes`, `p-values`, and `adjusted p-values` from the `DESeq` analysis. By default, the results are generated for the comparison of the last level of the last variable in the design formula against the reference level.
+
+However, users can specify the desired comparison using the name or contrast arguments in the `results` function. The contrast argument allows for precise specification of the levels and order of comparison, while the name argument can be used for simple two-group comparisons.
+It's important to note that `DESeq2` performs independent filtering by default, which removes genes with low mean normalized counts across all samples. This step aims to improve the estimation of dispersion and reduce the multiple testing burden.
+
+```{r}
+## Transplant_vs_Naive
+resCondition <- results(dds, contrast = c("Condition", "Transplant", "Naive"))
+summary(resCondition)
+```
+
+## Shrinkage of log fold change
+
+Shrinking log fold change (LFC) estimates is a beneficial technique to enhance the visualization and ranking of genes. To accomplish this shrinkage, we utilize the `lfcShrink` function for the `dds` object. In this example, we employ the `apeglm` method for effect size shrinkage (Zhu, Ibrahim, and Love 2018), which offers an improvement over the previously used estimator.
+
+* `apeglm` is the adaptive t prior shrinkage estimator from the apeglm package (Zhu, Ibrahim, and Love 2018). As of version 1.28.0, it is the default estimator.
+
+* `ashr` is the adaptive shrinkage estimator from the ashr package (Stephens 2016). Here DESeq2 uses the ashr option to fit a mixture of Normal distributions to form the prior, with method="shrinkage".
+
+* `normal` is the the original DESeq2 shrinkage estimator, an adaptive Normal distribution as prior.
+
+________
+
+```{r lfcShrink, message=FALSE, warning=FALSE}
+#--------------- Transplant_vs_Naive: Condition_Transplant_vs_Naive --------------
+
+dir.create("./results/Transplant_vs_Naive", recursive = TRUE)
+
+# lfcShrink function
+Transplant_vs_Naive <- lfcShrink(dds, coef="Condition_Transplant_vs_Naive", type="apeglm")
+
+Transplant_vs_Naive
+```
+
+
+# Explore the `DESeq2` result
+
+For the purposes of this workshop we will use the results which have implemented shrinkage of log2 fold changes (from the `Transplant_vs_Naive` variable).
+
+## P-value histogram plot
+
+Visualizing the histogram of p-values is a valuable practice when assessing the distribution of your hypotheses (null vs alternative). This plot aids in evaluating whether your data meets the assumptions required for False Discovery Rate (FDR) correction. Although FDR correction is typically applied to control for false positives, there are specific instances where careful consideration is warranted.
+
+These edge cases go beyond the scope of this workshop,
+but we encourage trainees to read the following post that nicely summarize 
+data patterns to be aware of:
+<http://varianceexplained.org/statistics/interpreting-pvalue-histogram/>
+
+
+```{r}
+# distribution of p-vals (always want to plot non-corrected p-values for this)
+hist(Transplant_vs_Naive$pvalue)
+```
+
+Each bar represents the number of genes with a p-value in the given bin (bin size=0.05).
+
+## MA Plot
+
+We can visualize the results in many ways. A good check is to explore the relationship between log2fold changes, significant DE genes and the genes mean count. `DESeq2` provides a useful function to do so, `plotMA()`.
+
+```{r}
+plotMA(Transplant_vs_Naive)
+```
+
+
+## Summary statistics
+
+In `DESeq2`, the `adjusted p-value` (also known as `padj`) is a modified version of the raw `p-value` that accounts for multiple hypothesis testing. When you perform thousands of statistical tests simultaneously (as in differential gene expression analysis), the probability of observing some false positives increases. The `adjusted p-value` controls for this by estimating the false discovery rate (FDR). The Default cutoff is `adjusted p-value < 0.1`.
+
+> **Discussion Question**
+>
+> In part 1, we applied pre-filtering to remove very low abundance genes.
+> How is pre-filtering linked to multiple hypothesis testing / false discovery rates?
+
+Default FDR Correction Method
+
+The default method for FDR correction in `DESeq2` is the `Benjamini-Hochberg` (BH) procedure. This method ranks the `p-values` from smallest to largest and calculates an `adjusted p-value` for each gene based on its rank and the total number of tests performed. The `adjusted p-value` represents the estimated proportion of false positives among all genes with an equal or smaller `p-value`.
+
+
+```{r}
+summary(Transplant_vs_Naive)
+```
+
+You can customize `adjusted p-value` cutoff by changing the default parameter:
+
+```{r}
+summary(Transplant_vs_Naive, alpha = 0.05)
+```
+
+At a first glance, this data suggests that there are significantly large
+transcriptomics alterations based on `adjusted p-value` < 0.05.
+
+
+**Challenge: different approaches to limit the DEGs count**
+
+<details><summary>Click here for solution</summary>
+
+```{r}
+summary(Transplant_vs_Naive, alpha = 0.01)
+```
+
+Note: the `summary` function is simplistic in nature. In the later portions of the
+workshop we will also cover another variable to filter results on: log2 fold changes.
+
+</details>
+
+
+## Sort by Adjusted p.value
+
+```{r}
+Transplant_vs_Naive <- Transplant_vs_Naive[order(Transplant_vs_Naive$padj),]
+
+head(Transplant_vs_Naive)
+```
+
+
+# Make annotation object
+
+At this point, we will create an annotation object which we will use in the later
+section of this workshop to add annotation information (e.g.: gene names)
+to our results.
+
+Note that in the code below we select mm39 (GENCODE release M32) corresponding 
+to Ensembl 109 since this is the genome / GTF versions we used in secondary 
+analysis. You should always aim to match the genomic version in tertiary analysis
+to what was used in the secondary analysis.
+
+Also note that while there are many ways to annotate your data, the code chunks below
+implements functions from the `biomaRt` package to fetch the annotations.
+
+_____
+
+As a starting point, let's check the available Ensembl versions, to ensure
+we select the correct one for our data:
+
+```{r}
+# check available urls (current and archives):
+listEnsemblArchives()
+```
+
+We can see from the output above, that the url matching the Ensembl 109 version
+is `https://feb2023.archive.ensembl.org`. Thus, we set the hosting url below to
+this specific version.
+
+Further, `biomaRt` provides several attributes you may add to your data
+for annotation. The attributes selected below are some of the most commonly used
+and needed metadata:
+
+You can list all available attributes for a glance
+`listAttributes(ensembl)` where `ensembl` is the Mart object we will create
+in this section.
+
+```{r annotation_info}
+# Specify the version specific archive:
+host_url <- "https://feb2023.archive.ensembl.org"
+
+# attributes
+attributes_to_add <- c("ensembl_gene_id", "external_gene_name","gene_biotype",
+                       "description","chromosome_name","start_position",
+                       "end_position","strand")
+```
+
+Next, select the species. If you are unsure on how to properly add your species,
+you can see the options by running 
+`listDatasets(mart=useMart("ENSEMBL_MART_ENSEMBL", host = host_url))`
+
+```{r}
+species <- "mmusculus_gene_ensembl"
+```
+
+With all required parameters set for `biomaRt`, run the code chunk below to:
+  * Connect to the selected BioMart database
+  * Use Ensembl IDs as the input query
+  * Fetch the annotation information
+
+```{r}
+ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset = species, host = host_url)
+
+listMarts(host=host_url)
+
+# although we filtered counts initially, we
+# fetch the annotation for all genes:
+gene_ids <- rownames(txi$counts)
+
+# remove GENCODE gene version to make ids compatible to Ensemvbl:
+gene_ids <- gsub("\\.[0-9]+","",gene_ids) 
+
+head(gene_ids)
+
+# fetch annotations
+genemap <- getBM(attributes = attributes_to_add,
+                 filters = "ensembl_gene_id",
+                 values = gene_ids,
+                 mart = ensembl,
+                 useCache = FALSE)
+
+head(genemap)
+nrow(genemap)
+
+length(gene_ids) == nrow(genemap)
+
+saveRDS(genemap, file = "./results/genemap.rds")
+```
+
+# Add annotation to DEG results
+
+Now that we have the differentially expressed genes (DEG), we can use the annotated
+object created earlier, to add gene metadata to the DEG results:
+
+```{r}
+# add the current gene_ids to new columns and remove the GENCODE version
+# Note we add 2 columns (one with GENCODE version and one without it) to preserve
+# version information if needed:
+
+Transplant_vs_Naive$ensembl_gene_id_version <- rownames(Transplant_vs_Naive)
+Transplant_vs_Naive$ensembl_gene_id <- rownames(Transplant_vs_Naive)
+
+Transplant_vs_Naive$ensembl_gene_id  <- gsub("\\.[0-9]+", "", Transplant_vs_Naive$ensembl_gene_id)
+
+# join the DEG list and biomaRt list by "ensembl_gene_id"
+Transplant_vs_Naive_annotated <- dplyr::left_join(x = as.data.frame(Transplant_vs_Naive),
+                                                  y = genemap,
+                                                  by = (c("ensembl_gene_id")))
+
+# add Ensembl IDs as row names:
+rownames(Transplant_vs_Naive_annotated) <- Transplant_vs_Naive_annotated$ensembl_gene_id
+head(Transplant_vs_Naive_annotated, 5)
+```
+
+
+# Save data outputs
+
+First, let's save our annotated DEG list as csv file:
+
+```{r}
+write.csv(Transplant_vs_Naive_annotated, 
+          file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv")
+```
+
+Second, let's save the normalized counts as a csv file. This is critical
+output for data visualization as it contain normalized counts per sample:
+
+```{r}
+# add normalized counts to a new vector:
+normalized_counts <- as.data.frame(counts(dds, normalized = TRUE))
+
+# add annotation
+# NOTE: here we add a new column names using the `mutate` function
+# as an alternative to the approach shown in the DEG results
+normalized_counts_annotated <- normalized_counts %>% 
+  mutate(ensembl_gene_id_version = rownames(normalized_counts),
+         ensembl_gene_id = rownames(normalized_counts)) %>%
+  mutate(ensembl_gene_id = gsub("\\.[0-9]+","",ensembl_gene_id)) %>%
+  dplyr::left_join(x = ., y = genemap, by = (c("ensembl_gene_id")))
+
+write.csv(normalized_counts_annotated,
+          file="./results/Transplant_vs_Naive/normalized_counts.csv",
+          row.names = FALSE)
+```
+
+To simplify the code sections below, we rename the longer variable names to shorter ones:
+(we explicitly named them longer in earlier sections for clarity in the workflow for teaching
+purposes)
+
+```{r}
+T_vs_N_annotated <- Transplant_vs_Naive_annotated
+counts_annotated <- normalized_counts_annotated
+```
+
+# DEG plots
+
+In the sections below, note that we apply an absolute log2 fold change cut-off in
+addition to adjusted p-values to define DEGs.
+
+## Volcano plot
+
+```{r fig.height=10, fig.width=10}
+EnhancedVolcano(T_vs_N_annotated,
+                lab = T_vs_N_annotated$external_gene_name,
+                x = "log2FoldChange",
+                y = "padj",
+                title = "Transplant_vs_Naive",
+                pCutoff = 0.05,
+                FCcutoff = 1.0,
+                pointSize = 1.0,
+                labSize = 4)
+```
+
+
+## Visualize selected set of genes
+
+Apply standard DEG filters `adj.P.Val <= 0.05, logFC <= -1 | logFC >= 1`.
+
+```{r}
+T_vs_N_annotated_DEGs <- T_vs_N_annotated %>%
+  dplyr::filter(padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1) %>%
+  dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %>%
+  # Filter out the duplicated rows using `dplyr::distinct()`
+  dplyr::distinct(external_gene_name, .keep_all = TRUE)
+```
+
+
+```{r}
+# Get all DE genes
+genes <- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %>%
+         rownames()
+
+heatmapData <- normalized_counts[genes, ]
+
+# Scale counts for visualization
+heatmapData <- t(scale(t(heatmapData)))
+
+# Add annotation
+heatmapColAnnot <- data.frame(colData(dds)[, "Condition"])
+heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
+                                       top_annotation = heatmapColAnnot,
+                                       cluster_rows = TRUE, 
+                                       cluster_columns = TRUE,
+                                       show_row_names = FALSE)
+
+DEG_heatmap
+```
+
+
+**Challenge: Plot top 10 DEGs by both direction**
+
+<details><summary>Click here for solution</summary>
+
+```{r fig.height=8, fig.width=8}
+# Get top 20 DE genes
+# Select top 10 up-regulated genes
+top_up_genes <- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %>%
+  filter(log2FoldChange > 1) %>%           # Focus on up-regulated (positive log2fc)
+  head(20) %>%
+  rownames()
+
+# Select top 10 down-regulated genes
+top_down_genes <- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %>%
+  filter(log2FoldChange < -1) %>%           # Focus on up-regulated (negative log2fc)
+  head(20) %>%
+  rownames()
+
+genes <- c(top_up_genes, top_down_genes)
+
+heatmapData <- normalized_counts[genes, ]
+
+# Scale counts for visualization
+heatmapData <- t(scale(t(heatmapData)))
+
+# Add annotation
+heatmapColAnnot <- data.frame(colData(dds)[, "Condition"])
+heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
+                        top_annotation = heatmapColAnnot,
+                        cluster_rows = TRUE, 
+                        cluster_columns = TRUE,
+                        show_row_names = TRUE)
+
+DEG_heatmap
+```
+
+</details>
+
+
+**Challenge: Plot top 10 DEGs by gene names**
+
+<details><summary>Click here for solution</summary>
+
+
+```{r}
+T_vs_N_fil <- T_vs_N_annotated[! is.na(T_vs_N_annotated$external_gene_name)
+                               & T_vs_N_annotated$external_gene_name !="", ]
+
+counts_fil <- counts_annotated[! is.na(counts_annotated$external_gene_name)
+                               & counts_annotated$external_gene_name !="", ]
+
+unique_gene_names <- make.unique(T_vs_N_fil$external_gene_name, sep = ".")
+
+unique_gene_names_count <- make.unique(counts_fil$external_gene_name, sep = ".")
+
+rownames(T_vs_N_fil) <- unique_gene_names
+
+rownames(counts_fil) <- unique_gene_names_count
+```
+
+```{r}
+# Get top 10 DE genes
+genes <- T_vs_N_fil[order(T_vs_N_fil$padj), ] %>%
+         head(10) %>%
+         rownames()
+
+heatmapData <- counts_fil[genes, ]
+
+# Scale counts for visualization
+heatmapData <- t(scale(t(heatmapData[, 1:8])))
+
+# Add annotation
+heatmapColAnnot <- data.frame(colData(dds)[, "Condition"])
+heatmapColAnnot <- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap <- ComplexHeatmap::Heatmap(heatmapData,
+                                       top_annotation = heatmapColAnnot,
+                                       cluster_rows = TRUE, 
+                                       cluster_columns = TRUE,
+                                       show_row_names = TRUE)
+
+DEG_heatmap
+```
+
+</details>
+
+
+# Plot selected genes
+
+
+## Box plot
+
+```{r}
+# Define the genes of interest.
+goi <- T_vs_N_fil[order(T_vs_N_fil$padj), ] %>%
+  head(10) %>%
+  rownames()
+```
+
+```{r}
+countData <- counts_fil[goi, 1:8]
+
+tcounts <- t(countData) %>%
+  merge(colData(dds), ., by="row.names") %>%
+  gather(gene, expression, (ncol(.)-length(goi)+1):ncol(.))
+```
+
+Now, create a single faceted plot. 
+
+
+```{r}
+ggplot(tcounts, aes(Condition, expression, fill=Time)) + 
+  geom_boxplot() + 
+  facet_wrap(~gene, scales="free_y") + 
+  labs(x="Condition", 
+       y="Expression (log normalized counts)", 
+       fill="(Time)", 
+       title="Top Results")
+```
+
+## count plot
+
+DESeq2 provides a simple count function which can be implemented for brief / quick
+visualizations:
+
+```{r}
+plotCounts(dds, 
+           gene = "ENSMUSG00000040204.7", 
+           intgroup = "Condition",
+           normalized = TRUE)
+```
+
+
+# Glimma report
+
+Glimma is an interactive R widget for creating plots for differential expression analysis, created using the Vega and `htmlwidgets` frameworks. The created plots can be embedded in R Markdown, or exported as standalone HTML documents.
+
+### MA Plot
+
+The MA plot is a visualization that plots the log-fold-change between experimental groups (M) against the mean expression across all the samples (A) for each gene.
+
+The Glimma MA plot contains two main components:
+
+1. a plot of summary statistics across all genes that have been tested, and
+
+2. a plot of gene expression from individual samples for a given gene
+
+The second plot shows gene expression from the last selected sample, which can be selected from the table or directly from the summary plot.
+
+```{r}
+# first choose selected annotation to be present in report
+# (we choose a subset to make visualization easier/reduce # of cols)
+selected_annotation <- data.frame(GeneID = rownames(normalized_counts))
+
+selected_annotation %>% 
+    mutate(ensembl_gene_id = selected_annotation$GeneID) %>%
+    mutate(ensembl_gene_id = gsub("\\.[0-9]+","",ensembl_gene_id)) %>%
+    plyr::join(., genemap, by = c("ensembl_gene_id")) %>%
+    dplyr::select(GeneID, external_gene_name, gene_biotype) %>%
+    {.} -> selected_annotation
+
+head(selected_annotation)
+```
+
+```{r}
+# use the original DESeq2 res. obj since row order is the same across all to facilitate
+# NOTE: basemean are shown in the natural log scale in the report
+
+file_name <- paste0("./results/Transplant_vs_Naive/Glimma_ma_plot.html")
+    
+rownames(Transplant_vs_Naive) <- Transplant_vs_Naive$ensembl_gene_id_version
+
+Transplant_vs_Naive <- Transplant_vs_Naive[order(Transplant_vs_Naive$ensembl_gene_id_version, decreasing = FALSE),]
+ 
+print(all(rownames(Transplant_vs_Naive) == rownames(normalized_counts))) # must always be true for glimma reports
+    
+# select sig (arbitrary choice of padj < 0.05) - to be highlighted in MA plot
+    
+sig_genes <- as.numeric(Transplant_vs_Naive$padj<0.05)
+    
+glMDPlot(Transplant_vs_Naive, 
+             status=sig_genes, 
+             counts=normalized_counts,
+             side.main="GeneID",
+             groups=colData$Condition,
+             folder = file_name,
+             html = "MA-Plot",
+             anno = selected_annotation,
+             side.xlab = "Group",
+             side.log = FALSE,
+             launch=FALSE)
+```
+
+
+## session info
+
+```{r}
+sessionInfo()
+```

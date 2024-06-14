@@ -1,0 +1,9 @@
+Sample ID,Condition,Group,Time,Genotype,Sex,Age
+N01_AM_Naive,Naive,Naive,Naive,Cx3cr1gfp/+B6,Male,14W
+N02_AM_Naive,Naive,Naive,Naive,Cx3cr1gfp/+B6,Male,14W
+N03_AM_Naive,Naive,Naive,Naive,Cx3cr1gfp/+B6,Male,14W
+N04_AM_Naive,Naive,Naive,Naive,Cx3cr1gfp/+B6,Male,14W
+R05_AM_Allo24h,Transplant,Transplant_24hr,24hr,Cx3cr1gfp/+B6,Male,14W
+R06_AM_Allo24h,Transplant,Transplant_24hr,24hr,Cx3cr1gfp/+B6,Male,14W
+R07_AM_Allo24h,Transplant,Transplant_24hr,24hr,Cx3cr1gfp/+B6,Male,14W
+R08_AM_Allo24h,Transplant,Transplant_24hr,24hr,Cx3cr1gfp/+B6,Male,14W

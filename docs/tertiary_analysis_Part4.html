@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D." />
+
+
+<title>RNASeq Tertiary Analysis: Part 4</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">U-BDS bulk RNA-seq workshop</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="installation.html">
+    <span class="fa fa-computer"></span>
+     
+    Install instructions
+  </a>
+</li>
+<li>
+  <a href="secondary_analysis.html">
+    <span class="fa fa-database"></span>
+     
+    secondary analysis
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-chart-simple"></span>
+     
+    tertiary analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="tertiary_analysis_Part1.html">Part 1</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part2.html">Part 2</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part3.html">Part 3</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part4.html">Part 4</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="additional_resources.html">
+    <span class="fa fa-book"></span>
+     
+    Additional resources
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">RNASeq Tertiary Analysis: Part 4</h1>
+<h4 class="author">Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov,
+Ph.D.</h4>
+
+</div>
+
+
+<div id="packages-loaded-globabally" class="section level1">
+<h1>Packages loaded globabally</h1>
+<pre class="r"><code># Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+
+# pathway analysis
+library(clusterProfiler)
+library(msigdbr)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(EnhancedVolcano)
+library(ComplexUpset)
+library(ComplexHeatmap)
+library(RColorBrewer)</code></pre>
+</div>
+<div id="gene-set-enrichment-analysis-gsea" class="section level1">
+<h1>Gene Set Enrichment Analysis (GSEA)</h1>
+<p>Gene Set Enrichment Analysis (GSEA) is a computational method used to
+determine whether a priori defined sets of genes (representing
+biological pathways or processes) show statistically significant,
+concordant differences between two biological states (e.g., phenotypes,
+experimental conditions).</p>
+<p>GSEA is a powerful tool for extracting biological insights from gene
+expression data. By focusing on gene sets rather than individual genes,
+it can reveal subtle patterns and coordinated changes in gene expression
+that might be missed by other methods.</p>
+<p>In most cases, gene sets are from public databases where huge efforts
+from scientific curators have already been made to carefully categorize
+genes into gene sets with clear biological meanings. Nevertheless, gene
+sets can also be self-defined from individual studies, such as a set of
+genes in a network module from a co-expression network analysis, or a
+set of genes that are up-regulated in a certain disease.</p>
+<p>There are three key elements of the GSEA method:</p>
+<ol style="list-style-type: decimal">
+<li>Calculation of an Enrichment Score (ES)</li>
+<li>Estimation of Significance Level of ES</li>
+<li>Adjustment for Multiple Hypothesis Testing</li>
+</ol>
+<div id="gsea-and-go-enrichment-analysis-differences"
+class="section level2">
+<h2>GSEA and GO enrichment analysis differences</h2>
+<p><strong>Gene Ontology (GO) Enrichment Analysis</strong></p>
+<ul>
+<li><p>Focus: Identifies which biological processes, molecular
+functions, or cellular components are over-represented in a set of genes
+compared to what would be expected by chance.</p></li>
+<li><p>Input: A list of genes, often differentially expressed genes from
+an experiment.</p></li>
+<li><p>Methodology: Uses statistical tests to compare the frequency of
+GO terms associated with the gene list to their frequency in a
+background set (e.g., expressed genes).</p></li>
+<li><p>Outcome: A list of enriched GO terms with their associated
+p-values, indicating the processes/functions most relevant to the gene
+list.</p></li>
+<li><p>Strengths: Simple to understand and implement, useful for
+identifying broad biological themes.</p></li>
+<li><p>Limitations: Does not consider the magnitude of changes in gene
+expression, treats all genes in the list equally.</p></li>
+</ul>
+<p><strong>Gene Set Enrichment Analysis (GSEA)</strong></p>
+<ul>
+<li><p>Focus: Determines whether a priori defined sets of genes
+(representing biological pathways or processes) show statistically
+significant, concordant differences between two biological states (e.g.,
+phenotypes, experimental conditions).</p></li>
+<li><p>Input: A list of genes ranked by their expression level (or other
+relevant metric), along with a collection of gene sets (e.g., from the
+Molecular Signatures Database).</p></li>
+<li><p>Methodology: Calculates an enrichment score for each gene set
+based on how the genes in the set are distributed across the ranked
+list.</p></li>
+<li><p>Outcome: A ranked list of gene sets with their enrichment scores
+and p-values, indicating which pathways/processes are most
+differentially regulated between the two states.</p></li>
+<li><p>Strengths: Takes into account the magnitude of changes in gene
+expression, can detect subtle but coordinated changes in gene
+sets.</p></li>
+<li><p>Limitations: Requires a priori defined gene sets, can be
+computationally intensive.</p></li>
+</ul>
+</div>
+</div>
+<div id="input-deg-list" class="section level1">
+<h1>Input DEG list</h1>
+<pre class="r"><code>Transplant_vs_Naive_annotated &lt;- read.csv(file = &quot;./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv&quot;,
+                                          row.names = 1)</code></pre>
+<p>GSEA can be executed on the full dataset regardless of cutoff.</p>
+<p><strong><em>GSEA on the Full Dataset</em></strong>: Instead of
+pre-filtering genes based on a statistical significance threshold (e.g.,
+<code>adjusted p-value</code>, <code>fold change</code>), GSEA can be
+applied to the entire ranked list of genes. The ranking is usually based
+on the magnitude and direction of change between the two conditions
+being compared. The advantages for this approach is increased
+sensitivity, reduced bias, and exploration of weaker signals. However,
+it has some challenges including interpretation of results and
+statistical significance of enrichment scores which can be more complex
+when using the full dataset.</p>
+<p><strong><em>GSEA on DEGs (Differential Expression
+Genes)</em></strong>: In this approach, only genes that meet a
+pre-defined cutoff for differential expression are included in the
+ranked list. The advantages for this approach is focus on strong signals
+and reduced noise. However this approach has some disadvantages
+including potential loss of information and dependence on arbitrary
+cutoffs which can significantly influence the results. Since there’s no
+universally accepted standard for selecting a cutoff value to define
+DEGs, this decision is heavily linked to the analyst best judgement
+(however, we suggest the use of adjusted p-values and an absolute fold
+change cutoff).</p>
+<p><strong><em>Choosing an appropriate approach</em></strong></p>
+<p>The decision of whether to use the full dataset or a subset of DEGs
+depends on the <em>specific research question and the characteristics of
+the dataset</em>.</p>
+<ul>
+<li><p>If you’re interested in exploring subtle or coordinated changes
+in gene expression, or if you have a large dataset with many genes that
+show small but potentially meaningful changes, GSEA on the full dataset
+might be a better choice.</p></li>
+<li><p>If you want to focus on the most pronounced changes in gene
+expression or have a smaller dataset, GSEA on DEGs could be more
+appropriate.</p></li>
+</ul>
+<hr />
+<p>For the purposes of this workshop, we will execute GSEA using the
+significant DEGs defined by
+<code>padj &lt;= 0.05, log2FoldChange &lt;= -1 | log2FoldChange &gt;= 1</code>
+to be consistent with GO analysis cutoff.</p>
+<pre class="r"><code>Transplant_vs_Naive_annotated_DEGs &lt;- Transplant_vs_Naive_annotated %&gt;%
+  dplyr::filter(str_trim(external_gene_name) != &quot;&quot;) %&gt;%  # Remove empty strings
+  dplyr::filter(padj &lt;= 0.05, log2FoldChange &lt;= -1 | log2FoldChange &gt;= 1) %&gt;% # THIS IS FILTERED ANALYSIS
+  dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %&gt;%
+  # Filter out the duplicated rows using `dplyr::distinct()`
+  dplyr::distinct(external_gene_name, .keep_all = TRUE)</code></pre>
+<p>Quick look at #of DEGs.</p>
+<pre class="r"><code>nrow(Transplant_vs_Naive_annotated_DEGs)</code></pre>
+<pre><code>## [1] 1179</code></pre>
+<p>Check for duplicated gene_ids</p>
+<pre class="r"><code>any(duplicated(Transplant_vs_Naive_annotated_DEGs$external_gene_name))</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<div id="create-log2fold-change-ranked-vector" class="section level2">
+<h2>Create log2Fold change ranked vector</h2>
+<pre class="r"><code>lfc_vector &lt;- Transplant_vs_Naive_annotated_DEGs$log2FoldChange
+names(lfc_vector) &lt;- Transplant_vs_Naive_annotated_DEGs$external_gene_name
+lfc_vector &lt;- sort(lfc_vector, decreasing = TRUE)
+
+head(lfc_vector)</code></pre>
+<pre><code>##  Gm37206  Gm54471     Saa3  Gm12537  Gm29247    H2-Ea 
+## 8.279647 7.607093 6.821312 5.829520 5.792019 5.462933</code></pre>
+</div>
+</div>
+<div id="get-the-gene_sets-from-msigdb" class="section level1">
+<h1>Get the gene_sets from MSigDB</h1>
+<div id="msigdb-gene-sets" class="section level3">
+<h3>MSigDB gene sets</h3>
+<p>The Molecular Signatures Database (MSigDB) is a meticulously curated
+collection of gene sets, initially created as a supplement to the
+groundbreaking Gene Set Enrichment Analysis (GSEA) paper. Since its
+inception in 2005 with just two collections and 843 gene sets, MSigDB
+has evolved independently into a powerful resource, boasting over 30,000
+gene sets across nine distinct collections in its latest version
+(<code>v2023.1.Hs</code>).</p>
+<p>MSigDB organizes its gene sets into several collections, each
+dedicated to a specific biological theme. Some collections are further
+subdivided for more refined analysis. While there are various ways to
+access MSigDB gene sets, the <code>msigdbr</code> package offers a
+convenient solution, supporting numerous organisms through ortholog
+mapping.</p>
+<p>Let’s check which organisms are supported and which gene sets
+collections it provides.</p>
+<pre class="r"><code>msigdbr_species()</code></pre>
+<pre><code>## # A tibble: 20 × 2
+##    species_name                    species_common_name                    
+##    &lt;chr&gt;                           &lt;chr&gt;                                  
+##  1 Anolis carolinensis             Carolina anole, green anole            
+##  2 Bos taurus                      bovine, cattle, cow, dairy cow, domest…
+##  3 Caenorhabditis elegans          &lt;NA&gt;                                   
+##  4 Canis lupus familiaris          dog, dogs                              
+##  5 Danio rerio                     leopard danio, zebra danio, zebra fish…
+##  6 Drosophila melanogaster         fruit fly                              
+##  7 Equus caballus                  domestic horse, equine, horse          
+##  8 Felis catus                     cat, cats, domestic cat                
+##  9 Gallus gallus                   bantam, chicken, chickens, Gallus dome…
+## 10 Homo sapiens                    human                                  
+## 11 Macaca mulatta                  rhesus macaque, rhesus macaques, Rhesu…
+## 12 Monodelphis domestica           gray short-tailed opossum              
+## 13 Mus musculus                    house mouse, mouse                     
+## 14 Ornithorhynchus anatinus        duck-billed platypus, duckbill platypu…
+## 15 Pan troglodytes                 chimpanzee                             
+## 16 Rattus norvegicus               brown rat, Norway rat, rat, rats       
+## 17 Saccharomyces cerevisiae        baker&#39;s yeast, brewer&#39;s yeast, S. cere…
+## 18 Schizosaccharomyces pombe 972h- &lt;NA&gt;                                   
+## 19 Sus scrofa                      pig, pigs, swine, wild boar            
+## 20 Xenopus tropicalis              tropical clawed frog, western clawed f…</code></pre>
+<p>Look different gene set (gs) collections</p>
+<pre class="r"><code>msigdbr_collections()</code></pre>
+<pre><code>## # A tibble: 23 × 3
+##    gs_cat gs_subcat         num_genesets
+##    &lt;chr&gt;  &lt;chr&gt;                    &lt;int&gt;
+##  1 C1     &quot;&quot;                         299
+##  2 C2     &quot;CGP&quot;                     3384
+##  3 C2     &quot;CP&quot;                        29
+##  4 C2     &quot;CP:BIOCARTA&quot;              292
+##  5 C2     &quot;CP:KEGG&quot;                  186
+##  6 C2     &quot;CP:PID&quot;                   196
+##  7 C2     &quot;CP:REACTOME&quot;             1615
+##  8 C2     &quot;CP:WIKIPATHWAYS&quot;          664
+##  9 C3     &quot;MIR:MIRDB&quot;               2377
+## 10 C3     &quot;MIR:MIR_Legacy&quot;           221
+## # ℹ 13 more rows</code></pre>
+<p>The first column in the above output is the primary category of gene
+sets. Some gene sets collections may have sub-collections, and they are
+shown in the second column.</p>
+</div>
+<div id="get-hallmark-gene-set" class="section level2">
+<h2>get Hallmark gene set</h2>
+<p>The Hallmark gene set represent well-defined biological states or
+processes and exhibit coherent expression patterns. Hallmark gene sets
+are designed to be concise summaries of specific biological processes,
+reducing noise and redundancy often found in larger gene sets. These
+gene sets are derived by aggregating multiple gene sets from other
+MSigDB collections and retaining genes that consistently show
+coordinated expression across various datasets. This rigorous selection
+process ensures high confidence in their biological relevance. Hallmark
+gene sets cover a wide range of biological processes, making them
+suitable for exploring diverse research questions in GSEA.</p>
+<p>The function we will use to retrieve gene set is the
+<code>msigdbr</code> which takes as input the the following main
+parameters:</p>
+<pre class="r"><code>msigdbr(species, category, subcategory)</code></pre>
+<p>As an example we will use the <code>H</code> category:</p>
+<pre class="r"><code>mm_hallmark_sets &lt;- msigdbr(
+  species = &quot;Mus musculus&quot;, # Replace with species name relevant to your data
+  category = &quot;H&quot;
+)
+
+head(mm_hallmark_sets)</code></pre>
+<pre><code>## # A tibble: 6 × 18
+##   gs_cat gs_subcat gs_name            gene_symbol entrez_gene ensembl_gene
+##   &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;              &lt;chr&gt;             &lt;int&gt; &lt;chr&gt;       
+## 1 H      &quot;&quot;        HALLMARK_ADIPOGEN… Abca1             11303 ENSMUSG0000…
+## 2 H      &quot;&quot;        HALLMARK_ADIPOGEN… Abcb8             74610 ENSMUSG0000…
+## 3 H      &quot;&quot;        HALLMARK_ADIPOGEN… Acaa2             52538 ENSMUSG0000…
+## 4 H      &quot;&quot;        HALLMARK_ADIPOGEN… Acadl             11363 ENSMUSG0000…
+## 5 H      &quot;&quot;        HALLMARK_ADIPOGEN… Acadm             11364 ENSMUSG0000…
+## 6 H      &quot;&quot;        HALLMARK_ADIPOGEN… Acads             11409 ENSMUSG0000…
+## # ℹ 12 more variables: human_gene_symbol &lt;chr&gt;, human_entrez_gene &lt;int&gt;,
+## #   human_ensembl_gene &lt;chr&gt;, gs_id &lt;chr&gt;, gs_pmid &lt;chr&gt;, gs_geoid &lt;chr&gt;,
+## #   gs_exact_source &lt;chr&gt;, gs_url &lt;chr&gt;, gs_description &lt;chr&gt;,
+## #   taxon_id &lt;int&gt;, ortholog_sources &lt;chr&gt;, num_ortholog_sources &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div id="run-gsea" class="section level1">
+<h1>Run GSEA</h1>
+<p>Type <code>?GSEA</code> to explore the parameters of GSEA. You can
+change the parameters for the arguments based on your preference and
+supported values/methods.</p>
+<pre class="r"><code># Run GSEA
+
+gsea_enrichment &lt;- GSEA(
+  geneList = lfc_vector,
+  minGSSize = 25, # minimum gene set
+  maxGSSize = 500, # maximum gene set
+  pvalueCutoff = 0.05,
+  eps = 1e-10, # default
+  seed = TRUE,
+  pAdjustMethod = &quot;BH&quot;, # change the pAdjustMethod as needed
+  TERM2GENE = dplyr::select(
+    mm_hallmark_sets,
+    gs_name,
+    gene_symbol)
+)</code></pre>
+<pre><code>## preparing geneSet collections...</code></pre>
+<pre><code>## GSEA analysis...</code></pre>
+<pre><code>## leading edge analysis...</code></pre>
+<pre><code>## done...</code></pre>
+<div id="explore-gsea-results" class="section level2">
+<h2>Explore GSEA results</h2>
+<pre class="r"><code># see head excluding the last collumn for simplicity:
+head(gsea_enrichment@result)[,1:(ncol(gsea_enrichment@result)-1)]</code></pre>
+<pre><code>##                                                        ID
+## HALLMARK_G2M_CHECKPOINT           HALLMARK_G2M_CHECKPOINT
+## HALLMARK_E2F_TARGETS                 HALLMARK_E2F_TARGETS
+## HALLMARK_MITOTIC_SPINDLE         HALLMARK_MITOTIC_SPINDLE
+## HALLMARK_ALLOGRAFT_REJECTION HALLMARK_ALLOGRAFT_REJECTION
+## HALLMARK_MTORC1_SIGNALING       HALLMARK_MTORC1_SIGNALING
+## HALLMARK_MYC_TARGETS_V1           HALLMARK_MYC_TARGETS_V1
+##                                               Description setSize
+## HALLMARK_G2M_CHECKPOINT           HALLMARK_G2M_CHECKPOINT      92
+## HALLMARK_E2F_TARGETS                 HALLMARK_E2F_TARGETS     123
+## HALLMARK_MITOTIC_SPINDLE         HALLMARK_MITOTIC_SPINDLE      43
+## HALLMARK_ALLOGRAFT_REJECTION HALLMARK_ALLOGRAFT_REJECTION      37
+## HALLMARK_MTORC1_SIGNALING       HALLMARK_MTORC1_SIGNALING      36
+## HALLMARK_MYC_TARGETS_V1           HALLMARK_MYC_TARGETS_V1      34
+##                              enrichmentScore       NES       pvalue
+## HALLMARK_G2M_CHECKPOINT            0.5867924  3.843796 1.000000e-10
+## HALLMARK_E2F_TARGETS               0.5335367  3.677797 1.000000e-10
+## HALLMARK_MITOTIC_SPINDLE           0.5551511  2.904063 1.117445e-08
+## HALLMARK_ALLOGRAFT_REJECTION      -0.4614127 -2.694340 5.450376e-06
+## HALLMARK_MTORC1_SIGNALING          0.4302780  2.142952 5.093555e-04
+## HALLMARK_MYC_TARGETS_V1            0.4340611  2.120313 9.326797e-04
+##                                  p.adjust       qvalue rank
+## HALLMARK_G2M_CHECKPOINT      4.000000e-10 5.263158e-11  412
+## HALLMARK_E2F_TARGETS         4.000000e-10 5.263158e-11  501
+## HALLMARK_MITOTIC_SPINDLE     2.979853e-08 3.920859e-09  430
+## HALLMARK_ALLOGRAFT_REJECTION 1.090075e-05 1.434310e-06  291
+## HALLMARK_MTORC1_SIGNALING    8.149687e-04 1.072327e-04  612
+## HALLMARK_MYC_TARGETS_V1      1.243573e-03 1.636280e-04  682
+##                                                 leading_edge
+## HALLMARK_G2M_CHECKPOINT       tags=83%, list=35%, signal=58%
+## HALLMARK_E2F_TARGETS          tags=85%, list=42%, signal=55%
+## HALLMARK_MITOTIC_SPINDLE      tags=84%, list=36%, signal=55%
+## HALLMARK_ALLOGRAFT_REJECTION  tags=68%, list=25%, signal=53%
+## HALLMARK_MTORC1_SIGNALING     tags=92%, list=52%, signal=45%
+## HALLMARK_MYC_TARGETS_V1      tags=100%, list=58%, signal=43%</code></pre>
+</div>
+<div id="dot-plot" class="section level2">
+<h2>Dot plot</h2>
+<pre class="r"><code>dotplot(gsea_enrichment, showCategory=20)</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-12-1.png" width="768" /></p>
+<p><strong>Challenge: Split the dot plot by
+activated/suppressed</strong></p>
+<details>
+<summary>
+Click here for solution
+</summary>
+<pre class="r"><code>dotplot(gsea_enrichment, showCategory=20, split=&quot;.sign&quot;) + facet_grid(.~.sign)</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-13-1.png" width="768" /></p>
+</details>
+</div>
+<div id="ridge-plot" class="section level2">
+<h2>Ridge Plot</h2>
+<pre class="r"><code>ridgeplot(gsea_enrichment,
+          showCategory = 10,
+          fill = &quot;p.adjust&quot;,
+          core_enrichment = TRUE,
+          label_format = 30,
+          orderBy = &quot;NES&quot;,
+          decreasing = FALSE)</code></pre>
+<pre><code>## Picking joint bandwidth of 0.182</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="additional-plots" class="section level2">
+<h2>Additional plots</h2>
+<pre class="r"><code>cnetplot(gsea_enrichment, 
+         showCategory = 2, 
+         foldChange=lfc_vector, 
+         colorEdge = TRUE,
+         cex_category = 1,
+         cex_gene = 1,
+         cex_label_category = 0.5,
+         cex_label_gene = 0.5,
+         circular = FALSE)</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><strong>Challenge: make the circular network</strong></p>
+<details>
+<summary>
+Click here for solution
+</summary>
+<pre class="r"><code>cnetplot(gsea_enrichment, 
+         showCategory = 2, 
+         foldChange=lfc_vector, 
+         colorEdge = TRUE,
+         cex_category = 0.5,
+         cex_gene = 0.5,
+         cex_label_category = 0.5,
+         cex_label_gene = 0.5,
+         circular = TRUE)</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-16-1.png" width="960" /></p>
+<details>
+<p><strong>Note</strong>: if you would like to display specific
+hallmakrs in the <code>cnetplot</code>, note that the
+<code>showCategory</code> parameter also accepts a vector of terms to be
+displayed.</p>
+<hr />
+<pre class="r"><code>heatplot(gsea_enrichment, showCategory = 7, foldChange=lfc_vector)</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-17-1.png" width="2400" /></p>
+<div id="most-positive-nes" class="section level4">
+<h4>Most Positive NES</h4>
+<pre class="r"><code>gsea_result_df &lt;- data.frame(gsea_enrichment@result)
+
+gsea_result_df %&gt;%
+  # This returns the 3 rows with the largest NES values
+  dplyr::slice_max(NES, n = 3)</code></pre>
+<pre><code>##                                                ID
+## HALLMARK_G2M_CHECKPOINT   HALLMARK_G2M_CHECKPOINT
+## HALLMARK_E2F_TARGETS         HALLMARK_E2F_TARGETS
+## HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE
+##                                       Description setSize enrichmentScore
+## HALLMARK_G2M_CHECKPOINT   HALLMARK_G2M_CHECKPOINT      92       0.5867924
+## HALLMARK_E2F_TARGETS         HALLMARK_E2F_TARGETS     123       0.5335367
+## HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE      43       0.5551511
+##                               NES       pvalue     p.adjust       qvalue
+## HALLMARK_G2M_CHECKPOINT  3.843796 1.000000e-10 4.000000e-10 5.263158e-11
+## HALLMARK_E2F_TARGETS     3.677797 1.000000e-10 4.000000e-10 5.263158e-11
+## HALLMARK_MITOTIC_SPINDLE 2.904063 1.117445e-08 2.979853e-08 3.920859e-09
+##                          rank                   leading_edge
+## HALLMARK_G2M_CHECKPOINT   412 tags=83%, list=35%, signal=58%
+## HALLMARK_E2F_TARGETS      501 tags=85%, list=42%, signal=55%
+## HALLMARK_MITOTIC_SPINDLE  430 tags=84%, list=36%, signal=55%
+##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               core_enrichment
+## HALLMARK_G2M_CHECKPOINT                                                                                                                                                                                     Ttk/Rad54l/Cdkn3/Exo1/Kif4/Cdc6/Pbk/Stil/Cdk1/Ccnf/Chek1/Cdc45/Knl1/Ccna2/Mcm5/Plk1/Bub1/Birc5/Aurkb/Top2a/Bard1/Mybl2/Ube2c/Hmgb3/Nusap1/Aurka/Mki67/Tacc3/Espl1/Prc1/Mcm2/Hmmr/Kif15/Lmnb1/Mcm6/Kif11/Pole/Chaf1a/Ndc80/Cdkn2c/Fbxo5/Tpx2/Kif2c/Gins2/Racgap1/Ccnb2/Traip/Mcm3/Smc2/Nek2/Cenpe/Stmn1/Polq/Kif20b/Troap/Rpa2/Sqle/Orc6/Cenpa/Ezh2/Cdc20/Plk4/Nasp/Incenp/Cdc7/Mad2l1/Cks1b/Kpna2/Cenpf/Suv39h1/Kif23/Brca2/Prim2/Kif22/Tmpo/E2f2
+## HALLMARK_E2F_TARGETS     Cenpm/Rrm2/Cdkn3/Kif4/Cdca3/Rad51ap1/E2f8/Asf1b/Spc24/Cdk1/Melk/Spc25/Chek1/Ccne1/Mcm5/Plk1/Gins1/Hells/Birc5/Aurkb/Top2a/Lig1/Brca1/Bard1/Mybl2/Dscc1/Hmgb3/Aurka/Mki67/Tacc3/Espl1/Cdca8/Trip13/Mcm2/Hmmr/Kif18b/Tcf19/Lmnb1/Mcm6/Pole/Cdkn2c/Kif2c/Tipin/Depdc1a/Dlgap5/Cit/Racgap1/Rad51c/Ccnb2/Spag5/Mcm3/Tk1/Ung/Cenpe/Ncapd2/Stmn1/Timeless/Mxd3/Dut/Ube2t/Mcm7/Cbx5/Rpa2/Mms22l/Wee1/Mcm4/Psmc3ip/Rfc3/Orc6/Diaph3/Cdkn2a/Ezh2/Cdc20/Hmgb2/Plk4/Dek/Atad2/Nasp/Mad2l1/Ctps/Cks1b/Kpna2/Pcna/Tubg1/Dnmt1/Suv39h1/Brca2/Prim2/Anp32e/Kif22/Tmpo/Rfc2/Ran/Ranbp1/Mthfd2/Shmt1/Dck/Bub1b/Pold2/Tubb5/Gins3/Rpa1/Cdk4/Chek2/Paics
+## HALLMARK_MITOTIC_SPINDLE                                                                                                                                                                                                                                                                                                                                                                                                                 Ttk/Kntc1/Kif4/Fscn1/Cdk1/Plk1/Bub1/Birc5/Top2a/Nusap1/Aurka/Espl1/Prc1/Kif15/Lmnb1/Kif11/Ndc80/Fbxo5/Tpx2/Kif2c/Dlgap5/Racgap1/Ccnb2/Nek2/Cenpe/Cep72/Kif20b/Ect2/Incenp/Cenpf/Kif23/Brca2/Kif22/Rapgef5/Sass6/Pif1</code></pre>
+<pre class="r"><code>most_positive_nes_plot &lt;- enrichplot::gseaplot(
+  gsea_enrichment,
+  geneSetID = &quot;HALLMARK_G2M_CHECKPOINT&quot;,
+  title = &quot;HALLMARK_G2M_CHECKPOINT&quot;,
+  color.line = &quot;#0d76ff&quot;
+)
+most_positive_nes_plot</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-19-1.png" width="576" /></p>
+</div>
+<div id="most-negative-nes" class="section level3">
+<h3>Most Negative NES</h3>
+<pre class="r"><code>gsea_result_df %&gt;%
+  # This returns the 3 rows with the largest NES values
+  dplyr::slice_min(NES, n = 3)</code></pre>
+<pre><code>##                                                            ID
+## HALLMARK_ALLOGRAFT_REJECTION     HALLMARK_ALLOGRAFT_REJECTION
+## HALLMARK_INFLAMMATORY_RESPONSE HALLMARK_INFLAMMATORY_RESPONSE
+## HALLMARK_MYC_TARGETS_V1               HALLMARK_MYC_TARGETS_V1
+##                                                   Description setSize
+## HALLMARK_ALLOGRAFT_REJECTION     HALLMARK_ALLOGRAFT_REJECTION      37
+## HALLMARK_INFLAMMATORY_RESPONSE HALLMARK_INFLAMMATORY_RESPONSE      30
+## HALLMARK_MYC_TARGETS_V1               HALLMARK_MYC_TARGETS_V1      34
+##                                enrichmentScore       NES       pvalue
+## HALLMARK_ALLOGRAFT_REJECTION        -0.4614127 -2.694340 5.450376e-06
+## HALLMARK_INFLAMMATORY_RESPONSE      -0.3418102 -1.861881 8.626892e-03
+## HALLMARK_MYC_TARGETS_V1              0.4340611  2.120313 9.326797e-04
+##                                    p.adjust       qvalue rank
+## HALLMARK_ALLOGRAFT_REJECTION   1.090075e-05 1.434310e-06  291
+## HALLMARK_INFLAMMATORY_RESPONSE 9.859305e-03 1.297277e-03  448
+## HALLMARK_MYC_TARGETS_V1        1.243573e-03 1.636280e-04  682
+##                                                   leading_edge
+## HALLMARK_ALLOGRAFT_REJECTION    tags=68%, list=25%, signal=53%
+## HALLMARK_INFLAMMATORY_RESPONSE  tags=70%, list=38%, signal=45%
+## HALLMARK_MYC_TARGETS_V1        tags=100%, list=58%, signal=43%
+##                                                                                                                                                                                                         core_enrichment
+## HALLMARK_ALLOGRAFT_REJECTION                                                       Zap70/Ltb/Cd28/Cd8b1/Prkcb/H2-Ob/Cd3g/Lck/Ets1/H2-DMa/Itk/Il1b/Stat4/Cd8a/Cd79a/Prf1/Cd3d/Gzmb/Gzma/Il2rb/Thy1/Ncr1/Ereg/Tgfb2/Stab1
+## HALLMARK_INFLAMMATORY_RESPONSE                                                               Il18r1/Fpr1/Calcrl/Ccrl2/Ptafr/Sgms2/Cd69/Cd55/Kcna3/Cd14/Lck/Scarf1/Btg2/Csf3r/Abca1/Il1b/Gabbr1/Il2rb/Rasgrp1/Ereg/Stab1
+## HALLMARK_MYC_TARGETS_V1        Cdc45/Ccna2/Mcm5/Tyms/Rrm1/Mcm2/Mcm6/Rfc4/Dut/Mcm7/Mcm4/Cdc20/Dek/Mad2l1/Ctps/Kpna2/Pcna/Ran/Ranbp1/Pold2/Cbx3/Cdk4/Tfdp1/Lsm2/Usp1/Hnrnpd/Odc1/Eif1ax/Erh/Hnrnpa1/Pgk1/Cdk2/Kpnb1/Pole3</code></pre>
+<pre class="r"><code>most_negative_nes_plot &lt;- enrichplot::gseaplot(
+  gsea_enrichment,
+  geneSetID = &quot;HALLMARK_ALLOGRAFT_REJECTION&quot;,
+  title = &quot;HALLMARK_ALLOGRAFT_REJECTION&quot;,
+  color.line = &quot;#0d76ff&quot;
+)
+most_negative_nes_plot</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-21-1.png" width="576" /></p>
+<p>Write GSEA results to csv</p>
+<pre class="r"><code>write.csv(gsea_enrichment@result, file = &quot;./results/Transplant_vs_Naive/Transplant_vs_Naive_GSEA_hallmark_padj_fc.csv&quot;)</code></pre>
+</div>
+</div>
+<div id="session-info" class="section level2">
+<h2>session info</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.3.3 (2024-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.4 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] msigdbr_7.5.1               clusterProfiler_4.10.1     
+##  [3] gprofiler2_0.2.3            ComplexUpset_1.3.3         
+##  [5] EnhancedVolcano_1.20.0      RColorBrewer_1.1-3         
+##  [7] ComplexHeatmap_2.18.0       lubridate_1.9.3            
+##  [9] forcats_1.0.0               stringr_1.5.1              
+## [11] purrr_1.0.2                 readr_2.1.5                
+## [13] tidyr_1.3.1                 tibble_3.2.1               
+## [15] tidyverse_2.0.0             dplyr_1.1.4                
+## [17] ggrepel_0.9.5               ggplot2_3.5.0              
+## [19] magrittr_2.0.3              biomaRt_2.58.2             
+## [21] vsn_3.70.0                  Glimma_2.12.0              
+## [23] DESeq2_1.42.1               SummarizedExperiment_1.32.0
+## [25] Biobase_2.62.0              MatrixGenerics_1.14.0      
+## [27] matrixStats_1.3.0           GenomicRanges_1.54.1       
+## [29] GenomeInfoDb_1.38.8         IRanges_2.36.0             
+## [31] S4Vectors_0.40.2            BiocGenerics_0.48.1        
+## [33] tximport_1.30.0            
+## 
+## loaded via a namespace (and not attached):
+##   [1] splines_4.3.3           later_1.3.2            
+##   [3] ggplotify_0.1.2         bitops_1.0-7           
+##   [5] filelock_1.0.3          polyclip_1.10-6        
+##   [7] preprocessCore_1.64.0   XML_3.99-0.16.1        
+##   [9] lifecycle_1.0.4         edgeR_4.0.16           
+##  [11] doParallel_1.0.17       lattice_0.22-6         
+##  [13] vroom_1.6.5             MASS_7.3-60.0.1        
+##  [15] crosstalk_1.2.1         limma_3.58.1           
+##  [17] plotly_4.10.4           sass_0.4.9             
+##  [19] rmarkdown_2.26          jquerylib_0.1.4        
+##  [21] yaml_2.3.8              httpuv_1.6.15          
+##  [23] cowplot_1.1.3           DBI_1.2.2              
+##  [25] abind_1.4-5             zlibbioc_1.48.2        
+##  [27] ggraph_2.2.1            RCurl_1.98-1.14        
+##  [29] yulab.utils_0.1.4       tweenr_2.0.3           
+##  [31] rappdirs_0.3.3          circlize_0.4.16        
+##  [33] GenomeInfoDbData_1.2.11 enrichplot_1.22.0      
+##  [35] tidytree_0.4.6          codetools_0.2-20       
+##  [37] DelayedArray_0.28.0     ggforce_0.4.2          
+##  [39] DOSE_3.28.2             xml2_1.3.6             
+##  [41] tidyselect_1.2.1        shape_1.4.6.1          
+##  [43] aplot_0.2.2             farver_2.1.1           
+##  [45] viridis_0.6.5           BiocFileCache_2.10.2   
+##  [47] jsonlite_1.8.8          GetoptLong_1.0.5       
+##  [49] tidygraph_1.3.1         ggridges_0.5.6         
+##  [51] iterators_1.0.14        bbmle_1.0.25.1         
+##  [53] foreach_1.5.2           ggnewscale_0.4.10      
+##  [55] tools_4.3.3             progress_1.2.3         
+##  [57] treeio_1.26.0           Rcpp_1.0.12            
+##  [59] glue_1.7.0              gridExtra_2.3          
+##  [61] SparseArray_1.2.4       xfun_0.43              
+##  [63] qvalue_2.34.0           withr_3.0.0            
+##  [65] numDeriv_2016.8-1.1     BiocManager_1.30.22    
+##  [67] fastmap_1.1.1           fansi_1.0.6            
+##  [69] digest_0.6.35           gridGraphics_0.5-1     
+##  [71] timechange_0.3.0        R6_2.5.1               
+##  [73] mime_0.12               colorspace_2.1-0       
+##  [75] GO.db_3.18.0            RSQLite_2.3.6          
+##  [77] utf8_1.2.4              generics_0.1.3         
+##  [79] hexbin_1.28.3           data.table_1.15.4      
+##  [81] graphlayouts_1.1.1      prettyunits_1.2.0      
+##  [83] httr_1.4.7              htmlwidgets_1.6.4      
+##  [85] S4Arrays_1.2.1          scatterpie_0.2.2       
+##  [87] pkgconfig_2.0.3         gtable_0.3.5           
+##  [89] blob_1.2.4              XVector_0.42.0         
+##  [91] shadowtext_0.1.3        htmltools_0.5.8.1      
+##  [93] fgsea_1.28.0            clue_0.3-65            
+##  [95] scales_1.3.0            png_0.1-8              
+##  [97] ggfun_0.1.4             knitr_1.46             
+##  [99] rstudioapi_0.16.0       reshape2_1.4.4         
+## [101] tzdb_0.4.0              rjson_0.2.21           
+## [103] nlme_3.1-164            coda_0.19-4.1          
+## [105] curl_5.2.1              bdsmatrix_1.3-7        
+## [107] cachem_1.0.8            GlobalOptions_0.1.2    
+## [109] parallel_4.3.3          HDO.db_0.99.1          
+## [111] AnnotationDbi_1.64.1    apeglm_1.24.0          
+## [113] pillar_1.9.0            vctrs_0.6.5            
+## [115] promises_1.3.0          dbplyr_2.5.0           
+## [117] xtable_1.8-4            cluster_2.1.6          
+## [119] evaluate_0.23           mvtnorm_1.2-4          
+## [121] cli_3.6.2               locfit_1.5-9.9         
+## [123] compiler_4.3.3          rlang_1.1.3            
+## [125] crayon_1.5.2            labeling_0.4.3         
+## [127] emdbook_1.3.13          affy_1.80.0            
+## [129] plyr_1.8.9              fs_1.6.3               
+## [131] stringi_1.8.3           viridisLite_0.4.2      
+## [133] BiocParallel_1.36.0     babelgene_22.9         
+## [135] munsell_0.5.1           Biostrings_2.70.3      
+## [137] lazyeval_0.2.2          GOSemSim_2.28.1        
+## [139] Matrix_1.6-5            hms_1.1.3              
+## [141] patchwork_1.2.0         bit64_4.0.5            
+## [143] KEGGREST_1.42.0         statmod_1.5.0          
+## [145] shiny_1.8.1.1           highr_0.10             
+## [147] fontawesome_0.5.2       igraph_2.0.3           
+## [149] memoise_2.0.1           affyio_1.72.0          
+## [151] bslib_0.7.0             ggtree_3.10.1          
+## [153] fastmatch_1.1-4         bit_4.0.5              
+## [155] gson_0.1.0              ape_5.8</code></pre>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
