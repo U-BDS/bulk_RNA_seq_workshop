@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D." />
+
+
+<title>RNASeq Tertiary Analysis: Part 1</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">U-BDS bulk RNA-seq workshop</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="installation.html">
+    <span class="fa fa-computer"></span>
+     
+    Install instructions
+  </a>
+</li>
+<li>
+  <a href="secondary_analysis.html">
+    <span class="fa fa-database"></span>
+     
+    secondary analysis
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-chart-simple"></span>
+     
+    tertiary analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="tertiary_analysis_Part1.html">Part 1</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part2.html">Part 2</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part3.html">Part 3</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part4.html">Part 4</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="additional_resources.html">
+    <span class="fa fa-book"></span>
+     
+    Additional resources
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">RNASeq Tertiary Analysis: Part 1</h1>
+<h4 class="author">Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov,
+Ph.D.</h4>
+
+</div>
+
+
+<p>In addition to U-BDS’s best practices and code written by U-BDS,
+sections of the teaching material for this workshop (especially tertiary
+analysis), contains materials which have been adapted or modified from
+the following sources (<em>we thank the curators and maintainers of all
+of these resources for their wonderful contributions, compiling the best
+practices, and easy to follow training guides for beginners</em>):</p>
+<ul>
+<li>Beta phase of carpentries meterial: <a
+href="https://carpentries-incubator.github.io/bioc-rnaseq/index.html"
+class="uri">https://carpentries-incubator.github.io/bioc-rnaseq/index.html</a></li>
+<li>Love MI, Huber W, Anders S (2014). “Moderated estimation of fold
+change and dispersion for RNA-seq data with DESeq2.” Genome Biology, 15,
+550. <a href="doi:10.1186/s13059-014-0550-8"
+class="uri">doi:10.1186/s13059-014-0550-8</a> ; vignette: <a
+href="https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html"
+class="uri">https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html</a></li>
+<li>Additional references and materials:
+<ul>
+<li><a
+href="https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html"
+class="uri">https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html</a></li>
+<li><a
+href="https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html"
+class="uri">https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html</a></li>
+</ul></li>
+</ul>
+<div id="overview" class="section level1">
+<h1>Overview</h1>
+<p>Tertiary analysis can be long and complex and is heavily dependent on
+study design. This workshop focuses on standard tertiary analysis tasks
+which are split across 4 parts covering: quality and control, data
+normalization and differential gene expression analysis with
+<code>DESeq2</code>, gene annotation, gene enrichment analysis
+(gene-ontology and gene set enrichment analysis), and the fundamentals
+of data visualization for transcriptomics.</p>
+</div>
+<div id="packages-loaded-globabally" class="section level1">
+<h1>Packages loaded globabally</h1>
+<pre class="r"><code># Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+library(tximport)
+library(DESeq2)
+library(Glimma)
+library(vsn)
+
+# Mouse annotation package we&#39;ll use for gene identifier conversion
+library(biomaRt)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(ComplexHeatmap)
+library(RColorBrewer)</code></pre>
+<div id="create-data-and-results-directory" class="section level3">
+<h3>Create <code>data</code> and <code>results</code> directory</h3>
+<pre class="r"><code>dir.create(&quot;./data&quot;, recursive = TRUE)
+dir.create(&quot;./results&quot;, recursive = TRUE) </code></pre>
+</div>
+</div>
+<div id="input-data" class="section level1">
+<h1>Input data</h1>
+<div id="the-deseqdataset" class="section level2">
+<h2>The <code>DESeqDataSet</code></h2>
+<p>In the <code>DESeq2</code> package, the core object for storing read
+counts and intermediate calculations during RNA-seq analysis is the
+<code>DESeqDataSet</code>. This object, often referred to as dds in code
+examples, is derived from the <code>RangedSummarizedExperiment</code>
+class within the <code>SummarizedExperiment</code> package.</p>
+<p>The “Ranged” aspect of <code>DESeqDataSet</code> signifies that each
+row of read count data can be linked to specific genomic regions, such
+as gene exons. This connection allows for seamless integration with
+other Bioconductor tools, enabling tasks like identifying
+<code>ChIP-seq</code> peaks near differentially expressed genes.</p>
+<p>Crucially, a <code>DESeqDataSet</code> object requires a
+<code>design</code> formula, which defines the variables considered in
+the statistical model. This formula typically consists of a tilde
+(<code>~</code>) followed by variables separated by plus signs. While
+the design can be modified after object creation, any changes
+necessitate repeating the upstream analytical steps of the DESeq2
+pipeline, as changes in the <code>design</code> influences the
+dispersion estimates and log2 fold change calculations.</p>
+<p>We can import input data by 4 ways to construct a
+<code>DESeqDataSet</code>, depending on what pipeline was used upstream
+of DESeq2 to generated counts or estimated counts:</p>
+<p>. From <code>transcript abundance</code> files and
+<code>tximport</code></p>
+<p>. From a <code>count matrix</code></p>
+<p>. From <code>htseq-count</code> files</p>
+<p>. From a <code>SummarizedExperiment</code> object</p>
+</div>
+<div id="transcript-abundance-files-and-tximport-tximeta"
+class="section level2">
+<h2>Transcript abundance files and tximport / tximeta</h2>
+<p>Given that we have implemented <code>salmon</code> quantification in
+secondary analysis, the recommended approach for tertiary analysis is to
+import the <code>salmon</code> transcript quantification to
+<code>DESeq2</code>, and then quantify gene-level data in
+<code>DESeq2</code> using <code>tximport</code>. This same approach can
+also be applied to other transcript abundance quantifiers such as
+<code>kallisto</code></p>
+<p>Employing <code>salmon</code> or <code>kallisto</code> for transcript
+abundance estimation offers several key benefits:</p>
+<p>Correction for gene length variations: These methods account for
+potential changes in gene length across samples, which can arise from
+differential isoform usage.</p>
+<p>Efficiency: As discussed in the secondary analysis portion,
+<code>salmon</code> and <code>kallisto</code> are notably faster and
+require less computational resources compared to alignment-based
+approaches that involve generating and storing BAM files. This is a
+significant advantage for large-scale studies or when analyzing datasets
+with limited resources.</p>
+<p>Increased sensitivity: Unlike traditional methods that discard
+ambiguously aligning fragments, these tools can leverage information
+from reads aligning to multiple homologous genes. This increases the
+sensitivity of transcript quantification, particularly for genes with
+high sequence similarity.</p>
+<p>With that being said and as previously discussed in secondary
+analysis, there can be study design needs where standard splice aware
+aligners may be more beneficial or complimentary.</p>
+<p><strong>Note : For this workshop, we will import the transcript
+abundance (<code>quant.sf</code>) file created by <code>salmon</code> in
+the secondary analysis pipeline (<code>nf-core</code>) using
+<code>tximport</code> method. The files are provided to you in the
+<code>/data</code> folder</strong></p>
+<p><strong>Note: For simplicity and organization, we have renamed the
+<code>.sf</code> files by <code>${sample_names}_quant.sf</code>. Please
+practice caution while updating the file names in your own research
+projects to avoid sample mix-up (tip: changing file names does not alter
+the md5sum of the file. Thus, this checker can be applied to ensure
+there has been no sample mix-ups.</strong></p>
+</div>
+<div id="salmon-or-star-salmon-files" class="section level2">
+<h2>salmon, or STAR-salmon files</h2>
+<p>Locate all the transcript abundance file and prepare them to be
+imported to <code>DESeq2</code>.</p>
+<pre class="r"><code>tx2gene &lt;- read.table(&quot;./data/tx2gene.tsv&quot;, sep = &#39;\t&#39;, header = FALSE)
+
+head(tx2gene)</code></pre>
+<pre><code>##                     V1                   V2            V3
+## 1 ENSMUST00000193812.2 ENSMUSG00000102693.2 4933401J01Rik
+## 2 ENSMUST00000082908.3 ENSMUSG00000064842.3       Gm26206
+## 3 ENSMUST00000162897.2 ENSMUSG00000051951.6          Xkr4
+## 4 ENSMUST00000159265.2 ENSMUSG00000051951.6          Xkr4
+## 5 ENSMUST00000070533.5 ENSMUSG00000051951.6          Xkr4
+## 6 ENSMUST00000192857.2 ENSMUSG00000102851.2       Gm18956</code></pre>
+<pre class="r"><code># Importing quant.sf file from secondary outputs within data:
+
+myFiles &lt;- dir(&quot;./data&quot;, &quot;.sf$&quot;, full.names = TRUE)
+myFiles</code></pre>
+<pre><code>## [1] &quot;./data/N01_AM_Naive_quant.sf&quot;   &quot;./data/N02_AM_Naive_quant.sf&quot;  
+## [3] &quot;./data/N03_AM_Naive_quant.sf&quot;   &quot;./data/N04_AM_Naive_quant.sf&quot;  
+## [5] &quot;./data/R05_AM_Allo24h_quant.sf&quot; &quot;./data/R06_AM_Allo24h_quant.sf&quot;
+## [7] &quot;./data/R07_AM_Allo24h_quant.sf&quot; &quot;./data/R08_AM_Allo24h_quant.sf&quot;</code></pre>
+<pre class="r"><code># Adding names for columns:
+
+myFiles_names &lt;- c()
+
+for (i in myFiles) {
+    result &lt;- gsub(&quot;_quant.sf&quot;,&quot;&quot;,i)
+    result &lt;- basename(result)
+    myFiles_names[result] &lt;- i
+}
+
+all(file.exists(myFiles_names))</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code># Making a log of the col names from full names:
+Log &lt;- as.matrix(myFiles_names)
+
+write.table(Log, file = &quot;./results/Sample_names_tximport.txt&quot;,
+            quote = FALSE, col.names = FALSE, sep = &quot;\t&quot;)</code></pre>
+</div>
+</div>
+<div id="tximport" class="section level1">
+<h1><code>tximport</code></h1>
+<p>We will now import the transcript-level abundances and quantify them
+into gene-level counts.</p>
+<p>Note that we explicitly set the <code>ignoreTxVersion</code>
+parameter to <code>FALSE</code> despite it being the default value. This
+serves as a reminder to ensure that the parameter has been set correctly
+according to the reference source. In this canse, we set it to
+<code>FALSE</code> given that we used a GENCODE reference, which
+contains versions associated to each feature which can be seen in the
+<code>tx2gene</code> object.</p>
+<pre class="r"><code># First, let&#39;s take a peak at the available parameters for the tximport functions
+?tximport</code></pre>
+<pre class="r"><code># with sensible parameters set, run tximport:
+txi &lt;- tximport(myFiles_names,
+                type = &quot;salmon&quot;,
+                tx2gene = tx2gene,
+                txOut = FALSE,
+                ignoreTxVersion=FALSE)</code></pre>
+<pre><code>## reading in files with read_tsv</code></pre>
+<pre><code>## 1 2 3 4 5 6 7 8 
+## summarizing abundance
+## summarizing counts
+## summarizing length</code></pre>
+<pre class="r"><code>names(txi)</code></pre>
+<pre><code>## [1] &quot;abundance&quot;           &quot;counts&quot;              &quot;length&quot;             
+## [4] &quot;countsFromAbundance&quot;</code></pre>
+<pre class="r"><code>head(txi$counts, 5)</code></pre>
+<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive
+## ENSMUSG00000000001.5          3831         3765         3395         2841
+## ENSMUSG00000000003.16            0            0            0            0
+## ENSMUSG00000000028.16          180          192          173           90
+## ENSMUSG00000000031.18            0            0            0            0
+## ENSMUSG00000000037.18            4            3            9            3
+##                       R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h
+## ENSMUSG00000000001.5        5403.000           4993       4155.000
+## ENSMUSG00000000003.16          0.000              0          0.000
+## ENSMUSG00000000028.16       1326.001           1378       1093.999
+## ENSMUSG00000000031.18          0.000              0          0.000
+## ENSMUSG00000000037.18         12.000             11          7.000
+##                       R08_AM_Allo24h
+## ENSMUSG00000000001.5            4122
+## ENSMUSG00000000003.16              0
+## ENSMUSG00000000028.16            861
+## ENSMUSG00000000031.18              0
+## ENSMUSG00000000037.18             10</code></pre>
+<pre class="r"><code>head(txi$abundance, 5)</code></pre>
+<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive
+## ENSMUSG00000000001.5     98.216401   106.299723    99.267634    95.303118
+## ENSMUSG00000000003.16     0.000000     0.000000     0.000000     0.000000
+## ENSMUSG00000000028.16     6.839288     8.727377     8.015467     4.422736
+## ENSMUSG00000000031.18     0.000000     0.000000     0.000000     0.000000
+## ENSMUSG00000000037.18     0.647132     0.120524     0.343255     0.192976
+##                       R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h
+## ENSMUSG00000000001.5       95.846128      94.673074      92.201307
+## ENSMUSG00000000003.16       0.000000       0.000000       0.000000
+## ENSMUSG00000000028.16      34.996297      38.631371      36.942847
+## ENSMUSG00000000031.18       0.000000       0.000000       0.000000
+## ENSMUSG00000000037.18       0.125222       0.149528       0.176068
+##                       R08_AM_Allo24h
+## ENSMUSG00000000001.5       89.722317
+## ENSMUSG00000000003.16       0.000000
+## ENSMUSG00000000028.16      29.781577
+## ENSMUSG00000000031.18       0.000000
+## ENSMUSG00000000037.18       0.305835</code></pre>
+</div>
+<div id="sample-meta-data" class="section level1">
+<h1>Sample meta data</h1>
+<p>A sample metadata file should contain all relevant metadata known for
+the samples in the study. This typically includes at a minimum the
+experimental grouping. However, it should also include additional
+factors when they are a part of the study (e.g.: sex, age, batch,
+time-points etc.)</p>
+<p>For this particular study, the sample metadata was acquired from the
+public repository containing the raw data:</p>
+<pre class="r"><code># import file containing sample metadata
+colData &lt;- read.csv(&quot;./data/ColData.csv&quot;, header=TRUE, row.names=1)
+colData</code></pre>
+<pre><code>##                 Condition           Group  Time      Genotype  Sex Age
+## N01_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## N02_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## N03_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## N04_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## R05_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W
+## R06_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W
+## R07_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W
+## R08_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W</code></pre>
+<pre class="r"><code>str(colData)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    8 obs. of  6 variables:
+##  $ Condition: chr  &quot;Naive&quot; &quot;Naive&quot; &quot;Naive&quot; &quot;Naive&quot; ...
+##  $ Group    : chr  &quot;Naive&quot; &quot;Naive&quot; &quot;Naive&quot; &quot;Naive&quot; ...
+##  $ Time     : chr  &quot;Naive&quot; &quot;Naive&quot; &quot;Naive&quot; &quot;Naive&quot; ...
+##  $ Genotype : chr  &quot;Cx3cr1gfp/+B6&quot; &quot;Cx3cr1gfp/+B6&quot; &quot;Cx3cr1gfp/+B6&quot; &quot;Cx3cr1gfp/+B6&quot; ...
+##  $ Sex      : chr  &quot;Male&quot; &quot;Male&quot; &quot;Male&quot; &quot;Male&quot; ...
+##  $ Age      : chr  &quot;14W&quot; &quot;14W&quot; &quot;14W&quot; &quot;14W&quot; ...</code></pre>
+<pre class="r"><code># change the condition, group, and time to factor
+
+colData$Condition &lt;- as.factor(colData$Condition)
+colData$Group &lt;- as.factor(colData$Group)
+colData$Time &lt;- as.factor(colData$Time)
+
+colData</code></pre>
+<pre><code>##                 Condition           Group  Time      Genotype  Sex Age
+## N01_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## N02_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## N03_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## N04_AM_Naive        Naive           Naive Naive Cx3cr1gfp/+B6 Male 14W
+## R05_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W
+## R06_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W
+## R07_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W
+## R08_AM_Allo24h Transplant Transplant_24hr  24hr Cx3cr1gfp/+B6 Male 14W</code></pre>
+</div>
+<div id="build-a-deseq2dataset" class="section level1">
+<h1>Build a DESeq2DataSet</h1>
+<p>The <code>DESeqDataSet</code> class, derived from
+<code>RangedSummarizedExperiment</code>, serves as the central data
+container in <code>DESeq2</code> for storing input data, intermediate
+calculations, and differential expression analysis results. It enforces
+the use of non-negative integer values in the counts matrix, the first
+element in its assay list. Moreover, a <code>design</code> formula
+defining the experimental setup is mandatory.</p>
+<p>Constructor functions facilitate the creation of
+<code>DESeqDataSet</code> objects from diverse sources:</p>
+<p>. <code>DESeqDataSet</code>: Accepts a
+<code>RangedSummarizedExperiment</code> object.</p>
+<p>. <code>DESeqDataSetFromMatrix</code>: Constructs from a matrix of
+<code>counts</code>.</p>
+<p>. <code>DESeqDataSetFromHTSeqCount</code>: Creates from
+<code>HTSeq</code> count files generated by the Python package.</p>
+<p>. <code>DESeqDataSetFromTximport</code>: Builds from a list object
+returned by the <code>tximport</code> function.</p>
+<p>The <code>design</code> parameter plays a pivotal role in modeling
+samples based on the experimental design. In our workshop dataset, where
+only the condition varies, a simple <code>~ Condition</code> model
+suffices.</p>
+<p>However, <code>DESeq2</code> accommodates complex designs involving
+batch correction, interactions, and time-series analysis. Refer to the
+“additional_resources” section of this workshop and the
+<code>DESeq2</code> vignette for more elaborate design examples.</p>
+<pre class="r"><code># tximport dds generation
+
+dds &lt;- DESeqDataSetFromTximport(txi,
+                                colData = colData,
+                                design = ~ Condition) # update the design as needed</code></pre>
+<pre><code>## using counts and average transcript lengths from tximport</code></pre>
+<pre class="r"><code>dds</code></pre>
+<pre><code>## class: DESeqDataSet 
+## dim: 55891 8 
+## metadata(1): version
+## assays(2): counts avgTxLength
+## rownames(55891): ENSMUSG00000000001.5 ENSMUSG00000000003.16 ...
+##   ENSMUSG00002076991.1 ENSMUSG00002076992.1
+## rowData names(0):
+## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h
+##   R08_AM_Allo24h
+## colData names(6): Condition Group ... Sex Age</code></pre>
+<pre class="r"><code>head(counts(dds), 5)</code></pre>
+<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive
+## ENSMUSG00000000001.5          3831         3765         3395         2841
+## ENSMUSG00000000003.16            0            0            0            0
+## ENSMUSG00000000028.16          180          192          173           90
+## ENSMUSG00000000031.18            0            0            0            0
+## ENSMUSG00000000037.18            4            3            9            3
+##                       R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h
+## ENSMUSG00000000001.5            5403           4993           4155
+## ENSMUSG00000000003.16              0              0              0
+## ENSMUSG00000000028.16           1326           1378           1094
+## ENSMUSG00000000031.18              0              0              0
+## ENSMUSG00000000037.18             12             11              7
+##                       R08_AM_Allo24h
+## ENSMUSG00000000001.5            4122
+## ENSMUSG00000000003.16              0
+## ENSMUSG00000000028.16            861
+## ENSMUSG00000000031.18              0
+## ENSMUSG00000000037.18             10</code></pre>
+<div id="note-on-factor-levels" class="section level2">
+<h2>Note on factor levels</h2>
+<p>By default, <code>R</code> automatically assigns a reference level to
+factors based on alphabetical order. If you don’t specify a different
+reference level (e.g., indicating the <code>control</code> group) when
+using <code>DESeq2</code> functions, comparisons will be made based on
+this alphabetical order.</p>
+<p>To address this, you have two options:</p>
+<ol style="list-style-type: decimal">
+<li><p>Explicitly define the comparison: Use the contrast argument in
+the results function to specify the exact comparison you want to make.
+This overrides the default reference level.</p></li>
+<li><p>Change the factor levels: Explicitly set the factor levels to
+determine the reference level. This change will be reflected in the
+results names after running <code>DESeq</code> or
+<code>nbinomWaldTest</code>/<code>nbinomLRT</code>.</p></li>
+</ol>
+<p>Below we demonstrate option #2:</p>
+<pre class="r"><code># see current levels:
+dds$Condition</code></pre>
+<pre><code>## [1] Naive      Naive      Naive      Naive      Transplant Transplant
+## [7] Transplant Transplant
+## Levels: Naive Transplant</code></pre>
+<p>In the output above, we can see that <code>Naive</code> is already
+set as the reference level by alphabetical order. However, it is still
+best practice to include the code chunk in your analysis and not rely on
+alphabetical order as it can easily change across experiments.</p>
+<pre class="r"><code># set reference to Naive
+
+dds$Condition &lt;- relevel(dds$Condition, ref = &quot;Naive&quot;)
+
+dds$Condition</code></pre>
+<pre><code>## [1] Naive      Naive      Naive      Naive      Transplant Transplant
+## [7] Transplant Transplant
+## Levels: Naive Transplant</code></pre>
+</div>
+</div>
+<div id="quality-control" class="section level1">
+<h1>Quality Control</h1>
+<p>Exploratory analysis is an essential step in <code>RNA-seq</code>
+data analysis for quality control and understanding the underlying
+patterns. It can reveal issues like quality problems, sample swaps, or
+contamination, while also highlighting the most prominent trends in the
+dataset.</p>
+<p>In this section, we’ll delve into two common approaches for
+exploratory analysis of RNA-seq data: <code>clustering</code> and
+<code>principal component analysis (PCA)</code>. These methods aren’t
+exclusive to RNA-seq but are widely applicable. However, certain aspects
+of count data require specific considerations when applying these
+techniques.</p>
+<div id="filter-low-abundance-genes" class="section level2">
+<h2>Filter low abundance genes</h2>
+<p>Before proceeding, it’s important to establish a threshold for
+<code>gene expression</code> detectability. A simple criterion we’ll use
+here is to consider a gene as non-detectable (or extremely low
+abundance) if its total count across all samples doesn’t exceed 5. This
+ensures we focus on genes with sufficient data for meaningful
+analysis.</p>
+<pre class="r"><code>#----- Counts Pre-filtering based on rowMeans -------
+message(paste0(&quot;Number of genes before pre-filtering: &quot;,  nrow(counts(dds))))</code></pre>
+<pre><code>## Number of genes before pre-filtering: 55891</code></pre>
+<pre class="r"><code># here we do rowMeans, other approaches are rowSums or min. per sample
+keep &lt;- rowMeans(counts(dds)) &gt;= 5 
+dds &lt;- dds[keep,]
+
+message(paste0(&quot;Number of genes after filtering: &quot;,  nrow(counts(dds))))</code></pre>
+<pre><code>## Number of genes after filtering: 15486</code></pre>
+<p>Note that there has been a notable drop in the number of genes
+present in this dataset.</p>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>Given the drop from ~55k genes to 15k genes. Is this expected for
+this species (mouse) and tissue type (lung-derived cells)? How many
+genes are typically expressed in mammalian genomes?</p>
+</blockquote>
+</div>
+</div>
+<div id="qc-plots" class="section level1">
+<h1>QC Plots</h1>
+<div id="library-size-differences" class="section level2">
+<h2>Library size differences</h2>
+<p><code>Library size</code> refers to the total number of reads
+assigned to genes for a given sample. Comparing raw
+<code>read counts</code> directly between samples with different library
+sizes can lead to incorrect conclusions about differential gene
+expression.</p>
+<p><code>Normalization</code> by library size adjusts the read counts to
+make them comparable across samples, removing the technical bias
+introduced by varying sequencing depths. Before proceeding with
+downstream analysis, it is crucial to compare the library sizes across
+all samples to identify potential outliers or samples with significantly
+different sequencing depths.</p>
+<pre class="r"><code># Add in the sum of all counts
+
+dds$libSize &lt;-  colSums(counts(dds))
+
+# Plot the libSize by using pipe %&gt;%
+# to extract the colData, turn it into a regular
+# data frame then send to ggplot:
+
+libsize_plot &lt;- colData(dds) %&gt;% 
+  as.data.frame() %&gt;% 
+  ggplot(aes(x = rownames(colData), y = libSize / 1e6, fill = Condition)) + 
+         geom_bar(stat = &quot;identity&quot;) + theme_bw() + 
+         labs(x = &quot;Sample&quot;, y = &quot;Total count in millions&quot;) + 
+         theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+# let&#39;s take a look at the plot:
+libsize_plot</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code># reminder on how to save figures:
+png(&quot;./results/libsize_plot.png&quot;)
+plot(libsize_plot)
+dev.off()</code></pre>
+<pre><code>## png 
+##   2</code></pre>
+<p>Based on the figure above, we can see that there are differences in
+the raw counts across the samples. This is expected, and in the later
+sections the data will be normalized to account for this technical
+artifact.</p>
+<div id="transform-the-data" class="section level3">
+<h3>Transform the data</h3>
+<p>The <code>DESeq2</code> package provides two main approaches for
+transforming RNA-seq count data: the variance stabilizing transformation
+(<code>vst</code>) and the regularized log transformation
+(<code>rlog</code>). Both methods aim to produce transformed data on the
+log2 scale that is normalized for library size or other normalization
+factors.</p>
+<p>. Variance Stabilizing Transformation (vst) The <code>vst</code> is
+based on the concept of transforming the data such that the variance
+becomes independent of the mean expression level. This approach is
+useful because RNA-seq data often exhibits higher variance for lowly
+expressed genes compared to highly expressed genes.</p>
+<p>. Regularized Log Transformation (rlog) The <code>rlog</code> is an
+alternative approach that transforms the count data to the
+<code>log2</code> scale while minimizing differences between samples for
+rows (genes) with small counts. It incorporates a prior on the sample
+differences, which acts as a regularization or shrinkage step.</p>
+<p>Both <code>vst</code> and <code>rlog</code> produce transformed data
+on the <code>log2</code> scale, normalized for <code>library size</code>
+or other factors. The choice between the two transformations may depend
+on the specific characteristics of the dataset, such as the range of
+library sizes or the presence of lowly expressed genes</p>
+<div id="blind-dispersion-estimation" class="section level4">
+<h4>Blind dispersion estimation</h4>
+<p>The <code>vst</code> and <code>rlog</code> functions in
+<code>DESeq2</code> have an argument blind that determines whether the
+transformation should be blind to the sample information specified by
+the design formula. When <code>blind</code> is set to <code>TRUE</code>
+(the default), the functions will re-estimate the dispersion using only
+an intercept, ensuring that the transformation is unbiased by any
+information about the experimental groups.</p>
+<p>If <code>blind</code> is set to <code>FALSE</code>, the functions
+will use the already estimated dispersion to perform the
+transformations. If dispersion are not already estimated, they will be
+calculated using the current <code>design</code> formula. It is
+important to note that even when <code>blind</code> is set to
+<code>FALSE</code>, the transformation primarily uses the fitted
+dispersion estimates from the mean-dispersion trend line, which reflects
+the global dependence of dispersion on the mean for the entire
+experiment. Therefore, setting <code>blind</code> to <code>FALSE</code>
+still largely avoids using specific information about which samples
+belong to which experimental groups during the transformation</p>
+<pre class="r"><code>meanSdPlot(assay(dds), ranks = FALSE)</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>vsd &lt;- vst(dds, blind=FALSE)</code></pre>
+<pre><code>## using &#39;avgTxLength&#39; from assays(dds), correcting for library size</code></pre>
+<pre class="r"><code>vsd</code></pre>
+<pre><code>## class: DESeqTransform 
+## dim: 15486 8 
+## metadata(1): version
+## assays(1): &#39;&#39;
+## rownames(15486): ENSMUSG00000000001.5 ENSMUSG00000000028.16 ...
+##   ENSMUSG00002076763.1 ENSMUSG00002076916.1
+## rowData names(4): baseMean baseVar allZero dispFit
+## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h
+##   R08_AM_Allo24h
+## colData names(7): Condition Group ... Age libSize</code></pre>
+<pre class="r"><code>meanSdPlot(assay(vsd), ranks = FALSE)</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="pca-plot" class="section level2">
+<h2>PCA Plot</h2>
+<p>Principal component analysis (PCA) is a dimensionality reduction
+technique that projects samples into a lower-dimensional space. This
+reduced representation can be used for visualization or as input for
+other analytical methods. PCA is unsupervised, meaning it does not
+incorporate external information about the samples, such as treatment
+conditions.</p>
+<p>In the plot below, we represent the samples in a two-dimensional
+principal component space. For each dimension, we indicate the fraction
+of the total variance represented by that component. By definition, the
+first principal component (PC1) always captures more variance than
+subsequent components. The fraction of explained variance measures how
+much of the ‘signal’ in the data is retained when projecting samples
+from the original high-dimensional space to the low-dimensional space
+for visualization.</p>
+<p>Principal component (PC) analysis plot displaying our 8 samples along
+PC1 and PC2, indicates that there ~83% of variance is explained in PC1
+and that ~4% is explained in PC2.</p>
+<pre class="r"><code>pcaData &lt;- DESeq2::plotPCA(vsd, intgroup = &quot;Condition&quot;,
+                           returnData = TRUE)</code></pre>
+<pre><code>## using ntop=500 top features by variance</code></pre>
+<pre class="r"><code>percentVar &lt;- round(100 * attr(pcaData, &quot;percentVar&quot;))
+
+ggplot(pcaData, aes(x = PC1, y = PC2)) +
+  geom_point(aes(color = Condition), size = 5) +
+  xlab(paste0(&quot;PC1: &quot;, percentVar[1], &quot;% variance&quot;)) +
+  ylab(paste0(&quot;PC2: &quot;, percentVar[2], &quot;% variance&quot;)) +
+  coord_fixed() +
+  theme(text = element_text(size=20)) +
+  theme_bw(base_size = 16) +
+  scale_y_continuous(limits = c(-6, 6)) </code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>What is your interpratation from the PCA plot above. Does it overall
+display variance that can be biologically relevant?</p>
+</blockquote>
+<p><strong>Challenge: Add names of samples on PCA plot</strong></p>
+<details>
+<summary>
+Click here for solution
+</summary>
+<pre class="r"><code>ggplot(pcaData, aes(x = PC1, y = PC2)) +
+  geom_point(aes(color = Condition), size = 5) +
+  coord_fixed() + 
+  theme_minimal() +
+  xlab(paste0(&quot;PC1: &quot;, percentVar[1], &quot;% variance&quot;)) +
+  ylab(paste0(&quot;PC2: &quot;, percentVar[2], &quot;% variance&quot;)) +
+  theme(text = element_text(size=20)) +
+  theme_bw(base_size = 16) +
+  scale_y_continuous(limits = c(-6, 6)) +
+  geom_text_repel(data = pcaData, 
+                  mapping = aes(label = name), 
+                  size = 2,
+                  fontface = &#39;bold.italic&#39;, 
+                  color = &#39;black&#39;,
+                  box.padding = unit(0.2, &quot;lines&quot;),
+                  point.padding = unit(0.2, &quot;lines&quot;))</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</details>
+</div>
+<div id="euclidean-distance-heatmap" class="section level2">
+<h2>Euclidean distance heatmap</h2>
+<p><code>Euclidean distance</code> is a measure of the straight-line
+distance between two points. In the context of sample clustering, it can
+be used to assess the similarity of gene expression patterns between
+samples. Longer <code>Euclidean distances</code> indicate greater
+differences in expression.</p>
+<p>One straightforward approach to <code>cluster</code> samples based on
+their expression patterns is to calculate the Euclidean distance between
+all possible sample pairs. These distances can then be visually
+represented using both a branching <code>dendrogram</code> and a
+<code>heatmap</code>, where color intensity corresponds to the magnitude
+of the distance.</p>
+<p>From this, we infer that all samples are clustered based on the
+<code>Groups</code>.</p>
+<pre class="r"><code># dist computes distance with Euclidean method
+sampleDists &lt;- dist(t(assay(vsd))) 
+
+colors &lt;- colorRampPalette(brewer.pal(9, &quot;Blues&quot;))(255)
+
+ComplexHeatmap::Heatmap(
+  as.matrix(sampleDists), 
+  col = colors,
+  name = &quot;Euclidean\ndistance&quot;,
+  cluster_rows = hclust(sampleDists),
+  cluster_columns = hclust(sampleDists),
+  bottom_annotation = columnAnnotation(
+    condition = vsd$Condition,
+    time = vsd$Time,
+    col = list(condition = c(Naive = &quot;blue&quot;, Transplant = &quot;brown&quot;),
+               time = c(&quot;Naive&quot; = &quot;yellow&quot;, &quot;24hr&quot; = &quot;forestgreen&quot;))
+    ))</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+<div id="interactive-qc-plots" class="section level2">
+<h2>Interactive QC Plots</h2>
+<p>Often it is useful to look at interactive plots to directly explore
+different experimental factors or get insights from someone without
+coding experience.(particularly useful when there are covariate
+etc.)</p>
+<p>Some useful tools for interactive exploratory data analysis for
+RNA-seq are <a
+href="https://bioconductor.org/packages/release/bioc/html/Glimma.html">Glimma</a>
+and <a
+href="https://bioconductor.org/packages/release/bioc/html/iSEE.html">iSEE</a></p>
+<p>While we will not cover them at this time, we encourage trainees to
+explore the resources above in the future.</p>
+</div>
+</div>
+<div id="save-data" class="section level1">
+<h1>save data</h1>
+<p>We will save the analyzed datasets for other parts of this
+workshop.</p>
+<pre class="r"><code>saveRDS(dds, file = &quot;./results/dds.rds&quot;)
+saveRDS(vsd, file = &quot;./results/vsd.rds&quot;)
+saveRDS(colData, file = &quot;./results/colData.rds&quot;)
+saveRDS(txi, file = &quot;./results/txi.rds&quot;)</code></pre>
+<div id="session-info" class="section level2">
+<h2>session info</h2>
+<p>R’s <code>sessionInfo()</code> captures the version of all packages
+loaded in the current environment. You may save this to an external file
+with the following command:</p>
+<p><code>writeLines(capture.output(sessionInfo()), "./results/sessionInfo.txt")</code></p>
+<p>In this case, we are displaying it as part of our lesson:</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.3.3 (2024-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.4 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] RColorBrewer_1.1-3          ComplexHeatmap_2.18.0      
+##  [3] lubridate_1.9.3             forcats_1.0.0              
+##  [5] stringr_1.5.1               purrr_1.0.2                
+##  [7] readr_2.1.5                 tidyr_1.3.1                
+##  [9] tibble_3.2.1                tidyverse_2.0.0            
+## [11] dplyr_1.1.4                 ggrepel_0.9.5              
+## [13] ggplot2_3.5.0               magrittr_2.0.3             
+## [15] biomaRt_2.58.2              vsn_3.70.0                 
+## [17] Glimma_2.12.0               DESeq2_1.42.1              
+## [19] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+## [21] MatrixGenerics_1.14.0       matrixStats_1.3.0          
+## [23] GenomicRanges_1.54.1        GenomeInfoDb_1.38.8        
+## [25] IRanges_2.36.0              S4Vectors_0.40.2           
+## [27] BiocGenerics_0.48.1         tximport_1.30.0            
+## 
+## loaded via a namespace (and not attached):
+##  [1] rstudioapi_0.16.0       jsonlite_1.8.8         
+##  [3] shape_1.4.6.1           farver_2.1.1           
+##  [5] rmarkdown_2.26          GlobalOptions_0.1.2    
+##  [7] zlibbioc_1.48.2         vctrs_0.6.5            
+##  [9] memoise_2.0.1           RCurl_1.98-1.14        
+## [11] htmltools_0.5.8.1       S4Arrays_1.2.1         
+## [13] progress_1.2.3          curl_5.2.1             
+## [15] SparseArray_1.2.4       sass_0.4.9             
+## [17] bslib_0.7.0             htmlwidgets_1.6.4      
+## [19] fontawesome_0.5.2       cachem_1.0.8           
+## [21] lifecycle_1.0.4         iterators_1.0.14       
+## [23] pkgconfig_2.0.3         Matrix_1.6-5           
+## [25] R6_2.5.1                fastmap_1.1.1          
+## [27] GenomeInfoDbData_1.2.11 clue_0.3-65            
+## [29] digest_0.6.35           colorspace_2.1-0       
+## [31] AnnotationDbi_1.64.1    RSQLite_2.3.6          
+## [33] filelock_1.0.3          labeling_0.4.3         
+## [35] fansi_1.0.6             timechange_0.3.0       
+## [37] httr_1.4.7              abind_1.4-5            
+## [39] compiler_4.3.3          bit64_4.0.5            
+## [41] withr_3.0.0             doParallel_1.0.17      
+## [43] BiocParallel_1.36.0     DBI_1.2.2              
+## [45] hexbin_1.28.3           highr_0.10             
+## [47] rappdirs_0.3.3          DelayedArray_0.28.0    
+## [49] rjson_0.2.21            tools_4.3.3            
+## [51] glue_1.7.0              cluster_2.1.6          
+## [53] generics_0.1.3          gtable_0.3.5           
+## [55] tzdb_0.4.0              preprocessCore_1.64.0  
+## [57] hms_1.1.3               xml2_1.3.6             
+## [59] utf8_1.2.4              XVector_0.42.0         
+## [61] foreach_1.5.2           pillar_1.9.0           
+## [63] vroom_1.6.5             limma_3.58.1           
+## [65] circlize_0.4.16         BiocFileCache_2.10.2   
+## [67] lattice_0.22-6          bit_4.0.5              
+## [69] tidyselect_1.2.1        locfit_1.5-9.9         
+## [71] Biostrings_2.70.3       knitr_1.46             
+## [73] edgeR_4.0.16            xfun_0.43              
+## [75] statmod_1.5.0           stringi_1.8.3          
+## [77] yaml_2.3.8              evaluate_0.23          
+## [79] codetools_0.2-20        BiocManager_1.30.22    
+## [81] cli_3.6.2               affyio_1.72.0          
+## [83] munsell_0.5.1           jquerylib_0.1.4        
+## [85] Rcpp_1.0.12             dbplyr_2.5.0           
+## [87] png_0.1-8               XML_3.99-0.16.1        
+## [89] parallel_4.3.3          blob_1.2.4             
+## [91] prettyunits_1.2.0       bitops_1.0-7           
+## [93] scales_1.3.0            affy_1.80.0            
+## [95] crayon_1.5.2            GetoptLong_1.0.5       
+## [97] rlang_1.1.3             KEGGREST_1.42.0</code></pre>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

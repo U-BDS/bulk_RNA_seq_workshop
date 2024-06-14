@@ -20,5 +20,6 @@ docs/packages/*
 docs/Dockerfile
 docs/rstudio-prefs.json
 docs/LICENSE
+docs/extra/*
 #other files
 rstudio-prefs.json

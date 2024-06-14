@@ -55,13 +55,13 @@ txi <- readRDS(file = "./results/txi.rds")
 
 The standard differential expression analysis steps in `DESeq2` are wrapped into a single function, `DESeq`. This function performs the following key steps:
 
-. Estimation of size factors: `DESeq2` calculates size factors for each sample to `normalize` the count data and account for differences in library size or sequencing depth.
+* Estimation of size factors: `DESeq2` calculates size factors for each sample to `normalize` the count data and account for differences in library size or sequencing depth.
 
-. Estimation of dispersions: `DESeq2` estimates gene-wise dispersions, which model the relationship between the mean and variance of counts across samples. This accounts for the mean-variance dependency often observed in RNA-seq data.
+* Estimation of dispersions: `DESeq2` estimates gene-wise dispersions, which model the relationship between the mean and variance of counts across samples. This accounts for the mean-variance dependency often observed in RNA-seq data.
 
-. Fitting the negative binomial generalized linear model: `DESeq2` fits a negative binomial GLM to the count data, using the design formula specified during the creation of the `DESeqDataSet` object.
+* Fitting the negative binomial generalized linear model: `DESeq2` fits a negative binomial GLM to the count data, using the design formula specified during the creation of the `DESeqDataSet` object.
 
-. Wald statistics: `DESeq2` computes Wald statistics and `p-values` to test for differential expression between conditions or levels of the variables in the design formula. Note that the Wald statistic is the default test approach. `DESeq2` also provides the likelihood ratio test.
+* Wald statistics: `DESeq2` computes Wald statistics and `p-values` to test for differential expression between conditions or levels of the variables in the design formula. Note that the Wald statistic is the default test approach. `DESeq2` also provides the likelihood ratio test.
 
 In summary, `DESeq2` provides a streamlined workflow for differential expression analysis, incorporating normalization, dispersion estimation, and statistical testing, while allowing users to specify the desired comparisons and extract results tailored to their experimental design
 
@@ -85,11 +85,11 @@ In a `DESeq2` analysis, the dispersion plot visualizes the relationship between 
 
 The dispersion plot is a crucial diagnostic tool for assessing the validity of several key assumptions underlying the `DESeq2` analysis:
 
-. Mean-Variance Relationship: `DESeq2` assumes a specific relationship between a gene's mean expression level and its variance (or dispersion). The dispersion plot helps verify whether this assumed relationship holds true in the data. Typically, genes with lower mean expression exhibit higher dispersion (more variability) than those with higher mean expression.
+* Mean-Variance Relationship: `DESeq2` assumes a specific relationship between a gene's mean expression level and its variance (or dispersion). The dispersion plot helps verify whether this assumed relationship holds true in the data. Typically, genes with lower mean expression exhibit higher dispersion (more variability) than those with higher mean expression.
 
-. Model Fit: The dispersion estimates for each gene should ideally align with the fitted dispersion trend line. Substantial deviations from this trend might indicate that the negative binomial model doesn't adequately capture the variance structure of the data.
+* Model Fit: The dispersion estimates for each gene should ideally align with the fitted dispersion trend line. Substantial deviations from this trend might indicate that the negative binomial model doesn't adequately capture the variance structure of the data.
 
-. Outliers: The dispersion plot can help identify outlier genes with unusually high dispersion estimates compared to other genes with similar mean expression levels. These outliers might warrant further investigation as they could be indicative of technical artifacts or biological phenomena not accounted for by the model.
+* Outliers: The dispersion plot can help identify outlier genes with unusually high dispersion estimates compared to other genes with similar mean expression levels. These outliers might warrant further investigation as they could be indicative of technical artifacts or biological phenomena not accounted for by the model.
 
 A well-behaved dispersion plot should show:
 
@@ -113,18 +113,19 @@ resCondition <- results(dds, contrast = c("Condition", "Transplant", "Naive"))
 summary(resCondition)
 ```
 
-## Shrink log fold changes association with condition
+## Shrinkage of log fold change
 
 Shrinking log fold change (LFC) estimates is a beneficial technique to enhance the visualization and ranking of genes. To accomplish this shrinkage, we utilize the `lfcShrink` function for the `dds` object. In this example, we employ the `apeglm` method for effect size shrinkage (Zhu, Ibrahim, and Love 2018), which offers an improvement over the previously used estimator.
 
-. `apeglm` is the adaptive t prior shrinkage estimator from the apeglm package (Zhu, Ibrahim, and Love 2018). As of version 1.28.0, it is the default estimator.
+* `apeglm` is the adaptive t prior shrinkage estimator from the apeglm package (Zhu, Ibrahim, and Love 2018). As of version 1.28.0, it is the default estimator.
 
-. `ashr` is the adaptive shrinkage estimator from the ashr package (Stephens 2016). Here DESeq2 uses the ashr option to fit a mixture of Normal distributions to form the prior, with method="shrinkage".
+* `ashr` is the adaptive shrinkage estimator from the ashr package (Stephens 2016). Here DESeq2 uses the ashr option to fit a mixture of Normal distributions to form the prior, with method="shrinkage".
 
-. `normal` is the the original DESeq2 shrinkage estimator, an adaptive Normal distribution as prior.
+* `normal` is the the original DESeq2 shrinkage estimator, an adaptive Normal distribution as prior.
 
+________
 
-```{r lfcShrink}
+```{r lfcShrink, message=FALSE, warning=FALSE}
 #--------------- Transplant_vs_Naive: Condition_Transplant_vs_Naive --------------
 
 dir.create("./results/Transplant_vs_Naive", recursive = TRUE)
@@ -433,7 +434,7 @@ DEG_heatmap
 
 <details><summary>Click here for solution</summary>
 
-```{r }
+```{r fig.height=8, fig.width=8}
 # Get top 20 DE genes
 # Select top 10 up-regulated genes
 top_up_genes <- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %>%
@@ -556,6 +557,9 @@ ggplot(tcounts, aes(Condition, expression, fill=Time)) +
 ```
 
 ## count plot
+
+DESeq2 provides a simple count function which can be implemented for brief / quick
+visualizations:
 
 ```{r}
 plotCounts(dds, 

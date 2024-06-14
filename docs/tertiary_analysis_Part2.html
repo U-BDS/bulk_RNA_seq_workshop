@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D." />
+
+
+<title>RNASeq Tertiary Analysis: Part 2</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">U-BDS bulk RNA-seq workshop</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="installation.html">
+    <span class="fa fa-computer"></span>
+     
+    Install instructions
+  </a>
+</li>
+<li>
+  <a href="secondary_analysis.html">
+    <span class="fa fa-database"></span>
+     
+    secondary analysis
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-chart-simple"></span>
+     
+    tertiary analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="tertiary_analysis_Part1.html">Part 1</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part2.html">Part 2</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part3.html">Part 3</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part4.html">Part 4</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="additional_resources.html">
+    <span class="fa fa-book"></span>
+     
+    Additional resources
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">RNASeq Tertiary Analysis: Part 2</h1>
+<h4 class="author">Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov,
+Ph.D.</h4>
+
+</div>
+
+
+<div id="packages-loaded-globally" class="section level1">
+<h1>Packages loaded globally</h1>
+<pre class="r"><code># Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+library(tximport)
+library(DESeq2)
+library(Glimma)
+library(vsn)
+
+# Mouse annotation package we&#39;ll use for gene identifier conversion
+library(biomaRt)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(EnhancedVolcano)
+library(ComplexUpset)
+library(ComplexHeatmap)
+library(RColorBrewer)</code></pre>
+</div>
+<div id="differential-expression-analysis" class="section level1">
+<h1>Differential expression analysis</h1>
+<div id="input-data" class="section level2">
+<h2>Input data</h2>
+<p>In case our objects from part 1 are not present in the environment,
+here we re-load them:</p>
+<pre class="r"><code>dds &lt;- readRDS(file = &quot;./results/dds.rds&quot;)
+colData &lt;- readRDS(file = &quot;./results/colData.rds&quot;)
+txi &lt;- readRDS(file = &quot;./results/txi.rds&quot;)</code></pre>
+</div>
+<div id="run-deseq-function" class="section level2">
+<h2>Run <code>DESeq</code> function</h2>
+<p>The standard differential expression analysis steps in
+<code>DESeq2</code> are wrapped into a single function,
+<code>DESeq</code>. This function performs the following key steps:</p>
+<ul>
+<li><p>Estimation of size factors: <code>DESeq2</code> calculates size
+factors for each sample to <code>normalize</code> the count data and
+account for differences in library size or sequencing depth.</p></li>
+<li><p>Estimation of dispersions: <code>DESeq2</code> estimates
+gene-wise dispersions, which model the relationship between the mean and
+variance of counts across samples. This accounts for the mean-variance
+dependency often observed in RNA-seq data.</p></li>
+<li><p>Fitting the negative binomial generalized linear model:
+<code>DESeq2</code> fits a negative binomial GLM to the count data,
+using the design formula specified during the creation of the
+<code>DESeqDataSet</code> object.</p></li>
+<li><p>Wald statistics: <code>DESeq2</code> computes Wald statistics and
+<code>p-values</code> to test for differential expression between
+conditions or levels of the variables in the design formula. Note that
+the Wald statistic is the default test approach. <code>DESeq2</code>
+also provides the likelihood ratio test.</p></li>
+</ul>
+<p>In summary, <code>DESeq2</code> provides a streamlined workflow for
+differential expression analysis, incorporating normalization,
+dispersion estimation, and statistical testing, while allowing users to
+specify the desired comparisons and extract results tailored to their
+experimental design</p>
+<pre class="r"><code>dds &lt;- DESeq(dds)
+
+# checking coefficient by resultsNames(dds):
+
+resultsNames(dds)</code></pre>
+<pre><code>## [1] &quot;Intercept&quot;                     &quot;Condition_Transplant_vs_Naive&quot;</code></pre>
+<pre class="r"><code># Dispersion plot
+
+plotDispEsts(dds)</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>In a <code>DESeq2</code> analysis, the dispersion plot visualizes the
+relationship between a gene’s mean expression level and its dispersion
+estimate. Dispersion, in this context, quantifies the degree to which
+the observed count data for a gene varies around its expected value
+under the negative binomial model.</p>
+<p><strong>Importance for Assumptions</strong></p>
+<p>The dispersion plot is a crucial diagnostic tool for assessing the
+validity of several key assumptions underlying the <code>DESeq2</code>
+analysis:</p>
+<ul>
+<li><p>Mean-Variance Relationship: <code>DESeq2</code> assumes a
+specific relationship between a gene’s mean expression level and its
+variance (or dispersion). The dispersion plot helps verify whether this
+assumed relationship holds true in the data. Typically, genes with lower
+mean expression exhibit higher dispersion (more variability) than those
+with higher mean expression.</p></li>
+<li><p>Model Fit: The dispersion estimates for each gene should ideally
+align with the fitted dispersion trend line. Substantial deviations from
+this trend might indicate that the negative binomial model doesn’t
+adequately capture the variance structure of the data.</p></li>
+<li><p>Outliers: The dispersion plot can help identify outlier genes
+with unusually high dispersion estimates compared to other genes with
+similar mean expression levels. These outliers might warrant further
+investigation as they could be indicative of technical artifacts or
+biological phenomena not accounted for by the model.</p></li>
+</ul>
+<p>A well-behaved dispersion plot should show:</p>
+<p><strong>Overall trend</strong>: A decreasing trend in dispersion as
+mean expression increases. <strong>Fit to the model</strong>: Most
+gene-wise dispersion estimates should cluster around the fitted trend
+line. <strong>Few outliers</strong>: A small number of points far from
+the trend line might indicate outliers.</p>
+<p>By carefully examining the dispersion plot, researchers can assess
+whether their data conforms to the assumptions of the
+<code>DESeq2</code> model, identify potential issues, and make informed
+decisions about downstream analysis steps.</p>
+</div>
+<div id="transplant_vs_naive-pair-wise-comparision"
+class="section level2">
+<h2><code>Transplant_vs_Naive</code> pair-wise comparision</h2>
+<p>The <code>results</code> function is used to extract a results table
+containing <code>log2 fold changes</code>, <code>p-values</code>, and
+<code>adjusted p-values</code> from the <code>DESeq</code> analysis. By
+default, the results are generated for the comparison of the last level
+of the last variable in the design formula against the reference
+level.</p>
+<p>However, users can specify the desired comparison using the name or
+contrast arguments in the <code>results</code> function. The contrast
+argument allows for precise specification of the levels and order of
+comparison, while the name argument can be used for simple two-group
+comparisons. It’s important to note that <code>DESeq2</code> performs
+independent filtering by default, which removes genes with low mean
+normalized counts across all samples. This step aims to improve the
+estimation of dispersion and reduce the multiple testing burden.</p>
+<pre class="r"><code>## Transplant_vs_Naive
+resCondition &lt;- results(dds, contrast = c(&quot;Condition&quot;, &quot;Transplant&quot;, &quot;Naive&quot;))
+summary(resCondition)</code></pre>
+<pre><code>## 
+## out of 15486 with nonzero total read count
+## adjusted p-value &lt; 0.1
+## LFC &gt; 0 (up)       : 3721, 24%
+## LFC &lt; 0 (down)     : 3420, 22%
+## outliers [1]       : 61, 0.39%
+## low counts [2]     : 0, 0%
+## (mean count &lt; 4)
+## [1] see &#39;cooksCutoff&#39; argument of ?results
+## [2] see &#39;independentFiltering&#39; argument of ?results</code></pre>
+</div>
+<div id="shrinkage-of-log-fold-change" class="section level2">
+<h2>Shrinkage of log fold change</h2>
+<p>Shrinking log fold change (LFC) estimates is a beneficial technique
+to enhance the visualization and ranking of genes. To accomplish this
+shrinkage, we utilize the <code>lfcShrink</code> function for the
+<code>dds</code> object. In this example, we employ the
+<code>apeglm</code> method for effect size shrinkage (Zhu, Ibrahim, and
+Love 2018), which offers an improvement over the previously used
+estimator.</p>
+<ul>
+<li><p><code>apeglm</code> is the adaptive t prior shrinkage estimator
+from the apeglm package (Zhu, Ibrahim, and Love 2018). As of version
+1.28.0, it is the default estimator.</p></li>
+<li><p><code>ashr</code> is the adaptive shrinkage estimator from the
+ashr package (Stephens 2016). Here DESeq2 uses the ashr option to fit a
+mixture of Normal distributions to form the prior, with
+method=“shrinkage”.</p></li>
+<li><p><code>normal</code> is the the original DESeq2 shrinkage
+estimator, an adaptive Normal distribution as prior.</p></li>
+</ul>
+<hr />
+<pre class="r"><code>#--------------- Transplant_vs_Naive: Condition_Transplant_vs_Naive --------------
+
+dir.create(&quot;./results/Transplant_vs_Naive&quot;, recursive = TRUE)
+
+# lfcShrink function
+Transplant_vs_Naive &lt;- lfcShrink(dds, coef=&quot;Condition_Transplant_vs_Naive&quot;, type=&quot;apeglm&quot;)
+
+Transplant_vs_Naive</code></pre>
+<pre><code>## log2 fold change (MAP): Condition Transplant vs Naive 
+## Wald test p-value: Condition Transplant vs Naive 
+## DataFrame with 15486 rows and 5 columns
+##                         baseMean log2FoldChange     lfcSE      pvalue
+##                        &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;   &lt;numeric&gt;
+## ENSMUSG00000000001.5  3992.86278     0.00063763 0.0559028 9.92683e-01
+## ENSMUSG00000000028.16  584.56681     2.40697733 0.1753700 5.17428e-44
+## ENSMUSG00000000037.18    7.49848    -0.13626169 0.3776449 4.39381e-01
+## ENSMUSG00000000056.8   366.29757     0.33061464 0.1533012 1.96559e-02
+## ENSMUSG00000000058.7  2117.12191    -0.13734295 0.0768850 6.85395e-02
+## ...                          ...            ...       ...         ...
+## ENSMUSG00002076377.1    118.0144     1.19874095  0.478207 0.000935118
+## ENSMUSG00002076457.1     12.1973    -0.05208992  0.359533 0.761654504
+## ENSMUSG00002076463.1     52.4421     0.29617535  0.262898 0.154408446
+## ENSMUSG00002076763.1     18.2897    -0.00998566  0.317344 0.958042773
+## ENSMUSG00002076916.1     48.3010     0.05373479  0.278437 0.793762229
+##                              padj
+##                         &lt;numeric&gt;
+## ENSMUSG00000000001.5  9.95285e-01
+## ENSMUSG00000000028.16 3.72959e-42
+## ENSMUSG00000000037.18 5.86031e-01
+## ENSMUSG00000000056.8  4.91078e-02
+## ENSMUSG00000000058.7  1.38344e-01
+## ...                           ...
+## ENSMUSG00002076377.1   0.00338278
+## ENSMUSG00002076457.1   0.84851370
+## ENSMUSG00002076463.1   0.26704230
+## ENSMUSG00002076763.1   0.97478956
+## ENSMUSG00002076916.1   0.86958682</code></pre>
+</div>
+</div>
+<div id="explore-the-deseq2-result" class="section level1">
+<h1>Explore the <code>DESeq2</code> result</h1>
+<p>For the purposes of this workshop we will use the results which have
+implemented shrinkage of log2 fold changes (from the
+<code>Transplant_vs_Naive</code> variable).</p>
+<div id="p-value-histogram-plot" class="section level2">
+<h2>P-value histogram plot</h2>
+<p>Visualizing the histogram of p-values is a valuable practice when
+assessing the distribution of your hypotheses (null vs alternative).
+This plot aids in evaluating whether your data meets the assumptions
+required for False Discovery Rate (FDR) correction. Although FDR
+correction is typically applied to control for false positives, there
+are specific instances where careful consideration is warranted.</p>
+<p>These edge cases go beyond the scope of this workshop, but we
+encourage trainees to read the following post that nicely summarize data
+patterns to be aware of: <a
+href="http://varianceexplained.org/statistics/interpreting-pvalue-histogram/"
+class="uri">http://varianceexplained.org/statistics/interpreting-pvalue-histogram/</a></p>
+<pre class="r"><code># distribution of p-vals (always want to plot non-corrected p-values for this)
+hist(Transplant_vs_Naive$pvalue)</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Each bar represents the number of genes with a p-value in the given
+bin (bin size=0.05).</p>
+</div>
+<div id="ma-plot" class="section level2">
+<h2>MA Plot</h2>
+<p>We can visualize the results in many ways. A good check is to explore
+the relationship between log2fold changes, significant DE genes and the
+genes mean count. <code>DESeq2</code> provides a useful function to do
+so, <code>plotMA()</code>.</p>
+<pre class="r"><code>plotMA(Transplant_vs_Naive)</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="summary-statistics" class="section level2">
+<h2>Summary statistics</h2>
+<p>In <code>DESeq2</code>, the <code>adjusted p-value</code> (also known
+as <code>padj</code>) is a modified version of the raw
+<code>p-value</code> that accounts for multiple hypothesis testing. When
+you perform thousands of statistical tests simultaneously (as in
+differential gene expression analysis), the probability of observing
+some false positives increases. The <code>adjusted p-value</code>
+controls for this by estimating the false discovery rate (FDR). The
+Default cutoff is <code>adjusted p-value &lt; 0.1</code>.</p>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>In part 1, we applied pre-filtering to remove very low abundance
+genes. How is pre-filtering linked to multiple hypothesis testing /
+false discovery rates?</p>
+</blockquote>
+<p>Default FDR Correction Method</p>
+<p>The default method for FDR correction in <code>DESeq2</code> is the
+<code>Benjamini-Hochberg</code> (BH) procedure. This method ranks the
+<code>p-values</code> from smallest to largest and calculates an
+<code>adjusted p-value</code> for each gene based on its rank and the
+total number of tests performed. The <code>adjusted p-value</code>
+represents the estimated proportion of false positives among all genes
+with an equal or smaller <code>p-value</code>.</p>
+<pre class="r"><code>summary(Transplant_vs_Naive)</code></pre>
+<pre><code>## 
+## out of 15486 with nonzero total read count
+## adjusted p-value &lt; 0.1
+## LFC &gt; 0 (up)       : 3721, 24%
+## LFC &lt; 0 (down)     : 3420, 22%
+## outliers [1]       : 61, 0.39%
+## low counts [2]     : 0, 0%
+## (mean count &lt; 4)
+## [1] see &#39;cooksCutoff&#39; argument of ?results
+## [2] see &#39;independentFiltering&#39; argument of ?results</code></pre>
+<p>You can customize <code>adjusted p-value</code> cutoff by changing
+the default parameter:</p>
+<pre class="r"><code>summary(Transplant_vs_Naive, alpha = 0.05)</code></pre>
+<pre><code>## 
+## out of 15486 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)       : 3342, 22%
+## LFC &lt; 0 (down)     : 2854, 18%
+## outliers [1]       : 61, 0.39%
+## low counts [2]     : 0, 0%
+## (mean count &lt; 4)
+## [1] see &#39;cooksCutoff&#39; argument of ?results
+## [2] see &#39;independentFiltering&#39; argument of ?results</code></pre>
+<p>At a first glance, this data suggests that there are significantly
+large transcriptomics alterations based on <code>adjusted p-value</code>
+&lt; 0.05.</p>
+<p><strong>Challenge: different approaches to limit the DEGs
+count</strong></p>
+<details>
+<summary>
+Click here for solution
+</summary>
+<pre class="r"><code>summary(Transplant_vs_Naive, alpha = 0.01)</code></pre>
+<pre><code>## 
+## out of 15486 with nonzero total read count
+## adjusted p-value &lt; 0.01
+## LFC &gt; 0 (up)       : 2730, 18%
+## LFC &lt; 0 (down)     : 2134, 14%
+## outliers [1]       : 61, 0.39%
+## low counts [2]     : 0, 0%
+## (mean count &lt; 4)
+## [1] see &#39;cooksCutoff&#39; argument of ?results
+## [2] see &#39;independentFiltering&#39; argument of ?results</code></pre>
+<p>Note: the <code>summary</code> function is simplistic in nature. In
+the later portions of the workshop we will also cover another variable
+to filter results on: log2 fold changes.</p>
+</details>
+</div>
+<div id="sort-by-adjusted-p.value" class="section level2">
+<h2>Sort by Adjusted p.value</h2>
+<pre class="r"><code>Transplant_vs_Naive &lt;- Transplant_vs_Naive[order(Transplant_vs_Naive$padj),]
+
+head(Transplant_vs_Naive)</code></pre>
+<pre><code>## log2 fold change (MAP): Condition Transplant vs Naive 
+## Wald test p-value: Condition Transplant vs Naive 
+## DataFrame with 6 rows and 5 columns
+##                        baseMean log2FoldChange     lfcSE       pvalue
+##                       &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;    &lt;numeric&gt;
+## ENSMUSG00000020649.12   3044.32        2.64171 0.0792717 1.64953e-244
+## ENSMUSG00000040204.7    2289.67        3.06535 0.1037299 4.37636e-193
+## ENSMUSG00000027342.15   6740.49        1.49248 0.0515139 1.42499e-185
+## ENSMUSG00000020914.18   7125.77        2.30101 0.0856891 5.38773e-160
+## ENSMUSG00000005470.9    1164.67        2.47450 0.0951897 5.21848e-150
+## ENSMUSG00000006678.7    1092.42        1.78528 0.0687794 1.26120e-149
+##                               padj
+##                          &lt;numeric&gt;
+## ENSMUSG00000020649.12 2.54441e-240
+## ENSMUSG00000040204.7  3.37526e-189
+## ENSMUSG00000027342.15 7.32684e-182
+## ENSMUSG00000020914.18 2.07764e-156
+## ENSMUSG00000005470.9  1.60990e-146
+## ENSMUSG00000006678.7  3.24234e-146</code></pre>
+</div>
+</div>
+<div id="make-annotation-object" class="section level1">
+<h1>Make annotation object</h1>
+<p>At this point, we will create an annotation object which we will use
+in the later section of this workshop to add annotation information
+(e.g.: gene names) to our results.</p>
+<p>Note that in the code below we select mm39 (GENCODE release M32)
+corresponding to Ensembl 109 since this is the genome / GTF versions we
+used in secondary analysis. You should always aim to match the genomic
+version in tertiary analysis to what was used in the secondary
+analysis.</p>
+<p>Also note that while there are many ways to annotate your data, the
+code chunks below implements functions from the <code>biomaRt</code>
+package to fetch the annotations.</p>
+<hr />
+<p>As a starting point, let’s check the available Ensembl versions, to
+ensure we select the correct one for our data:</p>
+<pre class="r"><code># check available urls (current and archives):
+listEnsemblArchives()</code></pre>
+<pre><code>##              name     date                                 url version
+## 1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37
+## 2     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112
+## 3     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111
+## 4     Ensembl 110 Jul 2023 https://jul2023.archive.ensembl.org     110
+## 5     Ensembl 109 Feb 2023 https://feb2023.archive.ensembl.org     109
+## 6     Ensembl 108 Oct 2022 https://oct2022.archive.ensembl.org     108
+## 7     Ensembl 107 Jul 2022 https://jul2022.archive.ensembl.org     107
+## 8     Ensembl 106 Apr 2022 https://apr2022.archive.ensembl.org     106
+## 9     Ensembl 105 Dec 2021 https://dec2021.archive.ensembl.org     105
+## 10    Ensembl 104 May 2021 https://may2021.archive.ensembl.org     104
+## 11    Ensembl 103 Feb 2021 https://feb2021.archive.ensembl.org     103
+## 12    Ensembl 102 Nov 2020 https://nov2020.archive.ensembl.org     102
+## 13    Ensembl 101 Aug 2020 https://aug2020.archive.ensembl.org     101
+## 14    Ensembl 100 Apr 2020 https://apr2020.archive.ensembl.org     100
+## 15     Ensembl 99 Jan 2020 https://jan2020.archive.ensembl.org      99
+## 16     Ensembl 98 Sep 2019 https://sep2019.archive.ensembl.org      98
+## 17     Ensembl 97 Jul 2019 https://jul2019.archive.ensembl.org      97
+## 18     Ensembl 80 May 2015 https://may2015.archive.ensembl.org      80
+## 19     Ensembl 77 Oct 2014 https://oct2014.archive.ensembl.org      77
+## 20     Ensembl 75 Feb 2014 https://feb2014.archive.ensembl.org      75
+## 21     Ensembl 54 May 2009 https://may2009.archive.ensembl.org      54
+##    current_release
+## 1                 
+## 2                *
+## 3                 
+## 4                 
+## 5                 
+## 6                 
+## 7                 
+## 8                 
+## 9                 
+## 10                
+## 11                
+## 12                
+## 13                
+## 14                
+## 15                
+## 16                
+## 17                
+## 18                
+## 19                
+## 20                
+## 21</code></pre>
+<p>We can see from the output above, that the url matching the Ensembl
+109 version is <code>https://feb2023.archive.ensembl.org</code>. Thus,
+we set the hosting url below to this specific version.</p>
+<p>Further, <code>biomaRt</code> provides several attributes you may add
+to your data for annotation. The attributes selected below are some of
+the most commonly used and needed metadata:</p>
+<p>You can list all available attributes for a glance
+<code>listAttributes(ensembl)</code> where <code>ensembl</code> is the
+Mart object we will create in this section.</p>
+<pre class="r"><code># Specify the version specific archive:
+host_url &lt;- &quot;https://feb2023.archive.ensembl.org&quot;
+
+# attributes
+attributes_to_add &lt;- c(&quot;ensembl_gene_id&quot;, &quot;external_gene_name&quot;,&quot;gene_biotype&quot;,
+                       &quot;description&quot;,&quot;chromosome_name&quot;,&quot;start_position&quot;,
+                       &quot;end_position&quot;,&quot;strand&quot;)</code></pre>
+<p>Next, select the species. If you are unsure on how to properly add
+your species, you can see the options by running
+<code>listDatasets(mart=useMart("ENSEMBL_MART_ENSEMBL", host = host_url))</code></p>
+<pre class="r"><code>species &lt;- &quot;mmusculus_gene_ensembl&quot;</code></pre>
+<p>With all required parameters set for <code>biomaRt</code>, run the
+code chunk below to: * Connect to the selected BioMart database * Use
+Ensembl IDs as the input query * Fetch the annotation information</p>
+<pre class="r"><code>ensembl &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;, dataset = species, host = host_url)
+
+listMarts(host=host_url)</code></pre>
+<pre><code>##                biomart                version
+## 1 ENSEMBL_MART_ENSEMBL      Ensembl Genes 109
+## 2   ENSEMBL_MART_MOUSE      Mouse strains 109
+## 3     ENSEMBL_MART_SNP  Ensembl Variation 109
+## 4 ENSEMBL_MART_FUNCGEN Ensembl Regulation 109</code></pre>
+<pre class="r"><code># although we filtered counts initially, we
+# fetch the annotation for all genes:
+gene_ids &lt;- rownames(txi$counts)
+
+# remove GENCODE gene version to make ids compatible to Ensemvbl:
+gene_ids &lt;- gsub(&quot;\\.[0-9]+&quot;,&quot;&quot;,gene_ids) 
+
+head(gene_ids)</code></pre>
+<pre><code>## [1] &quot;ENSMUSG00000000001&quot; &quot;ENSMUSG00000000003&quot; &quot;ENSMUSG00000000028&quot;
+## [4] &quot;ENSMUSG00000000031&quot; &quot;ENSMUSG00000000037&quot; &quot;ENSMUSG00000000049&quot;</code></pre>
+<pre class="r"><code># fetch annotations
+genemap &lt;- getBM(attributes = attributes_to_add,
+                 filters = &quot;ensembl_gene_id&quot;,
+                 values = gene_ids,
+                 mart = ensembl,
+                 useCache = FALSE)</code></pre>
+<pre><code>## Batch submitting query [=&gt;-----------------------] 8% eta: 41sBatch
+## submitting query [===&gt;---------------------] 17% eta: 27sBatch submitting
+## query [=====&gt;-------------------] 25% eta: 19sBatch submitting query
+## [=======&gt;-----------------] 33% eta: 15sBatch submitting query
+## [=========&gt;---------------] 42% eta: 11sBatch submitting query
+## [===========&gt;-------------] 50% eta: 9sBatch submitting query
+## [==============&gt;----------] 58% eta: 7sBatch submitting query
+## [================&gt;--------] 67% eta: 5sBatch submitting query
+## [==================&gt;------] 75% eta: 4sBatch submitting query
+## [====================&gt;----] 83% eta: 3sBatch submitting query
+## [======================&gt;--] 92% eta: 1s</code></pre>
+<pre class="r"><code>head(genemap)</code></pre>
+<pre><code>##      ensembl_gene_id external_gene_name   gene_biotype
+## 1 ENSMUSG00000000001              Gnai3 protein_coding
+## 2 ENSMUSG00000000003               Pbsn protein_coding
+## 3 ENSMUSG00000000028              Cdc45 protein_coding
+## 4 ENSMUSG00000000031                H19         lncRNA
+## 5 ENSMUSG00000000037              Scml2 protein_coding
+## 6 ENSMUSG00000000049               Apoh protein_coding
+##                                                                                            description
+## 1 guanine nucleotide binding protein (G protein), alpha inhibiting 3 [Source:MGI Symbol;Acc:MGI:95773]
+## 2                                                         probasin [Source:MGI Symbol;Acc:MGI:1860484]
+## 3                                           cell division cycle 45 [Source:MGI Symbol;Acc:MGI:1338073]
+## 4                     H19, imprinted maternally expressed transcript [Source:MGI Symbol;Acc:MGI:95891]
+## 5                                Scm polycomb group protein like 2 [Source:MGI Symbol;Acc:MGI:1340042]
+## 6                                                   apolipoprotein H [Source:MGI Symbol;Acc:MGI:88058]
+##   chromosome_name start_position end_position strand
+## 1               3      108014596    108053462     -1
+## 2               X       76881507     76897229     -1
+## 3              16       18599197     18630737     -1
+## 4               7      142129262    142131886     -1
+## 5               X      159865521    160041209      1
+## 6              11      108234180    108305222      1</code></pre>
+<pre class="r"><code>nrow(genemap)</code></pre>
+<pre><code>## [1] 55891</code></pre>
+<pre class="r"><code>length(gene_ids) == nrow(genemap)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>saveRDS(genemap, file = &quot;./results/genemap.rds&quot;)</code></pre>
+</div>
+<div id="add-annotation-to-deg-results" class="section level1">
+<h1>Add annotation to DEG results</h1>
+<p>Now that we have the differentially expressed genes (DEG), we can use
+the annotated object created earlier, to add gene metadata to the DEG
+results:</p>
+<pre class="r"><code># add the current gene_ids to new columns and remove the GENCODE version
+# Note we add 2 columns (one with GENCODE version and one without it) to preserve
+# version information if needed:
+
+Transplant_vs_Naive$ensembl_gene_id_version &lt;- rownames(Transplant_vs_Naive)
+Transplant_vs_Naive$ensembl_gene_id &lt;- rownames(Transplant_vs_Naive)
+
+Transplant_vs_Naive$ensembl_gene_id  &lt;- gsub(&quot;\\.[0-9]+&quot;, &quot;&quot;, Transplant_vs_Naive$ensembl_gene_id)
+
+# join the DEG list and biomaRt list by &quot;ensembl_gene_id&quot;
+Transplant_vs_Naive_annotated &lt;- dplyr::left_join(x = as.data.frame(Transplant_vs_Naive),
+                                                  y = genemap,
+                                                  by = (c(&quot;ensembl_gene_id&quot;)))
+
+# add Ensembl IDs as row names:
+rownames(Transplant_vs_Naive_annotated) &lt;- Transplant_vs_Naive_annotated$ensembl_gene_id
+head(Transplant_vs_Naive_annotated, 5)</code></pre>
+<pre><code>##                    baseMean log2FoldChange      lfcSE        pvalue
+## ENSMUSG00000020649 3044.320       2.641712 0.07927173 1.649533e-244
+## ENSMUSG00000040204 2289.666       3.065352 0.10372992 4.376356e-193
+## ENSMUSG00000027342 6740.487       1.492478 0.05151393 1.424992e-185
+## ENSMUSG00000020914 7125.770       2.301005 0.08568914 5.387733e-160
+## ENSMUSG00000005470 1164.674       2.474504 0.09518970 5.218481e-150
+##                             padj ensembl_gene_id_version
+## ENSMUSG00000020649 2.544405e-240   ENSMUSG00000020649.12
+## ENSMUSG00000040204 3.375264e-189    ENSMUSG00000040204.7
+## ENSMUSG00000027342 7.326835e-182   ENSMUSG00000027342.15
+## ENSMUSG00000020914 2.077644e-156   ENSMUSG00000020914.18
+## ENSMUSG00000005470 1.609901e-146    ENSMUSG00000005470.9
+##                       ensembl_gene_id external_gene_name   gene_biotype
+## ENSMUSG00000020649 ENSMUSG00000020649               Rrm2 protein_coding
+## ENSMUSG00000040204 ENSMUSG00000040204              Pclaf protein_coding
+## ENSMUSG00000027342 ENSMUSG00000027342               Pcna protein_coding
+## ENSMUSG00000020914 ENSMUSG00000020914              Top2a protein_coding
+## ENSMUSG00000005470 ENSMUSG00000005470              Asf1b protein_coding
+##                                                                                         description
+## ENSMUSG00000020649                    ribonucleotide reductase M2 [Source:MGI Symbol;Acc:MGI:98181]
+## ENSMUSG00000040204                 PCNA clamp associated factor [Source:MGI Symbol;Acc:MGI:1915276]
+## ENSMUSG00000027342             proliferating cell nuclear antigen [Source:MGI Symbol;Acc:MGI:97503]
+## ENSMUSG00000020914                   topoisomerase (DNA) II alpha [Source:MGI Symbol;Acc:MGI:98790]
+## ENSMUSG00000005470 anti-silencing function 1B histone chaperone [Source:MGI Symbol;Acc:MGI:1914179]
+##                    chromosome_name start_position end_position strand
+## ENSMUSG00000020649              12       24758240     24764145      1
+## ENSMUSG00000040204               9       65797519     65810548      1
+## ENSMUSG00000027342               2      132091082    132095234     -1
+## ENSMUSG00000020914              11       98883769     98915015     -1
+## ENSMUSG00000005470               8       84682136     84696826      1</code></pre>
+</div>
+<div id="save-data-outputs" class="section level1">
+<h1>Save data outputs</h1>
+<p>First, let’s save our annotated DEG list as csv file:</p>
+<pre class="r"><code>write.csv(Transplant_vs_Naive_annotated, 
+          file = &quot;./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv&quot;)</code></pre>
+<p>Second, let’s save the normalized counts as a csv file. This is
+critical output for data visualization as it contain normalized counts
+per sample:</p>
+<pre class="r"><code># add normalized counts to a new vector:
+normalized_counts &lt;- as.data.frame(counts(dds, normalized = TRUE))
+
+# add annotation
+# NOTE: here we add a new column names using the `mutate` function
+# as an alternative to the approach shown in the DEG results
+normalized_counts_annotated &lt;- normalized_counts %&gt;% 
+  mutate(ensembl_gene_id_version = rownames(normalized_counts),
+         ensembl_gene_id = rownames(normalized_counts)) %&gt;%
+  mutate(ensembl_gene_id = gsub(&quot;\\.[0-9]+&quot;,&quot;&quot;,ensembl_gene_id)) %&gt;%
+  dplyr::left_join(x = ., y = genemap, by = (c(&quot;ensembl_gene_id&quot;)))
+
+write.csv(normalized_counts_annotated,
+          file=&quot;./results/Transplant_vs_Naive/normalized_counts.csv&quot;,
+          row.names = FALSE)</code></pre>
+<p>To simplify the code sections below, we rename the longer variable
+names to shorter ones: (we explicitly named them longer in earlier
+sections for clarity in the workflow for teaching purposes)</p>
+<pre class="r"><code>T_vs_N_annotated &lt;- Transplant_vs_Naive_annotated
+counts_annotated &lt;- normalized_counts_annotated</code></pre>
+</div>
+<div id="deg-plots" class="section level1">
+<h1>DEG plots</h1>
+<p>In the sections below, note that we apply an absolute log2 fold
+change cut-off in addition to adjusted p-values to define DEGs.</p>
+<div id="volcano-plot" class="section level2">
+<h2>Volcano plot</h2>
+<pre class="r"><code>EnhancedVolcano(T_vs_N_annotated,
+                lab = T_vs_N_annotated$external_gene_name,
+                x = &quot;log2FoldChange&quot;,
+                y = &quot;padj&quot;,
+                title = &quot;Transplant_vs_Naive&quot;,
+                pCutoff = 0.05,
+                FCcutoff = 1.0,
+                pointSize = 1.0,
+                labSize = 4)</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-18-1.png" width="960" /></p>
+</div>
+<div id="visualize-selected-set-of-genes" class="section level2">
+<h2>Visualize selected set of genes</h2>
+<p>Apply standard DEG filters
+<code>adj.P.Val &lt;= 0.05, logFC &lt;= -1 | logFC &gt;= 1</code>.</p>
+<pre class="r"><code>T_vs_N_annotated_DEGs &lt;- T_vs_N_annotated %&gt;%
+  dplyr::filter(padj &lt;= 0.05, log2FoldChange &lt;= -1 | log2FoldChange &gt;= 1) %&gt;%
+  dplyr::arrange(dplyr::desc(abs(log2FoldChange))) %&gt;%
+  # Filter out the duplicated rows using `dplyr::distinct()`
+  dplyr::distinct(external_gene_name, .keep_all = TRUE)</code></pre>
+<pre class="r"><code># Get all DE genes
+genes &lt;- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %&gt;%
+         rownames()
+
+heatmapData &lt;- normalized_counts[genes, ]
+
+# Scale counts for visualization
+heatmapData &lt;- t(scale(t(heatmapData)))
+
+# Add annotation
+heatmapColAnnot &lt;- data.frame(colData(dds)[, &quot;Condition&quot;])
+heatmapColAnnot &lt;- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap &lt;- ComplexHeatmap::Heatmap(heatmapData,
+                                       top_annotation = heatmapColAnnot,
+                                       cluster_rows = TRUE, 
+                                       cluster_columns = TRUE,
+                                       show_row_names = FALSE)
+
+DEG_heatmap</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><strong>Challenge: Plot top 10 DEGs by both direction</strong></p>
+<details>
+<summary>
+Click here for solution
+</summary>
+<pre class="r"><code># Get top 20 DE genes
+# Select top 10 up-regulated genes
+top_up_genes &lt;- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %&gt;%
+  filter(log2FoldChange &gt; 1) %&gt;%           # Focus on up-regulated (positive log2fc)
+  head(20) %&gt;%
+  rownames()
+
+# Select top 10 down-regulated genes
+top_down_genes &lt;- T_vs_N_annotated_DEGs[order(T_vs_N_annotated_DEGs$padj), ] %&gt;%
+  filter(log2FoldChange &lt; -1) %&gt;%           # Focus on up-regulated (negative log2fc)
+  head(20) %&gt;%
+  rownames()
+
+genes &lt;- c(top_up_genes, top_down_genes)
+
+heatmapData &lt;- normalized_counts[genes, ]
+
+# Scale counts for visualization
+heatmapData &lt;- t(scale(t(heatmapData)))
+
+# Add annotation
+heatmapColAnnot &lt;- data.frame(colData(dds)[, &quot;Condition&quot;])
+heatmapColAnnot &lt;- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap &lt;- ComplexHeatmap::Heatmap(heatmapData,
+                        top_annotation = heatmapColAnnot,
+                        cluster_rows = TRUE, 
+                        cluster_columns = TRUE,
+                        show_row_names = TRUE)
+
+DEG_heatmap</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-21-1.png" width="768" /></p>
+</details>
+<p><strong>Challenge: Plot top 10 DEGs by gene names</strong></p>
+<details>
+<summary>
+Click here for solution
+</summary>
+<pre class="r"><code>T_vs_N_fil &lt;- T_vs_N_annotated[! is.na(T_vs_N_annotated$external_gene_name)
+                               &amp; T_vs_N_annotated$external_gene_name !=&quot;&quot;, ]
+
+counts_fil &lt;- counts_annotated[! is.na(counts_annotated$external_gene_name)
+                               &amp; counts_annotated$external_gene_name !=&quot;&quot;, ]
+
+unique_gene_names &lt;- make.unique(T_vs_N_fil$external_gene_name, sep = &quot;.&quot;)
+
+unique_gene_names_count &lt;- make.unique(counts_fil$external_gene_name, sep = &quot;.&quot;)
+
+rownames(T_vs_N_fil) &lt;- unique_gene_names
+
+rownames(counts_fil) &lt;- unique_gene_names_count</code></pre>
+<pre class="r"><code># Get top 10 DE genes
+genes &lt;- T_vs_N_fil[order(T_vs_N_fil$padj), ] %&gt;%
+         head(10) %&gt;%
+         rownames()
+
+heatmapData &lt;- counts_fil[genes, ]
+
+# Scale counts for visualization
+heatmapData &lt;- t(scale(t(heatmapData[, 1:8])))
+
+# Add annotation
+heatmapColAnnot &lt;- data.frame(colData(dds)[, &quot;Condition&quot;])
+heatmapColAnnot &lt;- HeatmapAnnotation(df = heatmapColAnnot)
+
+
+# Plot as heatmap
+DEG_heatmap &lt;- ComplexHeatmap::Heatmap(heatmapData,
+                                       top_annotation = heatmapColAnnot,
+                                       cluster_rows = TRUE, 
+                                       cluster_columns = TRUE,
+                                       show_row_names = TRUE)
+
+DEG_heatmap</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+</details>
+</div>
+</div>
+<div id="plot-selected-genes" class="section level1">
+<h1>Plot selected genes</h1>
+<div id="box-plot" class="section level2">
+<h2>Box plot</h2>
+<pre class="r"><code># Define the genes of interest.
+goi &lt;- T_vs_N_fil[order(T_vs_N_fil$padj), ] %&gt;%
+  head(10) %&gt;%
+  rownames()</code></pre>
+<pre class="r"><code>countData &lt;- counts_fil[goi, 1:8]
+
+tcounts &lt;- t(countData) %&gt;%
+  merge(colData(dds), ., by=&quot;row.names&quot;) %&gt;%
+  gather(gene, expression, (ncol(.)-length(goi)+1):ncol(.))</code></pre>
+<p>Now, create a single faceted plot.</p>
+<pre class="r"><code>ggplot(tcounts, aes(Condition, expression, fill=Time)) + 
+  geom_boxplot() + 
+  facet_wrap(~gene, scales=&quot;free_y&quot;) + 
+  labs(x=&quot;Condition&quot;, 
+       y=&quot;Expression (log normalized counts)&quot;, 
+       fill=&quot;(Time)&quot;, 
+       title=&quot;Top Results&quot;)</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+</div>
+<div id="count-plot" class="section level2">
+<h2>count plot</h2>
+<p>DESeq2 provides a simple count function which can be implemented for
+brief / quick visualizations:</p>
+<pre class="r"><code>plotCounts(dds, 
+           gene = &quot;ENSMUSG00000040204.7&quot;, 
+           intgroup = &quot;Condition&quot;,
+           normalized = TRUE)</code></pre>
+<p><img src="tertiary_analysis_Part2_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+</div>
+</div>
+<div id="glimma-report" class="section level1">
+<h1>Glimma report</h1>
+<p>Glimma is an interactive R widget for creating plots for differential
+expression analysis, created using the Vega and <code>htmlwidgets</code>
+frameworks. The created plots can be embedded in R Markdown, or exported
+as standalone HTML documents.</p>
+<div id="ma-plot-1" class="section level3">
+<h3>MA Plot</h3>
+<p>The MA plot is a visualization that plots the log-fold-change between
+experimental groups (M) against the mean expression across all the
+samples (A) for each gene.</p>
+<p>The Glimma MA plot contains two main components:</p>
+<ol style="list-style-type: decimal">
+<li><p>a plot of summary statistics across all genes that have been
+tested, and</p></li>
+<li><p>a plot of gene expression from individual samples for a given
+gene</p></li>
+</ol>
+<p>The second plot shows gene expression from the last selected sample,
+which can be selected from the table or directly from the summary
+plot.</p>
+<pre class="r"><code># first choose selected annotation to be present in report
+# (we choose a subset to make visualization easier/reduce # of cols)
+selected_annotation &lt;- data.frame(GeneID = rownames(normalized_counts))
+
+selected_annotation %&gt;% 
+    mutate(ensembl_gene_id = selected_annotation$GeneID) %&gt;%
+    mutate(ensembl_gene_id = gsub(&quot;\\.[0-9]+&quot;,&quot;&quot;,ensembl_gene_id)) %&gt;%
+    plyr::join(., genemap, by = c(&quot;ensembl_gene_id&quot;)) %&gt;%
+    dplyr::select(GeneID, external_gene_name, gene_biotype) %&gt;%
+    {.} -&gt; selected_annotation
+
+head(selected_annotation)</code></pre>
+<pre><code>##                  GeneID external_gene_name   gene_biotype
+## 1  ENSMUSG00000000001.5              Gnai3 protein_coding
+## 2 ENSMUSG00000000028.16              Cdc45 protein_coding
+## 3 ENSMUSG00000000037.18              Scml2 protein_coding
+## 4  ENSMUSG00000000056.8               Narf protein_coding
+## 5  ENSMUSG00000000058.7               Cav2 protein_coding
+## 6  ENSMUSG00000000078.8               Klf6 protein_coding</code></pre>
+<pre class="r"><code># use the original DESeq2 res. obj since row order is the same across all to facilitate
+# NOTE: basemean are shown in the natural log scale in the report
+
+file_name &lt;- paste0(&quot;./results/Transplant_vs_Naive/Glimma_ma_plot.html&quot;)
+    
+rownames(Transplant_vs_Naive) &lt;- Transplant_vs_Naive$ensembl_gene_id_version
+
+Transplant_vs_Naive &lt;- Transplant_vs_Naive[order(Transplant_vs_Naive$ensembl_gene_id_version, decreasing = FALSE),]
+ 
+print(all(rownames(Transplant_vs_Naive) == rownames(normalized_counts))) # must always be true for glimma reports</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code># select sig (arbitrary choice of padj &lt; 0.05) - to be highlighted in MA plot
+    
+sig_genes &lt;- as.numeric(Transplant_vs_Naive$padj&lt;0.05)
+    
+glMDPlot(Transplant_vs_Naive, 
+             status=sig_genes, 
+             counts=normalized_counts,
+             side.main=&quot;GeneID&quot;,
+             groups=colData$Condition,
+             folder = file_name,
+             html = &quot;MA-Plot&quot;,
+             anno = selected_annotation,
+             side.xlab = &quot;Group&quot;,
+             side.log = FALSE,
+             launch=FALSE)</code></pre>
+</div>
+<div id="session-info" class="section level2">
+<h2>session info</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.3.3 (2024-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.4 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## 
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
+## 
+## attached base packages:
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] ComplexUpset_1.3.3          EnhancedVolcano_1.20.0     
+##  [3] RColorBrewer_1.1-3          ComplexHeatmap_2.18.0      
+##  [5] lubridate_1.9.3             forcats_1.0.0              
+##  [7] stringr_1.5.1               purrr_1.0.2                
+##  [9] readr_2.1.5                 tidyr_1.3.1                
+## [11] tibble_3.2.1                tidyverse_2.0.0            
+## [13] dplyr_1.1.4                 ggrepel_0.9.5              
+## [15] ggplot2_3.5.0               magrittr_2.0.3             
+## [17] biomaRt_2.58.2              vsn_3.70.0                 
+## [19] Glimma_2.12.0               DESeq2_1.42.1              
+## [21] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+## [23] MatrixGenerics_1.14.0       matrixStats_1.3.0          
+## [25] GenomicRanges_1.54.1        GenomeInfoDb_1.38.8        
+## [27] IRanges_2.36.0              S4Vectors_0.40.2           
+## [29] BiocGenerics_0.48.1         tximport_1.30.0            
+## 
+## loaded via a namespace (and not attached):
+##   [1] rstudioapi_0.16.0       jsonlite_1.8.8         
+##   [3] shape_1.4.6.1           farver_2.1.1           
+##   [5] rmarkdown_2.26          GlobalOptions_0.1.2    
+##   [7] zlibbioc_1.48.2         vctrs_0.6.5            
+##   [9] memoise_2.0.1           RCurl_1.98-1.14        
+##  [11] htmltools_0.5.8.1       S4Arrays_1.2.1         
+##  [13] progress_1.2.3          curl_5.2.1             
+##  [15] SparseArray_1.2.4       sass_0.4.9             
+##  [17] bslib_0.7.0             htmlwidgets_1.6.4      
+##  [19] fontawesome_0.5.2       plyr_1.8.9             
+##  [21] cachem_1.0.8            lifecycle_1.0.4        
+##  [23] iterators_1.0.14        pkgconfig_2.0.3        
+##  [25] Matrix_1.6-5            R6_2.5.1               
+##  [27] fastmap_1.1.1           GenomeInfoDbData_1.2.11
+##  [29] clue_0.3-65             numDeriv_2016.8-1.1    
+##  [31] digest_0.6.35           colorspace_2.1-0       
+##  [33] patchwork_1.2.0         AnnotationDbi_1.64.1   
+##  [35] RSQLite_2.3.6           filelock_1.0.3         
+##  [37] labeling_0.4.3          fansi_1.0.6            
+##  [39] timechange_0.3.0        httr_1.4.7             
+##  [41] abind_1.4-5             compiler_4.3.3         
+##  [43] bit64_4.0.5             withr_3.0.0            
+##  [45] doParallel_1.0.17       BiocParallel_1.36.0    
+##  [47] DBI_1.2.2               hexbin_1.28.3          
+##  [49] highr_0.10              MASS_7.3-60.0.1        
+##  [51] rappdirs_0.3.3          DelayedArray_0.28.0    
+##  [53] rjson_0.2.21            tools_4.3.3            
+##  [55] glue_1.7.0              cluster_2.1.6          
+##  [57] generics_0.1.3          gtable_0.3.5           
+##  [59] tzdb_0.4.0              preprocessCore_1.64.0  
+##  [61] hms_1.1.3               xml2_1.3.6             
+##  [63] utf8_1.2.4              XVector_0.42.0         
+##  [65] foreach_1.5.2           pillar_1.9.0           
+##  [67] emdbook_1.3.13          vroom_1.6.5            
+##  [69] limma_3.58.1            circlize_0.4.16        
+##  [71] BiocFileCache_2.10.2    lattice_0.22-6         
+##  [73] bit_4.0.5               tidyselect_1.2.1       
+##  [75] locfit_1.5-9.9          Biostrings_2.70.3      
+##  [77] knitr_1.46              edgeR_4.0.16           
+##  [79] xfun_0.43               statmod_1.5.0          
+##  [81] stringi_1.8.3           yaml_2.3.8             
+##  [83] evaluate_0.23           codetools_0.2-20       
+##  [85] bbmle_1.0.25.1          BiocManager_1.30.22    
+##  [87] cli_3.6.2               affyio_1.72.0          
+##  [89] munsell_0.5.1           jquerylib_0.1.4        
+##  [91] Rcpp_1.0.12             dbplyr_2.5.0           
+##  [93] coda_0.19-4.1           png_0.1-8              
+##  [95] bdsmatrix_1.3-7         XML_3.99-0.16.1        
+##  [97] parallel_4.3.3          blob_1.2.4             
+##  [99] prettyunits_1.2.0       bitops_1.0-7           
+## [101] mvtnorm_1.2-4           apeglm_1.24.0          
+## [103] scales_1.3.0            affy_1.80.0            
+## [105] crayon_1.5.2            GetoptLong_1.0.5       
+## [107] rlang_1.1.3             KEGGREST_1.42.0</code></pre>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

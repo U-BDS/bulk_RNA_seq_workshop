@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D." />
+
+
+<title>RNASeq Secondary Analysis</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">U-BDS bulk RNA-seq workshop</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li>
+  <a href="installation.html">
+    <span class="fa fa-computer"></span>
+     
+    Install instructions
+  </a>
+</li>
+<li>
+  <a href="secondary_analysis.html">
+    <span class="fa fa-database"></span>
+     
+    secondary analysis
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-chart-simple"></span>
+     
+    tertiary analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="tertiary_analysis_Part1.html">Part 1</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part2.html">Part 2</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part3.html">Part 3</a>
+    </li>
+    <li>
+      <a href="tertiary_analysis_Part4.html">Part 4</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="additional_resources.html">
+    <span class="fa fa-book"></span>
+     
+    Additional resources
+  </a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">RNASeq Secondary Analysis</h1>
+<h4 class="author">Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov,
+Ph.D.</h4>
+
+</div>
+
+
+<!-- Add some CSS for horizontal scrolling in samplesheet blocks -->
+<style>
+  .scrollable-horizontal {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+</style>
+<div id="introduction-to-secondary-analysis" class="section level1">
+<h1>Introduction to Secondary Analysis</h1>
+<div class="float">
+<img src="imgs/primary_secondary_tertiary.jpg"
+alt="https://www.rna-seqblog.com/learn-more-about-available-bioinformatics-tools-and-pipelines-to-analyze-rna-sequencing-data/" />
+<div class="figcaption"><a
+href="https://www.rna-seqblog.com/learn-more-about-available-bioinformatics-tools-and-pipelines-to-analyze-rna-sequencing-data/"
+class="uri">https://www.rna-seqblog.com/learn-more-about-available-bioinformatics-tools-and-pipelines-to-analyze-rna-sequencing-data/</a></div>
+</div>
+<p>An experiment can typically be broken down into 3 different
+parts:</p>
+<ul>
+<li><p><strong>Primary Analysis</strong> - There can be a bit of a
+disjoint in the community about what constitutes a primary analysis.
+Some consider trimming + initial qc to be part of it. For this workshop,
+we’re going to consider this analysis to be the steps performed by a
+sequencing core and the end result of this will be a demultiplexed
+FASTQs. That is very much an oversimplification about what happens at
+this step, as there is a lot of complexity, an entire workshops could be
+given (and are given) solely on this step.</p></li>
+<li><p><strong>Secondary Analysis</strong> - Secondary analysis are the
+steps in a workflow where FASTQ files are quality-controlled (QC),
+trimmed, aligned, and quantified. The type of quantification produced
+differs depending on what kind of analysis you are performing - e.g.: a
+single-cell analysis would need a feature-barcode matrix, whole genome
+analysis would work with variant call files. For bulk RNA-seq analyses,
+the quantification represents expression count files.</p></li>
+<li><p><strong>Tertiary Analysis</strong> - Tertiary analysis takes the
+output from secondary for additional analysis, visualization and data
+interpretation. The additional analysis steps may include more QC, data
+filtering, annotation and experimental specific analysis (driven by
+study design). A typical bulk RNA-seq analysis, includes differential
+and co-regulated expression of genes and to infer their biological
+meaning.</p></li>
+</ul>
+<p><strong>The purpose of this workshop will be to provide a more
+in-depth look at secondary and tertiary analysis from data derived from
+short read sequencing.</strong></p>
+<div id="introduction-to-fastq-files" class="section level2">
+<h2>Introduction to FASTQ Files</h2>
+<p>As mentioned previously, secondary analysis starts with a FASTQ file.
+A FASTQ file is a standard file format for storing the raw sequences and
+their qualities obtained from primary analysis.</p>
+<p>Taking a quick look at the input files provided with the workshop, we
+can tell it’s a FASTQ because it has the <code>.fq</code> file
+extension, but you’ll also see <code>.fastq</code> as an alternative
+extension. The other file extension we see on the files is
+<code>.gz</code>. <code>gz</code> indicates that the file is zipped
+using the gzip tool. Gzip is both the name of the tool and the name for
+the file compression algorithm. File compression is typically performed
+to minimize the storage space the file takes up on a file system. This
+is especially important for FASTQs because they can be very large files.
+Furthermore, many standard tools for secondary analysis of RNA-seq
+accept compressed FASTQs (in the gzip format) as input, and thus, the
+user does not need to de-compress the files prior to starting the
+analysis.</p>
+<p>Let’s go ahead and peek at the FASTQ file itself. We’ll use
+<code>gunzip -c</code> to produce the file contents to stdout, and we’ll
+just look at the first 10 lines using <code>head</code>.</p>
+<pre><code>gunzip -c &lt;fastq.name&gt; | head</code></pre>
+<p>We can see that there is a discernible pattern. Each set of four
+lines is considered a single entry. The four lines are:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>sequence identifier</strong>. The exact contents of this
+vary depending on many different factors, but are always unique for each
+entry.</li>
+<li>The <strong>sequence</strong>. A string of A, T, C, G, and N. (N
+indicates the base could not be identified)</li>
+<li>A <strong>separator</strong>. Starts with a <code>+</code> sign.
+Sometimes this will also have a quality score identifier that matches
+the sequence identifier, but it’s also not uncommon for this to only
+contain the <code>+</code> sign.</li>
+<li>The <strong>sequence qualities</strong>. These indicate the quality
+for the base at the same position. These are encoded using characters,
+and there are ways to convert them back into a numerical value. See the
+table below for quick guide on the character-score translations. The
+reason these are stored as characters is again to reduce the amount of
+space the FASTQ takes up on a file system.</li>
+</ol>
+<div class="float">
+<img src="imgs/q_scores.png"
+alt="https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/" />
+<div class="figcaption"><a
+href="https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/"
+class="uri">https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/</a></div>
+</div>
+<div id="qc-ing-fastq-files" class="section level3">
+<h3>QC-ing FASTQ Files</h3>
+<p>Before starting an analysis, there are a couple sanity checks that
+can be run on a FASTQ file in order to ensure they are correct (for
+example, not corrupted from a download).</p>
+<div id="checking-line-count" class="section level4">
+<h4>Checking line count</h4>
+<p>The first sanity check is to perform just a simple word count on the
+file.</p>
+<pre><code>gunzip -c &lt;fastq_file&gt; \| wc -l</code></pre>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>What is the purpose of this check?</p>
+<p>If you recall, the format of the FASTQ file is each entry is
+separated into four lines. So a very quick sanity check to perform is
+making sure the number of lines in a FASTQ is divisible by 4.</p>
+</blockquote>
+<blockquote>
+<p><strong>NOTE</strong></p>
+<p>If you are running the above command on a computing cluster or high
+performance computer, please ensure that you do not run this command on
+the login or head node. With large files, such as FASTQ files, this
+command can cause high memory usage and cause issues for other users
+that are also using the high performance computer. In order to run the
+command either submit the command onto the cluster or run the command
+while in an interactive session. Example commands for how to perform
+this will be demonstrated later in the lesson.</p>
+</blockquote>
+</div>
+<div id="md5-checks" class="section level4">
+<h4>Md5 Checks</h4>
+<p>The second sanity check is a little more complex, but it’s known as
+an md5 check. An md5 is a string of characters and numbers. The
+important note is that the md5 is unique for every file, so two files
+having the same md5 hash indicates a high probability the files are the
+same (we say probability because it is technically possible for two
+different files to have the same md5, however because of how its
+calculated this is an extremely low chance and for the purposes of this
+course you can consider md5’s to be unique to a file).</p>
+<p>The reason to perform this check is often due to the fact that FASTQs
+are uploaded and downloaded from other sources, so the md5 can be
+computed to determine if there is a potential chance for corruption
+during either the upload or download process. If the source (e.g.:
+sequencing core, collaborators etc.) does not provide any md5’s, it is
+worth reaching out to the source with this request. Once these are
+generated you are able to check the md5s of the FASTQs after they‘ve
+been downloaded against the md5’s that the source generated. Ensuring
+these values are the same is a good way to ensure no corruption happened
+during the download process.</p>
+<p>The way to generate a md5 of a local file is using the following
+<code>md5sum</code> command</p>
+<pre><code>md5sum &lt;fastq_file&gt;</code></pre>
+<p>The output of the above can be checked against md5 received from a
+sequencing core to ensure they match perfectly. Additionally, if you
+receive a text file containing all md5 files across various samples
+(named <code>md5sum.txt</code> in the example below), they can be
+efficiently checked with the following command:</p>
+<pre><code># given you are in a directory that contains all fastq files
+# and that you have the md5sum txt file from a sequencing facility:
+
+md5sum -c md5sum.txt</code></pre>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>Given that you can generate md5 yourself for a given file, why is it
+critical to have the md5 from the data generators/sequencing
+facility?</p>
+</blockquote>
+</div>
+</div>
+</div>
+<div id="intro-to-rna-seq" class="section level2">
+<h2>Intro to RNA-Seq</h2>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>Has anyone performed any rna-seq analysis? What tools have you
+used?</p>
+</blockquote>
+<p>The FASTQ file on its own doesn’t really tell much information. In
+order to move forward with our project, these raw base calls need to be
+converted into raw expression data.</p>
+<div class="float">
+<img src="imgs/nf-core_rnaseq.png"
+alt="https://nf-co.re/rnaseq/3.14.0" />
+<div class="figcaption"><a href="https://nf-co.re/rnaseq/3.14.0"
+class="uri">https://nf-co.re/rnaseq/3.14.0</a></div>
+</div>
+<p>The rnaseq pipeline developed and published by nf-core will be the
+pipeline that this lesson will be using to analyze the FASTQs.</p>
+<p>This rnaseq pipeline has a lot of tools that are part of it, and a
+user may choose to run it in default mode (tools that are executed by
+default), or configure it to run with more or less tools/steps.</p>
+<hr />
+<p><strong>Note:</strong> Importantly, this pipeline is designed for
+short-read sequencing (e.g.: Illumina). Long-read bulk RNA-seq requires
+distinct analytical steps which are linked to the nature of long read vs
+short read sequencing. While bulk long-read sequencing is beyond to
+scopre of this workshop, nf-core has pipelines for long-read sequencing
+(e.g.: for more information see the <code>nf-core/nanoseq</code>
+pipeline).</p>
+<hr />
+<p>RNA-Seq workflows follows generally the below pattern:</p>
+<ol style="list-style-type: decimal">
+<li>Quality-control</li>
+<li>Read trimming/filtering</li>
+<li>Alignment or quasi-mapping</li>
+<li>Counting / quantification</li>
+</ol>
+<p>The pipeline contains several quality control steps in order to
+assist in the determination of any steps where an error may have
+happened or to determine viability of the samples as they progress
+through the pipeline.</p>
+<p>Additionally the pipeline also provides support for experimental
+specific approaches which we will not cover in today’s workshop. This
+includes as an example: removal of genome contaminants in expected model
+types (e.g.: mouse PDX / xenograft) and inclusion of Unique Molecular
+Identifier (UMI) tagging for PCR deduplication (an optional molecular
+preparation step).</p>
+<div id="trimming-and-filtering" class="section level3">
+<h3>Trimming and Filtering</h3>
+<p>A common initial step in RNA-seq workflows is often read trimming and
+filtering. A common type of trimming is adapter trimming. Adapters are
+artificial sequences that are attached to the DNA fragments to be
+sequenced to ensure that the fragment attaches to the sequencing flow
+cell. Adapters are normally also sequenced with the fragment, meaning
+some of the reads may have bases that are not biological and can impact
+the accuracy of mapping and other downstream analyses. In order to
+alleviate this concern there are dedicated tools published that will
+remove adapters (also referred to as “adapter trimming”). Some examples
+of tools that do this are <code>TrimGalore</code>, <code>BBmap</code>,
+or <code>Trimmomatic.</code></p>
+<p>The <code>nf-core/rnaseq</code> pipeline additionally supports the
+removal of contamination with <code>bbsplit</code> (e.g.: xenograph
+experiment, or un-expected genomic contamination), and removal of
+ribosomal rna using <code>SortMeRNA</code>.</p>
+</div>
+<div id="alignment" class="section level3">
+<h3>Alignment</h3>
+<p>Following trimming is alignment/mapping. With RNA-seq, there is more
+than one approach to alignment, the and nf-core/rnaseq pipelines
+supports various methods.</p>
+<p>Alignment is the process by which a read is mapped to a reference
+genome. <code>STAR</code> is considered the standard aligner for
+RNA-seq. The reason it is used over traditional mappers such as
+<code>bwa</code> is due to <code>STAR</code> being a splice aware
+aligner, where exon-exon junctions are taken into account at the mapping
+stage. <code>STAR</code> alignment outputs (BAM files) can be critical
+for use-cases where genome alignment is required such as gene fusion
+identification, or variant-calling/genome-wide/exome data
+integration.</p>
+<p>The second type of alignment/mapping supported is
+“quasi-mapping”/“pseudo-alignment”.</p>
+<p><code>Salmon</code> is a quasi-mapper which implements k-mer based
+indexing of the transcriptome (as opposed to the genome) to perform
+lightweight mapping to the reference. Similarly, <code>kallisto</code>
+also implements k-mer indexing of the transcriptome, but it processes
+the reads without mapping, and instead identifies k-mers within the
+reads which are compatible and shared to the index. Thus, a key
+difference between the tools is that pseudo-alignment relies on shared
+k-mers between the reference and the reads, while quasi-mapping
+implements efficient lightweight mapping using the k-mer indexed
+reference.</p>
+<p>Lastly, <code>Salmon</code> and <code>kallisto</code> are
+computationally efficient, leading to rapid mapping with low memory
+use.</p>
+</div>
+<div id="counting" class="section level3">
+<h3>Counting</h3>
+<p>Feature (gene or transcript) quantification is typically the last
+analytical step of an RNA-seq pipeline. Importantly, the outputs of
+<code>Salmon</code> and <code>kallisto</code> are quantified counts, as
+opposed to <code>STAR</code> which are mapped data (BAM files), where an
+additional quantification tools is required. In the nf-core/rnaseq
+pipeline <code>Salmon</code> is implemented as the read quantifier from
+a <code>STAR</code> alignment.</p>
+<p>The count outputs format typically contains a list of features (genes
+names or IDs) as rows and their relative abundance as columns for each
+sample.</p>
+<hr />
+<p>As discussed earlier, the pipeline we will cover also contains
+several additional steps for QC and optional steps dependent on design
+or analytical needs. The primary steps covered in the sections above are
+the required analytical steps across all bulk RNA-seq analysis.</p>
+<hr />
+</div>
+</div>
+<div id="executing-the-nf-corernaseq-pipeline" class="section level2">
+<h2>Executing the nf-core/rnaseq Pipeline</h2>
+<div id="intro-to-nextflow-nf-core" class="section level3">
+<h3>Intro to Nextflow / nf-core</h3>
+<p>Due to the amount of steps this analysis uses, it is written using a
+workflow management system (or workflow manager) known as Nextflow.
+Workflow management systems allow for the chaining together of tools and
+inherently support some of the common checks that a developer would have
+to program in, such as checking if a file exists, moving output files to
+a central location, and logging information. Workflow management systems
+are useful as they natively support parallelization, portability,
+scalability and reproducibility. There are other workflow languages such
+as Snakemake or WDL.</p>
+<p>Nextflow is built on top of a programming language known as Groovy.
+The specifics of Groovy are not necessarily important for the lesson,
+but if anyone wishes to develop pipelines using Nextflow it will be
+relevant.</p>
+<p>Nf-core is a community-led effort to curate and develop a set of
+analysis pipelines using Nextflow. All pipelines published as part of
+nf-core are open source and there are a wide range of pipelines
+published currently supporting analyses such as single-cell or ATAC-seq.
+The community itself is not specifically limited to bioinformatics, but
+most pipelines published so far have all been within that field. One
+point to be noted, is that the nf-core team has published a lot of
+standards and tools to create a styling guidelines, and that any
+Nextflow pipeline is able to use these standards and tools even if they
+do not wish to publish as part of nf-core. To view a list of all
+pipelines (released and in development), please visit <a
+href="https://nf-co.re/pipelines"
+class="uri">https://nf-co.re/pipelines</a>.</p>
+<div id="workflows-and-reproducibility" class="section level4">
+<h4>Workflows and Reproducibility</h4>
+<p>As mentioned previously, one of the important benefits of using
+workflow management systems, such as Nextflow, is reproducibility. By
+ensuring that analyses are reproducible, you or any other person is able
+to run a workflow and receive the exact same results. One of the ways
+that Nextflow ensures reproducibility is via native support for tools
+that utilize containers, such as Docker or Singularity.</p>
+<p>A container is a packaged up snapshot of code (or software) and all
+of its dependencies. A container allows the application it encapsulates
+to run on any machine afterwards. Containers help with the automation of
+installing all the packages and dependencies and minimizes the chance
+for error and deviation during the installation process.</p>
+<p>It is highly recommended that any code or analysis that is meant to
+be shared should be encapsulated in a container as that will help in
+increasing the reproducibility of your work.</p>
+</div>
+</div>
+<div id="testing-the-pipeline" class="section level3">
+<h3>Testing the Pipeline</h3>
+<p>Importantly, when implementing a novel pipeline or tool, it is
+critical to always test the pipeline to ensure that it is installed and
+working properly. Nf-core requires all pipelines to have downsampled
+test data to be able to run a test profile.</p>
+<p>We will be using UAB’s supercomputer (called <code>Cheaha</code>) to
+run the nf-core/rnaseq pipeline, since most common use-cases require
+resources that are not be readily available in local computers. More
+specifically, we’ll be using the OnDemand application provided by UAB’s
+Research Computing team, which provides an online interface to interact
+with Cheaha. Thus as a first step, we will need to navigate to the
+OnDemand website and login using your UAB login. The link can be found
+below:</p>
+<p><code>https://rc.uab.edu/pun/sys/dashboard/</code></p>
+<p>OnDemand provides an interactive file system that can be accessed by
+clicking on <code>Files</code> in the upper left of the OnDemand
+homepage, and then clicking <code>/scratch/&lt;blazer_id&gt;</code> in
+the dropdown (NOTE: The <code>&lt;blazer_id&gt;</code> in the path
+should be replaced with your blazer id).</p>
+<p>We’ll navigate to the directory where we have moved the files
+downloaded from Globus, which can be done by double clicking on
+directories. Following the install instructions will have placed the
+files in the directory below (NOTE: The <code>&lt;blazer_id&gt;</code>
+in the path should be replaced with your blazer id):</p>
+<pre><code>/scratch/&lt;blazer_id&gt;/rnaseq_workshop</code></pre>
+<blockquote>
+<p><strong>NOTE</strong></p>
+<p>For this lesson, we’ll be using the onDemand Editor provided by UAB
+Research Computing in order to edit and create files. However, if you
+are more comfortable using a software editor such as <code>vim</code>,
+<code>nano</code> , or <code>Visual Studio Code</code>, that is also
+acceptable.</p>
+</blockquote>
+<p>In order to run the pipeline with test data, we’ll want to create a
+script to submit and run the Nextflow command, thus we will start by
+creating a file called <code>run_test_rnaseq.sh</code>. In order to
+create a file, click the <code>New File</code> button in the upper right
+of interactive file system, and in the dialog box type
+<code>run_test_rnaseq.sh</code>.</p>
+<blockquote>
+<p><strong>NOTE</strong></p>
+<p>It is considered bad practice to execute any script or command that
+requires large amounts of resources on the login node of a
+supercomputer. Not only does it take resources from other users on the
+login node, but it can cause errors and system failures for the super
+computer itself, therefore <strong>ALWAYS</strong> ensure you either
+submit code to the computer OR execute code in an interactive
+session.</p>
+</blockquote>
+<p>Once the file is created, make sure it is highlighted in the file
+system window and click the <code>Edit</code> button located in the
+upper left of the screen, below the file path. In the new window, we’ll
+start by entering the below text:</p>
+<pre><code>#!/usr/bin/env bash</code></pre>
+<p>This is known as a <code>shebang</code>. It is standard practice to
+put this line at the top of any script you make, as it is used by the
+computer to assist in determing which language the script will be using.
+In this case we are letting the computer know that this is
+<code>bash</code> script. Because this script needs to be submitted to
+Cheaha, it is especially important to place this line in the file. When
+the job is dispatched to a its own machine, the machine will not know
+how to execute the script and error immediately.</p>
+<p>The next lines we will add are known as slurm directives. Slurm
+directives are used to define how much resources are needed to execute
+the job, and define where to place stdout and stderr outputs from the
+command.</p>
+<pre><code>#SBATCH --job-name=rnaseq_test
+#SBATCH --output=rnaseq_test.out
+#SBATCH --error=rnaseq_test.err
+#SBATCH --time=1:00:00
+#SBATCH --partition=express
+#SBATCH --mem-per-cpu=1000
+#SBATCH --cpus-per-task=1</code></pre>
+<p>To break down each line:</p>
+<ul>
+<li><code>--job-name</code> : Submitting code on the cluster is called a
+job. The <code>job-name</code> flag assigns a user-generated name to the
+job to allow for easier tracking. Job names should be short and
+descriptive in order to assist in determining a job. In this case we
+will be naming out job <code>rnaseq_test</code></li>
+<li><code>--output</code> and <code>--error</code> : These are for
+defining files to place the <code>stdout</code> and <code>stderr</code>
+output of the command being submitted. Because these jobs are not
+interactive, if these flags are not defined, the output will be lost.
+Instead of providing the direct name to these directives, slurm provides
+file name patterns which can be used. For instance, adding
+<code>%j_%x.out</code> and <code>%j_%x.err</code> will generate outputs
+with the following file name pattern: job id and job name</li>
+<li><code>--time</code> : This defines the amount of time you expect a
+command to run. If a job runs longer than this command, it will be
+killed by Cheaha.</li>
+<li><code>--partition</code> : There are a number of partitions
+available on Cheaha. The <code>express</code> partition is for jobs you
+expect to run in less than 2 hours. There are also <code>short</code>,
+<code>medium</code>, and <code>long</code> queues, which have their own
+maximum run time that can be found in the Cheaha documentation. It is
+recommended to choose the partition that best fits the needs of your
+pipeline, as choosing the wrong one can result in your scripts being
+killed too soon or causing very long pending times.</li>
+<li><code>--mem-per-cpu</code> : This defines how much memory a job will
+take multiplied by the number of cpus requested. There is not good way
+to determine the memory a job will take ahead of time, so it is very
+common for this to take some iteration as the script will be killed if
+it goes over the memory limit specified in this file.</li>
+<li><code>--cpus-per-task</code> : This defines how many CPUs you expect
+a job to take.</li>
+</ul>
+<p>We are specifying pretty low memory and time requirements for this
+job as because this is downsampled data, it should run very quickly and
+require very little resources. Its also important to note that
+submitting a job like this will always require low memory since we are
+submitting what is known as the Nextflow runner job. The Nextflow
+runner’s job is to just to submit the steps in the workflow that do the
+actual work for the pipeline.</p>
+<p>Next, we need to load our conda environment created from our
+installation instructions to ensure that the required software are
+active. This can be done with the following:</p>
+<pre><code>module load Anaconda3
+conda activate $USER_SCRATCH/conda_envs/rnaseq_workshop</code></pre>
+<p>With all that completed, we can now place the Nextflow command in the
+file:</p>
+<pre><code>nextflow run nf-core/rnaseq -profile test,cheaha -r 3.14.0 --outdir output</code></pre>
+<p>Breaking the Nextflow command down:</p>
+<ul>
+<li><p><code>nextflow run</code> is how to run any nextflow pipeline.
+nf-core/rnaseq tells which nf-core pipeline to run, if we were running a
+single-cell pipeline, we’d use nf-core/scrnaseq.</p></li>
+<li><p><code>-profile test, cheaha</code> : Profiles can be thought of
+as presets for a pipeline. The pipeline comes with a lot of defaults,
+but the profiles provide additional defaults for the pipeline. The
+<code>test</code> profile tells the pipeline that we are going to use
+the test data for the pipeline. The <code>cheaha</code> profile is what
+is called an institutional profile, and the one for use at UAB is
+<code>cheaha</code>. But there are also other institutions and you are
+able to create your own if one doesn’t already exist. One point to note
+is that if you pass in multiple profiles corresponding to the same
+pipeline parameters, the last one takes precedence.</p></li>
+<li><p>The <code>-r</code> specifies a version of the pipeline to use.
+This is an important parameter for reproducibility as we can force
+rnaseq to run at a specific version. If you do not use this parameter,
+the pipeline will default to the latest version.</p></li>
+<li><p><code>--outdir output</code> With this flag we are noting where
+the pipeline needs to place all the output files, in this case it will
+be a directory called <code>output</code>.</p></li>
+</ul>
+<p>In order to save the file, we click the <code>Save</code> button
+located in the upper right of the editor window.</p>
+<p>The final step is we need to submit our script to cheaha so it can be
+executed. The way we will accomplish that is via the commandline
+available from OnDemand. To access the commandline, click the
+<code>Open in Terminal</code> button located in the upper right of the
+interactive file system.</p>
+<p>We’ll need to start by navigating to our <code>rnaseq_workshop</code>
+directory (NOTE: The <code>&lt;blazer_id&gt;</code> in the path should
+be replaced with your blazer id):</p>
+<pre><code># Note: /scratch/&lt;blazer_id&gt;/ can be replaced by $USER_SCRATCH variable
+cd /scratch/&lt;blazer_id&gt;/rnaseq_workshop</code></pre>
+<p>In order to submit the command we need to run the below command:</p>
+<pre><code>sbatch run_test_rnaseq.sh</code></pre>
+<p>Once the command is run, you will see output similar to below:</p>
+<pre><code>Submitted batch job 28085735</code></pre>
+<p>The number will be different, but this is giving you the job id,
+which can be used to query the job for additional information. You can
+monitor the job by running the below command (NOTE: The
+<code>&lt;job_id&gt;</code> in the command should be replaced with the
+job id obtained from the previous command):</p>
+<pre><code>seff &lt;job_id&gt;</code></pre>
+<pre><code>Job ID: 28085735
+Cluster: slurm_cluster
+User/Group: atrull/atrull
+State: COMPLETED (exit code 0)
+Cores: 1
+CPU Utilized: 00:00:00
+CPU Efficiency: 0.00% of 00:00:01 core-walltime
+Job Wall-clock time: 00:00:01
+Memory Utilized: 1.62 MB
+Memory Efficiency: 0.16% of 1.00 GB</code></pre>
+<p>Running that command will provide some basic information about the
+job being queried, you can see how much memory the job used, its
+walltime, and other information. For this workshop, we are mainly just
+wanting to check the <code>State</code> of the job, and determine when
+it has changed to <code>COMPLETED</code> as in the example, as this
+means the job has completed successfully.</p>
+<p>You may also check the running status of the Nextflow runner’s jobs
+(and the jobs it submits) with the following command:</p>
+<pre><code>squeue -u $USER</code></pre>
+<p>Once everything is completed, move on to the next section as we can
+conclude the pipeline has been downloaded successfully.</p>
+<blockquote>
+<p><strong>NOTE</strong></p>
+<p>This section briefly introduces the concept of the institutional
+profile. The institutional profile is very useful as it allows users to
+configure nf-core workflows to better utilize the resources at their
+institution. However, due to the specificity the insitutional profile
+possesses, it is not recommended to run an instituional profile that
+does not match the institution you are running the analysis at as their
+resources may not the be same and can lead to errors or take resources
+from other users.</p>
+</blockquote>
+<blockquote>
+<p><strong>NOTE</strong></p>
+<p>The <code>cheaha</code> profile that is used within this lesson has a
+number of configurations to allow nf-core workflows to make better use
+of the cheaha supercomputer. It will direct jobs to the correct queue to
+ensure that jobs have minimal time between being submitted and run. It
+will also use the module system and native nextflow configuration to
+ensure that Singularity is used to process containers.</p>
+</blockquote>
+</div>
+<div id="understanding-the-dataset" class="section level3">
+<h3>Understanding the Dataset</h3>
+<p>Let’s start moving to actual data. In order to run the data, it’s
+important to understand the data a little more before proceeding.</p>
+<p>The data comes from the following paper: <a
+href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6096346/"
+class="uri">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6096346/</a></p>
+<p>The data that we will be analyzing is mouse transplant data. The
+original paper contains 12 samples in total - 4 naive controls, 4 from 2
+hours past transplant, and 4 from 24 hours past transplant. For this
+workshop, we will only be concerned with the controls and the 24 hour
+samples. We will be using the results from a pipeline run that contained
+only these samples for the tertiary portion, and will be reviewing the
+reports for later in this portion of the lesson. In addition, we are
+going to run down sampled versions of the data for teaching purposes,
+but the steps we will follow will be largely applicable to the full
+dataset.</p>
+<p>Another point to note is that the paper we are obtaining the data
+from is a beginner’s guide for RNA-seq published about 10 years ago.
+Given the timeline, you will note that are some differences from the
+analysis that was done for the paper versus the analysis done today. The
+reason is a lot of the tools used by the paper are considered outdated
+or have been phased out of the field. Bioinformatics and computational
+biology are fast-paced domains. Thus, it is important to ensure that all
+analyses are using correct and modern approaches. In summary, always
+ensure that the tools and pipelines you apply to your analysis are up to
+date to what is considered best practice in the RNA-seq domain.</p>
+</div>
+<div id="creating-the-samplesheet" class="section level3">
+<h3>Creating the Samplesheet</h3>
+<p>So lets work on running the pipeline on actual data. The RNAseq
+pipeline (like most nf-core pipelines) receives input via a samplesheet.
+The format of which can be seen here:</p>
+<p><a href="https://nf-co.re/rnaseq/3.14.0/docs/usage"
+class="uri">https://nf-co.re/rnaseq/3.14.0/docs/usage</a></p>
+<p>We will again want to open the interactive file system from UAB
+Research Computing’s OnDemand application, and navigate to the below
+directory (NOTE: The <code>&lt;blazer_id&gt;</code> in the path should
+be replaced with your blazer id):</p>
+<pre><code>/scratch/&lt;blazer_id&gt;/rnaseq_workshop</code></pre>
+<p>We will want to start by creating a file called
+<code>samplesheet.csv</code>. In order to create a file, click the
+<code>New File</code> button in the upper right of interactive file
+system, and in the dialog box type <code>samplesheet.csv</code>.</p>
+<p>Once the file is created, make sure it is highlighted and click the
+<code>Edit</code> button located. In the new window, enter the below
+text.</p>
+<pre><code>sample,fastq_1,fastq_2,strandedness</code></pre>
+<p>We’ve put the header into the samplesheet, so let’s save the
+samplesheet because we need to also include the FASTQs.</p>
+<p>The next step in creating the samplesheet is to populate it with
+information. The way we will do that is via the commandline available
+from OnDemand. To access the commandline, click the
+<code>Open in Terminal</code> button located in the upper right of the
+interactive file system.</p>
+<p>In order to get the list of fastqs, we’ll run the below command.</p>
+<pre><code>for file in input/downsample/*.fastq.gz; do echo $file; done</code></pre>
+<p>That will output all the FASTQs we will be working with. Lets
+redirect the output to the end of the samplesheet</p>
+<pre><code>for file in input/downsample_fastqs/*.fastq.gz; do echo $file; done &gt;&gt; samplesheet.csv</code></pre>
+<p>Open up the samplesheet again. You will see the header and a list of
+FASTQs. To start modifying it, a sample name needs to be added with some
+additional commas.</p>
+<div class="scrollable-horizontal">
+<pre>
+sample,fastq_1,fastq_2,strandedness
+N01_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328050_SRR7457559.fastq.gz,,auto
+N02_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328049_SRR7457560.fastq.gz,,auto
+N03_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328052_SRR7457557.fastq.gz,,auto
+N04_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328051_SRR7457558.fastq.gz,,auto
+R05_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328058_SRR7457551.fastq.gz,,auto
+R06_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328057_SRR7457552.fastq.gz,,auto
+R07_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328048_SRR7457561.fastq.gz,,auto
+R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328047_SRR7457562.fastq.gz,,auto
+</pre>
+</div>
+<p>The sample name is completely up to the user, so pick something that
+will help with identification for yourself if there is not an already
+existent sample name. Strandedness we have set to <code>auto</code> for
+the purposes of the workshop, if you know if the data is forward or
+reverse stranded by all means use that instead.</p>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>You’ll note that we have two commas next to each other in the
+samplesheet, which means we have left a column empty. The data for this
+workshop is single-ended, meaning that there is just a single FASTQ for
+us to analyze per sample. It’s also common for data to be paired-ended,
+which for us would result in a pair of FASTQs for each sample, known as
+an read 1 and read 2.</p>
+Can anyone tell me what we would change with this samplesheet if the
+data was paired-end instead of single-end?
+<details>
+<summary>
+<strong>Click here for solution</strong>
+</summary>
+We would need to fill in the column that is left blank. The samplesheet
+headers help guide us in what information needs to be placed in each
+column. In this case, <code>fastq_1</code> would correspond to the read
+1 fastq and <code>fastq_2</code> would correspond to the read 2 fastq.
+</details>
+</blockquote>
+</div>
+<div id="adding-pipeline-parameters" class="section level3">
+<h3>Adding Pipeline Parameters</h3>
+<p>One point of customization is the pipeline parameters. The amount of
+configurability the parameters provide is very dependent on the pipeline
+and the pipeline authors, so we won’t be able to customize every aspect
+of the pipeline, but parameters are often based on common requests by
+users of the pipeline.</p>
+<p>The parameter options for an nf-core can be found on the pipeline
+website, for rnaseq its available here: <a
+href="https://nf-co.re/rnaseq/3.14.0/parameters"
+class="uri">https://nf-co.re/rnaseq/3.14.0/parameters</a></p>
+<p>While there are a lot of options, it’s very rare that you will need
+all of these as the pipeline authors have set sensible parameters. But
+these range from everything - from required inputs to which steps to run
+in the pipeline. It is <strong>heavily encouraged</strong> to read
+through this when doing your own analysis to evaluate if there are any
+flags that may apply, as well as to note the default flag values as
+these can have notable impact on analyses.</p>
+<p>Parameters are able to be passed as flags to the command line or via
+a yaml file. For the workshop, we will use the yaml option in order to
+keep the pipeline execution command more straight-forward.</p>
+<p>Inside the <code>/scratch/&lt;blazer_id&gt;/rnaseq_workshop</code>
+directory, we want to create a new file called <code>params.yml</code>.
+Once created, let’s open the file up for editing.</p>
+<pre><code># names/email
+email: &quot;atrull@uab.edu&quot;
+multiqc_title: &quot;rnaseq_workshop&quot;</code></pre>
+<p>The first parameters to add are our email and the title. We’ll get an
+email anytime the pipeline fails or succeeds.</p>
+<pre><code># input samplesheet
+input: &quot;./samplesheet.csv&quot;
+
+# Genome references
+fasta: &quot;/path/to/fasta&quot;
+gtf: &quot;/path/to/gtf&quot;
+gencode: true</code></pre>
+<p>Next we’ll provide the required parameters. <code>input</code> is the
+path to the samplesheet. <code>fasta</code> and <code>gtf</code> are the
+paths to the FASTA and GTF files to be used for the analysis. Note that
+these can be obtained from the GENCODE website at <a
+href="https://www.gencodegenes.org/"
+class="uri">https://www.gencodegenes.org/</a>. For genomes not available
+you can also find reference files at the Ensembl website <a
+href="https://useast.ensembl.org/index.html"
+class="uri">https://useast.ensembl.org/index.html</a>. If you use
+GENCODE reference files, be sure to set the <code>gencode</code>
+parameter to <code>true</code>. For this workshop we have provided the
+GENCODE reference (version M32) in the data downloaded from Globus
+(<code>reference</code> folder).</p>
+<pre><code># Read Trimming Options
+trimmer: &quot;trimgalore&quot;
+extra_trimgalore_args: &quot;--illumina&quot;</code></pre>
+<p>We are going to use <code>trim_galore</code> for the trimmer. The
+pipeline also provides <code>fastp</code> as an option. Neither one of
+these is necessarily better than the other, <code>trim_galore</code>
+provides a wrapper around an older tool called <code>cutadapt</code> and
+<code>FASTQC.</code> Trim_galore will try to guess the adapters it needs
+to cut, but you can limit this by passing specific parameters. This
+dataset uses the illumina default adapters, so the
+<code>--illumina</code> flag needs to be passed to the tool.</p>
+<pre><code># Alignment Options
+aligner: &quot;star_salmon&quot;
+pseudo_aligner: &quot;salmon&quot;</code></pre>
+<p>The aligner we use is <code>star_salmon</code>. For rnaseq, this
+means <code>STAR</code> will be the aligner and <code>Salmon</code> will
+be used for quantification. We also instruct the pipeline to run
+quasi-mapping with <code>Salmon</code>. The choice of which to use for
+your analysis is dependent on factors including experimental design, and
+resource limitations. As previously discussed, if you also have genome
+data being processed you may want to use the <code>STAR</code> (followed
+by <code>Salmon</code> quantification), since it outputs genomic mapping
+data. We typically execute the pipeline so that both types of mapping
+strategies are executed (as demonstrated above). This way, the situation
+never arises where the pipeline needs to be rerun just to generate the
+files from the opposite aligner.</p>
+<pre><code># Quality Control
+deseq2_vst: true</code></pre>
+<p>We’ll also add this parameters for the run.</p>
+<ul>
+<li><code>deseq2_vst</code> will use the vst transformation over deseq’s
+rlog. This is ideal as vst is faster to run and more suitable for larger
+datsets. We will see more about this in the tertiary analysis
+section.</li>
+</ul>
+</div>
+<div id="additional-customization" class="section level3">
+<h3>Additional Customization</h3>
+<p>Pipeline parameters are very useful, but can only get so far. An
+additional route of customization is to use the custom configuration
+(“configs”) files implemented within Nextflow. Custom configs allow
+customization of everything from resource allocations to addition of
+parameters to specific tools in the pipeline.</p>
+<p>To demonstrate this, let’s start by creating a file called
+<code>custom.conf</code>, and adding the below lines.</p>
+<pre><code>process {
+    executor = &#39;slurm&#39;
+    queue = ‘amdhdr-100’
+}</code></pre>
+<p>Custom configuration works off the idea of scopes – what this means
+is users can group settings so they apply to specific pieces of the
+pipeline.</p>
+<p>The above lines of code set the executor to be slurm, and set the
+queue so that all jobs will be submitted to the <code>amdhdr-100</code>
+partition on cheaha.</p>
+<p>Another item that can be configured via this method is adding
+parameters to specific tools in the pipeline. In order to do that, you
+will need to find the module. For this example, let’s modify the Salmon
+script. There is a way to do this via the pipeline parameters (with the
+<code>extra_salmon_quant_args</code> parameter), however, this is a good
+opportunity to show custom configuration to pipeline tools.</p>
+<p>The first step to do that is to find the name of the process. For
+this step, it’s important to understand the nf-core directory structure
+a little better. Let’s start by changing into the rnaseq directory that
+was downloaded when the test command was executed.</p>
+<p>Open up the OnDemand Terminal and run the below command.</p>
+<pre><code>cd ~/.nextflow/assets/nf-core/rnaseq/</code></pre>
+<p>The directory above contains the copy of the pipeline source code
+matching the version which we specified in the run. This can also be
+found in GitHub noting that the following links to the same pipeline
+version used here: <a
+href="https://github.com/nf-core/rnaseq/tree/3.14.0"
+class="uri">https://github.com/nf-core/rnaseq/tree/3.14.0</a>.</p>
+<p>For the purpose of this workshop, we will explore some of the source
+code from our local copy.</p>
+<p>There’s a lot of files and directories in here, breaking down the
+directories one at a time:</p>
+<ul>
+<li><p><code>assets</code> - Contains images and tool-specfic
+files</p></li>
+<li><p><code>bin</code> - Contains scripts used by the pipeline</p></li>
+<li><p><code>conf</code> - Contains pipeline configuration
+files</p></li>
+<li><p><code>docs</code> - Contains documentation</p></li>
+<li><p><code>libs</code> - Contains groovy libraries for the pipeline to
+use</p></li>
+<li><p><code>modules</code> - Contains the nextflow process files for
+individual tools. It is further split into ‘local’ modules which are
+unique to the pipeline and ‘nf-core’ modules which are files that have
+been obtained from a central repo.</p></li>
+<li><p><code>subworkflows</code> and <code>workflows</code> - Contains
+the actual workflow files themselves. <code>subworkflows</code> are
+parts of a workflow that are repeated multiple times so are abstracted
+out of the main workflow to alleviate the maintenance burden.</p></li>
+</ul>
+<p>There are additional files in the pipeline directory, but most of
+these are used for either documentation or for the pipeline template.
+For the purposes of this workshop, these are largely unimportant but are
+very important should someone choose to write an nf-core style
+pipeline.</p>
+<p>To find Salmon, we need to search down the <code>modules</code>
+directory. There are two bash commands that can be executed to find the
+Salmon process file:</p>
+<pre><code>find modules -name &quot;*salmon*&quot;</code></pre>
+<p>OR</p>
+<pre><code>grep -rl &quot;salmon&quot; modules/</code></pre>
+<p>The <code>find</code> command assumes that there is a file or
+directory that is named like the tool, this isn’t always the case so the
+grep can help in the cases where find fails to find anything.</p>
+<p>We can see that the salmon module is located at
+<code>modules/nf-core/salmon/quant</code>. Let’s take a look at the
+process file:</p>
+<pre><code>cat modules/nf-core/salmon/quant/main.nf</code></pre>
+<p>The name of the process is at the very top of the file, which is what
+we need. Feel free to explore this, but a lot of this is Nextflow
+syntax. Special attention should be paid to the command for the tool
+which is located towards the bottom of the file.</p>
+<p>With the name of the process, let’s go back and open up the custom
+configuration file using the OnDemand Editor and add the below
+lines.</p>
+<pre><code>process{
+withName: ‘.*:SALMON_QUANT’{
+    ext.args = ‘--gcBias --seqBias’
+}</code></pre>
+<p>With this customization, Nextflow will add the two additional flags.
+The flags themselves tell <code>Salmon</code> to correct for gc and
+sequence bias. We use <code>withName</code> to limit the additions to
+only the salmon process, as opposed to all other tools. Since
+<code>withName</code> respects regular expressions we use the
+<code>.*</code> to act as a catchall for all salmon jobs.</p>
+<p>There are additional ways you can use this config, controlling
+whether Nextflow processes are run with Singularity or Docker, further
+configurations with processes such as controlling memory or cpus making
+this method a very powerful tool for modifying a pipeline without
+changing the source code (this is known as modularity).</p>
+</div>
+<div id="submitting-the-pipeline" class="section level3">
+<h3>Submitting the pipeline</h3>
+<p>With all the files created, we can submit the pipeline. We’ll create
+a <code>run_rnaseq.sh</code> file, and put the below lines in it. Note
+we aren’t increasing the resources for the job because we are only
+submitting the Nextflow runner which requires very minimal resources. In
+general when submitting the Nextflow runner, the main resource that may
+need increasing is the <code>--time</code> flag as that determines how
+much time you are allocating for the pipeline to run.</p>
+<pre><code>#!/usr/bin/env bash
+
+#SBATCH --job-name=rnaseq_test
+#SBATCH --output=rnaseq_test.out
+#SBATCH --error=rnaseq_test.err
+#SBATCH --time=1:00:00
+#SBATCH --partition=express
+#SBATCH --mem-per-cpu=1000
+#SBATCH --cpus-per-task=1
+
+# load environment
+module load Anaconda3
+conda activate $USER_SCRATCH/conda_envs/rnaseq_workshop
+
+# run pipeline
+nextflow run nf-core/rnaseq \
+    --outdir ./subsample_results \
+    -profile cheaha \
+    -r 3.14.0 \
+    -params-file ./params.yml \
+    -c custom.conf</code></pre>
+<blockquote>
+<p><strong>Discussion Question</strong></p>
+<p>So we have currently submitted the downsampled data. Can anyone tell
+me what we would need to change in order to run the full dataset as if
+we were doing a complete analysis?</p>
+<details>
+<summary>
+<strong>Click here for solution</strong>
+</summary>
+<p>The files that need to be updated are provided below with a
+description of what needs to be changed.</p>
+<code>samplesheet.csv</code> needs to have the file paths in the
+<code>fastq_1</code> column to point to the full dataset.
+<div class="scrollable-horizontal">
+<pre>
+sample,fastq_1,fastq_2,strandedness
+N01_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328050_SRR7457559.fastq.gz,,auto
+N02_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328049_SRR7457560.fastq.gz,,auto
+N03_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328052_SRR7457557.fastq.gz,,auto
+N04_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328051_SRR7457558.fastq.gz,,auto
+R05_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328058_SRR7457551.fastq.gz,,auto
+R06_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328057_SRR7457552.fastq.gz,,auto
+R07_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328048_SRR7457561.fastq.gz,,auto
+R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328047_SRR7457562.fastq.gz,,auto
+</pre>
+</div>
+<p><code>custom.conf</code> would remove the section we added to route
+all jobs to the <code>amdhdr-100</code> queue. We want the jobs to go to
+the ‘correct’ queue since we would be processing the full dataset and
+may require different resources that would better suit a different
+queue.</p>
+<pre class="custom.conf"><code>process{
+withName: ‘.*:SALMON_QUANT’{
+   ext.args = ‘--gcBias --seqBias’
+}</code></pre>
+</details>
+</blockquote>
+</div>
+</div>
+<div id="reviewing-pipeline-results" class="section level2">
+<h2>Reviewing Pipeline Results</h2>
+<div id="pipeline-metrics" class="section level3">
+<h3>Pipeline Metrics</h3>
+<p>Inside the <code>subsample_results</code> directory, there is a
+<code>pipeline_info</code> directory that contains the metrics and
+statistics for the jobs the pipeline submitted to the cluster. We are
+going to review the report and timeline files.</p>
+<p><img src="imgs/report.png" /></p>
+<p>The report file provides details on the resource and timings for each
+process that was executed as part of the pipeline. This is useful in
+helping to narrow down jobs with high memory usage for optimization
+purposes.</p>
+<p><img src="imgs/timeline.png" /></p>
+<p>The timeline file provides a detailed timeline noting when each
+process was executed. This is especially useful in being able to
+estimate how long a pipeline may take and to identify long running
+tools.</p>
+</div>
+<div id="secondary-outputs" class="section level3">
+<h3>Secondary Outputs</h3>
+<p>The rnaseq pipeline produces a lot of output files. Many of them are
+for qc and general review of the pipeline user. Due to the amount of
+files, we will only go over some of the more commonly used files in this
+workshop, but note that this pipeline (along with other nf-core
+pipelines) have dedicated documentation for noting the various output
+files. For nf-core/rnaseq, the description of all the output files can
+be found <a
+href="https://nf-co.re/rnaseq/3.14.0/docs/output">here</a>.</p>
+<div id="multiqc-report" class="section level4">
+<h4>MultiQC Report</h4>
+<p>The first point of review for the pipeline is the multiqc report.
+MultiQC is a very useful tool that aggregates a number of different
+tools into a single report, providing a quick way of reviewing the
+quality of the data to determine if there are any potential
+concerns.</p>
+<p>The first table in the multiqc report is the “General Statistics
+Table”. This provides a high level overview of various metrics, from
+read counts in the BAM to read counts in the FASTQ. It’s a lot of
+metrics, but this is useful in the accessing if a large amount of data
+filtration occur. This is also a good place to check if the samples have
+sufficient sequencing depth. Standard mRNA-sequencing typically requires
+an average of ~25M reads. This requirement increases for
+whole-transcriptome (where other RNA species are also quantified). For
+more reading abour sequencing depth consideration, please visit <a
+href="https://knowledge.illumina.com/library-preparation/rna-library-prep/library-preparation-rna-library-prep-reference_material-list/000001243">this
+Illumina resource</a>.</p>
+<p><img src="imgs/multiqc_1.png" /></p>
+<p>RNASeq does the very initial stages of tertiary analysis. It is
+definitely recommended to do these on your own rather than rely on the
+results from rnaseq as these are very generic. These results help
+indicate if there are any outliers within your dataset or if there are
+potential sample swaps that may be a concern as we expect samples that
+are similar to each other to indicate that.</p>
+<p><img src="imgs/multiqc_2.png" /></p>
+<p><img src="imgs/multiqc_3.png" /></p>
+<p>The next three qc reports are very useful for rnaseq. We expect these
+reads to be from exonic, protein coding regions. These QC’s act as good
+sanity checks that our data matches our assumptions.</p>
+<p><img src="imgs/multiqc_6.png" /></p>
+<p><img src="imgs/multiqc_7.png" /></p>
+<p><img src="imgs/multiqc_8.png" /></p>
+<p><code>RSeQC</code> is tool with a lot of quality-control for RNA-seq
+data. In addition to the above, it also lets us check for duplication
+levels. The image below is indicative of a good ‘normal’ plot for this
+metric.</p>
+<p><img src="imgs/multiqc_9.png" /></p>
+<p>There are a couple variations of BAM metrics. <code>SAMtools</code>
+is a common tool with a number of subtools that provide useful metrics
+for your BAM. The key points to look for are mapping rates, unique
+mappings, (and properly paired in the case of paired FASTQs) as those
+are expected to be high regardless of dataset, though the degree varies
+based on species.</p>
+<p><img src="imgs/multiqc_12.png" /></p>
+<p><img src="imgs/multiqc_13.png" /></p>
+<p><img src="imgs/multiqc_14.png" /></p>
+<p><img src="imgs/multiqc_15.png" /></p>
+<p>The mappings per chromosome can vary, but in general the smaller the
+chromosome the less mappings will occur, so this graph is pretty
+normal.</p>
+<p><img src="imgs/multiqc_16.png" /></p>
+<p>In the case of experiments involving multiple sexes of organisms, the
+XY count chart can be very useful for ensuring no sample swap has
+occurred.</p>
+<p><img src="imgs/multiqc_17.png" /></p>
+<p>In addition to <code>SAMtools</code>, <code>STAR</code> provides its
+own versions. We again are looking for high unique mappings. Multi
+mapped regions are okay though, we just need to make sure they are not
+the overwhelming majority.</p>
+<p><img src="imgs/multiqc_18_true.png" /></p>
+<p><code>FastQC</code> is a very common tool used for providing metrics
+for FASTQ files. There is also a <code>FastQC</code> report that gets
+generated, but its on a per-sample basis and as a result does not
+aggreate the results like in MultiQC.</p>
+<p>We also note that the <code>FastQC</code> plot below also qc
+duplicate rates from the raw data. Bear in mind unless the RNA-seq
+library preparation protocol implements UMI-tagging, duplicates cannot
+be removed from RNA-seq data (as it is not possible to differentiate
+technical/artifact duplicates from biological duplicates derived from
+the high abundance of RNA molecules / expression).</p>
+<p><img src="imgs/multiqc_19.png" /></p>
+<p>For short read data, we expect the mean quality score to remain well
+in the green section. But it’s important to note that there are quality
+drops at the start and end of the read and this is a result of the
+technology, and that any low quality reads (based on trimming
+parameters) are removing at the trimming step.</p>
+<p><img src="imgs/multiqc_20.png" /></p>
+<p><img src="imgs/multiqc_21.png" /></p>
+<p>The Per Base Sequence Content is very useful for determing if there
+is any potential issue with the FASTQ. You’ll again notice there are
+issues at the start and end of the reads and its universal across
+samples. Clicking each row provides a better view of which base is the
+strongest. This is again pretty expected for reasons mentioned earlier,
+but always worth investigating.</p>
+<p><img src="imgs/multiqc_22.png" /></p>
+<p><img src="imgs/multiqc_23.png" /></p>
+<p>This is pretty typical GC Content, anything wrong with this could
+indicate species contamination.</p>
+<p><img src="imgs/multiqc_24.png" /></p>
+<p>Per Base N Content indicates how many ‘N’s’ were detected in the
+dataset. N’s mean the base was unable to be determined, and high levels
+could indicate a potentially significant sequencer error.</p>
+<p><img src="imgs/multiqc_25.png" /></p>
+<p><img src="imgs/multiqc_26.png" /></p>
+<p><img src="imgs/multiqc_27.png" /></p>
+<p>We expect a level of adapters in our data, however note that this is
+pre trimmed figure, and that they are removed at the trimming step.</p>
+<p><img src="imgs/multiqc_28.png" /></p>
+<p>Finally there are the pipeline data. Just below the citations, are
+the tool versions. This is useful for manuscript writing, and for
+reporting tool-specific versions (along with the rnaseq pipeline
+version). It is also critical to cite the pipeline, the nf-core
+community and the tools’ developers at the writing stage (many of these
+tools have published papers available for citation).</p>
+<p>All nf-core pipelines contain a <code>CITATION.md</code> document
+listing all tools and proper citation. The <code>README.md</code> file
+contains the method to cite the pipeline.</p>
+<p><img src="imgs/multiqc_30.png" /></p>
+<p>The workflow summary indicates what parameters and options were used
+during the analysis.</p>
+<p><img src="imgs/multiqc_31.png" /></p>
+</div>
+<div id="files-for-tertiary-analysis" class="section level4">
+<h4>Files for Tertiary Analysis</h4>
+<p>Due to the way we configured the rnaseq pipeline, there are two set
+of files we can use for tertiary analysis. While we only need to choose
+one set, you can also run analyses on both to determine which results
+you prefer, but note that the two sets should produce very similar
+results.</p>
+<div id="star-salmon-results" class="section level5">
+<h5>STAR + Salmon Results</h5>
+<p>The <code>star_salmon</code> results are produced by aligning reads
+using STAR and quantifying using Salmon.</p>
+</div>
+<div id="salmon-results" class="section level5">
+<h5>Salmon Results</h5>
+<p>The <code>salmon</code> results are produced by performing
+quasi-mapping using <code>Salmon</code>. This method will NOT produce
+any alignment files as discussed earlier.</p>
+</div>
+</div>
+</div>
+<div id="troubleshooting-nextflow-pipelines" class="section level3">
+<h3>Troubleshooting Nextflow Pipelines</h3>
+<p>Another useful skill when running Nextflow pipelines is the ability
+to troubleshoot pipelines.</p>
+<p>We’ve reviewed the results, but we are still unsure if the arguments
+we passed in with the custom config were applied to the pipeline. In our
+case, we are wanting to make sure that the process names
+<code>SALMON_QUANT</code> had the <code>--gcBias --seqBias</code> flags
+added to its command</p>
+<p>All this information is held within the <code>work</code> directory,
+so lets try and take a peek into it.</p>
+<pre><code>ls work</code></pre>
+<p>If we take a look at the <code>work</code> directory, we’ll see that
+we have a number of directories that we don’t know what they are for.
+Nextflow hashes all of its processes for memory’s sake, however it makes
+it much harder for us to locate information on individual processes.</p>
+<p>In order to find our command, we’ll need to use the Nextflow log
+command:</p>
+<pre><code>nextflow log</code></pre>
+<p>With no arguments, this command will produce a history of Nextflow
+pipelines. It produces some basic metrics, such as start date, duration,
+and even the command that was used to execute the pipeline.</p>
+<p>Its also important to note the output are ordered such that newer
+runs are at the bottom of the list and older runs are at the top. Our
+test run should be the last item in the list (or the only item in the
+list in the case it’s the only entry).</p>
+<blockquote>
+<p>Discussion Question</p>
+<p>What happens if you run this command in a different directory?</p>
+<p>You may get output that looks like the below:</p>
+<p><code>It looks like no pipeline was executed in this folder (or execution history is empty)</code></p>
+<p>The Nextflow log command uses a hidden folder called
+<code>.nextflow</code>. This directory contains the information for all
+nextflow runs that have bene executed within that directory. As a
+result, <code>nextflow log</code> is only useful in locations where
+there have been nextflow runs.</p>
+</blockquote>
+<p>In order to continue, we’ll need to obtain the run name for our
+Nextflow run. Run names are in the third column of the Nextflow log
+output, and for our run it will be in the last row in the output of
+Nextflow log. The run name is a randomly generated phrase of two words
+separated by an underscore. For the sake of simplicity, I’ll be using
+the name of my run (<code>thirsty_heisenberg</code>) in the examples
+below, but just note that your run name is expected to be different and
+just use your run name in place of mine when running the below
+commands.</p>
+<pre><code>nextflow log thirsty_heisenberg</code></pre>
+<p>This time when we run the Nextflow log command, we receive a list of
+file paths. These paths are the work directories used by the pipeline,
+but they don’t really mean anything to us as we still don’t know what
+they mean.</p>
+<pre><code>nextflow log thirsty_heisenberg -l</code></pre>
+<p>We need to configure the columns produced by our Nextflow line, by
+running the same command with the <code>-l</code> flag we will produce
+all the column names the tool will produce. We are wanting to find the
+<code>SALMON_QUANT</code> process and its command, so we’ll want the
+<code>name</code> and <code>script</code> columns</p>
+<pre><code>nextflow log thirsty_heisenberg -f name,script</code></pre>
+<p>This produces a lot of output, we can see that it has changed to
+contain the process name and a series of bash commands. However it is a
+lot to go through when we only care about a single process. So let’s
+filter down the output:</p>
+<pre><code>nextflow log thirsty_heisenberg -f name,script -filter &#39;name =~ &quot;.*SALMON_QUANT.*&quot;&#39; </code></pre>
+<p>As can be seen in the previous command’s output, the process names
+are very long and there is not an easy way to find it. So we’ve added
+the <code>-filter</code> flag to reduce down the results. The value
+we’re assigning it is <code>'name =~ ".*SALMON_QUANT.*"'</code>. This is
+a regular expression, which just means we are trying to find a string,
+we know the structure of the string, but not the exact string. Let’s
+break down the regex a little better:</p>
+<ul>
+<li><p>The <code>=~</code> operator is used when you are performing a
+regex match.</p></li>
+<li><p><code>.*SALMON_QUANT.*</code> is our regex to match against</p>
+<ul>
+<li><p><code>.</code> means any character.</p></li>
+<li><p><code>*</code> means that the previous character can repeat 0 or
+more times</p>
+<p>Putting it together, the regex means that we are looking for the
+string <code>SALMON_QUANT</code> and it can appear anywhere in the
+<code>name</code> string.</p></li>
+</ul></li>
+</ul>
+<p>Running this yields a number of results, but we are able to now
+validate that we do see the <code>--gcBias --seqBias</code> being added
+to all commands.</p>
+<p>Lastly, the various <code>work</code> directories are also useful for
+troubleshooting the pipeline as they contain other “hidden” files (files
+starting with a <code>.</code>) and logs that are useful for the the
+troubleshooting process.</p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

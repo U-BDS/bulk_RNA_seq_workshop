@@ -39,40 +39,41 @@ Gene Ontology (GO) enrichment analysis is a computational method used to identif
 
 How it works:
 
-. Input: You start with a list of genes of interest, often derived from experimental data like differentially expressed genes (DEGs) from a RNA-seq experiment.
+* Input: You start with a list of genes of interest, often derived from experimental data like differentially expressed genes (DEGs) from a RNA-seq experiment.
 
-. Annotation: Each gene in your list is associated with GO terms that describe its known functions.
+* Annotation: Each gene in your list is associated with GO terms that describe its known functions.
 
-. Statistical Test: A statistical test (e.g., Fisher's exact test, hypergeometric test) is applied to determine if any GO terms are enriched in your gene list compared to what would be expected by chance.
+* Statistical Test: A statistical test (e.g., Fisher's exact test, hypergeometric test) is applied to determine if any GO terms are enriched in your gene list compared to what would be expected by chance.
 
-. Output: The result is a list of GO terms along with their associated p-values (or adjusted p-values). Significantly enriched terms suggest that the biological processes they represent are particularly relevant to your gene list.
+* Output: The result is a list of GO terms along with their associated p-values (or adjusted p-values). Significantly enriched terms suggest that the biological processes they represent are particularly relevant to your gene list.
 
-**Categories of GO Analysis:**
+## Categories of GO Analysis
 
 The Gene Ontology is organized into three main categories:
 
-. Biological Process (BP): Represents a series of events accomplished by one or more ordered assemblies of molecular functions (e.g., DNA replication, cell cycle, signal transduction).
+* Biological Process (BP): Represents a series of events accomplished by one or more ordered assemblies of molecular functions (e.g., DNA replication, cell cycle, signal transduction).
 
-. Molecular Function (MF): Describes the elemental activities of a gene product at the molecular level, such as binding or catalysis (e.g., kinase activity, DNA binding, transporter activity).
+* Molecular Function (MF): Describes the elemental activities of a gene product at the molecular level, such as binding or catalysis (e.g., kinase activity, DNA binding, transporter activity).
 
-. Cellular Component (CC): Refers to the location relative to cellular structures in which a gene product performs a function (e.g., nucleus, cytoplasm, plasma membrane).
+* Cellular Component (CC): Refers to the location relative to cellular structures in which a gene product performs a function (e.g., nucleus, cytoplasm, plasma membrane).
 Types of GO Enrichment Analysis:
 
 For more information, we encourage further reading at:
 <https://geneontology.org/docs/ontology-documentation/>
 
-** There are two main approaches to GO enrichment analysis:**
+**There are two main approaches to GO enrichment analysis:**
 
-. Over-Representation Analysis (ORA): This is the simpler method and focuses on identifying GO terms that are significantly over-represented in your gene list. It is based on the assumption that all genes in the list are independent.
+* Over-Representation Analysis (ORA): This is the simpler method and focuses on identifying GO terms that are significantly over-represented in your gene list. It is based on the assumption that all genes in the list are independent.
 
-. Functional Class Scoring (FCS): This approach considers the relative ranking of genes in your list (e.g., based on expression levels) and tests if gene sets associated with specific GO terms are enriched towards the top or bottom of the list. This can reveal subtle patterns that ORA might miss.
+* Functional Class Scoring (FCS): This approach considers the relative ranking of genes in your list (e.g., based on expression levels) and tests if gene sets associated with specific GO terms are enriched towards the top or bottom of the list. This can reveal subtle patterns that ORA might miss.
 
-Interpreting Results:
+## Interpreting Results:
 
 The enriched GO terms provide valuable insights into the biological functions that are most relevant to your gene list. This can help generate hypotheses about the underlying mechanisms involved and guide further research.
 
 
-#### Kyoto Encyclopedia of Genes and Genomes (KEGG)
+### Kyoto Encyclopedia of Genes and Genomes (KEGG)
+
 KEGG is a collection of manually drawn pathway maps representing molecular interaction and reaction networks. 
 
 ### Other gene sets
@@ -140,11 +141,11 @@ with gene names.
 Lastly, note we set the `custom_bg` (custom background) to the gene names present in our 
 normalized counts which is derived from the raw data that was pre-filtered. This is important due to the following reasons:
 
-. Statistical Significance: The background set defines the domain of genes from which your input list was derived. By comparing the frequency of GO terms in your gene list to their frequency in the background set, `gprofiler2` can calculate p-values that indicate the likelihood of observing such enrichment by chance. Without a proper background set, these p-values would be unreliable.
+* Statistical Significance: The background set defines the domain of genes from which your input list was derived. By comparing the frequency of GO terms in your gene list to their frequency in the background set, `gprofiler2` can calculate p-values that indicate the likelihood of observing such enrichment by chance. Without a proper background set, these p-values would be unreliable.
 
-. Context-Specific Analysis: The choice of background set can dramatically influence the results of your GO analysis. Using the entire genome as the background might not be appropriate if your gene list comes from a specific tissue, cell type, or experimental condition. In such cases, it's often more meaningful to use a custom background set that reflects the relevant biological context (in our case this corresponds to the total gene number after pre-filtering).
+* Context-Specific Analysis: The choice of background set can dramatically influence the results of your GO analysis. Using the entire genome as the background might not be appropriate if your gene list comes from a specific tissue, cell type, or experimental condition. In such cases, it's often more meaningful to use a custom background set that reflects the relevant biological context (in our case this corresponds to the total gene number after pre-filtering).
 
-. Controlling False Positives: A well-defined background set helps control the false positive rate in your analysis. If your background set is too small or biased, you might detect spurious enrichment of GO terms that are not truly relevant to your gene list.
+* Controlling False Positives: A well-defined background set helps control the false positive rate in your analysis. If your background set is too small or biased, you might detect spurious enrichment of GO terms that are not truly relevant to your gene list.
 
 `gprofiler2` offers several options for choosing a background set: annotated genes, custom background, and predefined backgrounds.
 

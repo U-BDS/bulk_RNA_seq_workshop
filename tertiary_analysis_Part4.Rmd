@@ -53,31 +53,31 @@ There are three key elements of the GSEA method:
 
 **Gene Ontology (GO) Enrichment Analysis**
 
-. Focus: Identifies which biological processes, molecular functions, or cellular components are over-represented in a set of genes compared to what would be expected by chance.
+* Focus: Identifies which biological processes, molecular functions, or cellular components are over-represented in a set of genes compared to what would be expected by chance.
 
-. Input: A list of genes, often differentially expressed genes from an experiment.
+* Input: A list of genes, often differentially expressed genes from an experiment.
 
-. Methodology: Uses statistical tests to compare the frequency of GO terms associated with the gene list to their frequency in a background set (e.g., expressed genes).
+* Methodology: Uses statistical tests to compare the frequency of GO terms associated with the gene list to their frequency in a background set (e.g., expressed genes).
 
-. Outcome: A list of enriched GO terms with their associated p-values, indicating the processes/functions most relevant to the gene list.
+* Outcome: A list of enriched GO terms with their associated p-values, indicating the processes/functions most relevant to the gene list.
 
-. Strengths: Simple to understand and implement, useful for identifying broad biological themes.
+* Strengths: Simple to understand and implement, useful for identifying broad biological themes.
 
-. Limitations: Does not consider the magnitude of changes in gene expression, treats all genes in the list equally.
+* Limitations: Does not consider the magnitude of changes in gene expression, treats all genes in the list equally.
 
 **Gene Set Enrichment Analysis (GSEA)**
 
-. Focus: Determines whether a priori defined sets of genes (representing biological pathways or processes) show statistically significant, concordant differences between two biological states (e.g., phenotypes, experimental conditions).
+* Focus: Determines whether a priori defined sets of genes (representing biological pathways or processes) show statistically significant, concordant differences between two biological states (e.g., phenotypes, experimental conditions).
 
-. Input: A list of genes ranked by their expression level (or other relevant metric), along with a collection of gene sets (e.g., from the Molecular Signatures Database).
+* Input: A list of genes ranked by their expression level (or other relevant metric), along with a collection of gene sets (e.g., from the Molecular Signatures Database).
 
-. Methodology: Calculates an enrichment score for each gene set based on how the genes in the set are distributed across the ranked list.
+* Methodology: Calculates an enrichment score for each gene set based on how the genes in the set are distributed across the ranked list.
 
-. Outcome: A ranked list of gene sets with their enrichment scores and p-values, indicating which pathways/processes are most differentially regulated between the two states.
+* Outcome: A ranked list of gene sets with their enrichment scores and p-values, indicating which pathways/processes are most differentially regulated between the two states.
 
-. Strengths: Takes into account the magnitude of changes in gene expression, can detect subtle but coordinated changes in gene sets.
+* Strengths: Takes into account the magnitude of changes in gene expression, can detect subtle but coordinated changes in gene sets.
 
-. Limitations: Requires a priori defined gene sets, can be computationally intensive.
+* Limitations: Requires a priori defined gene sets, can be computationally intensive.
 
 
 # Input DEG list
@@ -97,9 +97,9 @@ GSEA can be executed on the full dataset regardless of cutoff.
 
 The decision of whether to use the full dataset or a subset of DEGs depends on the *specific research question and the characteristics of the dataset*.
 
-. If you're interested in exploring subtle or coordinated changes in gene expression, or if you have a large dataset with many genes that show small but potentially meaningful changes, GSEA on the full dataset might be a better choice.
+* If you're interested in exploring subtle or coordinated changes in gene expression, or if you have a large dataset with many genes that show small but potentially meaningful changes, GSEA on the full dataset might be a better choice.
 
-. If you want to focus on the most pronounced changes in gene expression or have a smaller dataset, GSEA on DEGs could be more appropriate.
+* If you want to focus on the most pronounced changes in gene expression or have a smaller dataset, GSEA on DEGs could be more appropriate.
 
 _____
 

@@ -18,14 +18,14 @@ navbar:
       - text: "Part 1"
         href: tertiary_analysis_Part1.html
       - text: "Part 2"
-#        href: tertiary_analysis_Part2.html
+        href: tertiary_analysis_Part2.html
       - text: "Part 3"
-#        href: tertiary_analysis_Part3.html
+        href: tertiary_analysis_Part3.html
       - text: "Part 4"
-#        href: tertiary_analysis_Part4.html
-#  - text: "Additional resources" ## TODO
-#    icon: fa-book
-#    href: additional_resouces.html
+        href: tertiary_analysis_Part4.html
+  - text: "Additional resources"
+    icon: fa-book
+    href: additional_resources.html
 
 output:
   html_document:
