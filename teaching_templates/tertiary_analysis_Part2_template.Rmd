@@ -116,6 +116,13 @@ You can customize `adjusted p-value` cutoff by changing the default parameter:
 
 ```
 
+**Challenge: different approaches to limit the DEGs count**
+
+
+```{r}
+
+```
+
 
 ## Sort by Adjusted p.value
 
