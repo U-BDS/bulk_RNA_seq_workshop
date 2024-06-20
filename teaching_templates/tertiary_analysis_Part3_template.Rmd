@@ -1,0 +1,117 @@
+---
+title: "RNASeq Tertiary Analysis: Part 3"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages loaded globabally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+
+# pathway analysis
+library(gprofiler2)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(ComplexHeatmap)
+library(RColorBrewer)
+```
+
+
+# Gene Ontology (GO)
+
+# Input DEG list and DEG filtering
+
+```{r}
+Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv",
+                                          row.names = 1)
+
+normalized_counts_annotated <- read.csv(file="./results/Transplant_vs_Naive/normalized_counts.csv")
+```
+
+
+For our enrichment analysis, we will use DEGs filtered by the following cutoff:
+`adj.P.Val <= 0.05, logFC <= -1 | logFC >= 1`.
+
+```{r}
+
+```
+
+Quick look at the number of DEGs.
+
+```{r}
+
+```
+
+Check for duplicated gene_ids
+
+```{r}
+
+```
+
+# GO by `gprofiler2`
+
+```{r}
+set_base_url("https://biit.cs.ut.ee/gprofiler_archive3/e109_eg56_p17")
+```
+
+
+```{r}
+# select species
+species <- "mmusculus" 
+
+#select data sources, these are our min. standards:
+
+data_sources <- c("GO", "KEGG", "REAC", "MIRNA", "HP", "HPA", "WP")
+
+```
+
+
+```{r}
+
+```
+
+
+# Explore `gprofiler2` results
+
+```{r}
+
+```
+
+
+```{r warning=FALSE}
+
+```
+
+Write `gprofiler2` results to csv
+
+```{r}
+
+```
+
+
+```{r}
+write.csv(go_results,
+          file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_Gprofiler_padj_fc.csv",
+          row.names = FALSE)
+```
+
+## session info
+
+```{r}
+sessionInfo()
+```
