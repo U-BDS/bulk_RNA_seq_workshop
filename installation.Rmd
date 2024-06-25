@@ -7,7 +7,7 @@ To participate in the workshop, you will need access to the software as describe
 
 ------------------------------------------------------------------------
 
-`r fontawesome::fa("triangle-exclamation", fill = "#d40808")` If you have any questions or issues regarding any of the below issues, please feel free to attend the Data Science Office Hours hosted over Zoom by U-BDS every Thursday from 1:30p.m. - 2:00p.m. Please click [here](https://uab.zoom.us/meeting/register/tZ0rduCuqzotGtHShsawHLyRROqH3Sdz71mf) for the Zoom link.
+`r fontawesome::fa("triangle-exclamation", fill = "#d40808")` If you have any questions or issues regarding any of the below instructions, please feel free to attend the office hours dedicated to installation troubleshooting. For information regarding the exact time and Zoom link, please visit: <https://u-bds.github.io/2024-07-09-uab/installation.html>
 
 ------------------------------------------------------------------------
 
