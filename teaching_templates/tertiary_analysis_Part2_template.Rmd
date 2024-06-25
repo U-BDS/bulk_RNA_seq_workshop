@@ -1,0 +1,361 @@
+---
+title: "RNASeq Tertiary Analysis: Part 2"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages loaded globally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+library(tximport)
+library(DESeq2)
+library(Glimma)
+library(vsn)
+
+# Mouse annotation package we'll use for gene identifier conversion
+library(biomaRt)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(EnhancedVolcano)
+library(ComplexUpset)
+library(ComplexHeatmap)
+library(RColorBrewer)
+```
+
+
+# Differential expression analysis
+
+## Input data
+
+In case our objects from part 1 are not present in the environment, here we re-load them:
+
+```{r}
+dds <- readRDS(file = "./results/dds.rds")
+colData <- readRDS(file = "./results/colData.rds")
+txi <- readRDS(file = "./results/txi.rds")
+```
+
+
+## Run `DESeq` function
+
+```{r, message=FALSE}
+
+# checking coefficient by resultsNames(dds):
+
+
+# Dispersion plot
+
+```
+
+## `Transplant_vs_Naive` pair-wise comparision
+
+
+```{r}
+## Transplant_vs_Naive
+
+```
+
+## Shrinkage of log fold change
+
+
+```{r lfcShrink, message=FALSE, warning=FALSE}
+#--------------- Transplant_vs_Naive: Condition_Transplant_vs_Naive --------------
+
+# lfcShrink function
+```
+
+
+# Explore the `DESeq2` result
+
+For the purposes of this workshop we will use the results which have implemented shrinkage of log2 fold changes (from the `Transplant_vs_Naive` variable).
+
+## P-value histogram plot
+
+```{r}
+# distribution of p-vals (always want to plot non-corrected p-values for this)
+
+```
+
+
+## MA Plot
+
+```{r}
+
+```
+
+
+## Summary statistics
+
+> **Discussion Question**
+>
+> In part 1, we applied pre-filtering to remove very low abundance genes.
+> How is pre-filtering linked to multiple hypothesis testing / false discovery rates?
+
+
+```{r}
+summary(Transplant_vs_Naive)
+```
+
+You can customize `adjusted p-value` cutoff by changing the default parameter:
+
+```{r}
+
+```
+
+**Challenge: different approaches to limit the DEGs count**
+
+
+```{r}
+
+```
+
+
+## Sort by Adjusted p.value
+
+```{r}
+```
+
+
+# Make annotation object
+
+
+```{r}
+# check available urls (current and archives):
+
+```
+
+Note: for easy in teaching we have left the url and attributes in the template below: 
+
+```{r annotation_info}
+# Specify the version specific archive:
+host_url <- "https://feb2023.archive.ensembl.org"
+
+# attributes
+attributes_to_add <- c("ensembl_gene_id", "external_gene_name","gene_biotype",
+                       "description","chromosome_name","start_position",
+                       "end_position","strand")
+```
+
+
+```{r}
+species <- "mmusculus_gene_ensembl"
+```
+
+With all required parameters set for `biomaRt`, run the code chunk below to:
+  * Connect to the selected BioMart database
+  * Use Ensembl IDs as the input query
+  * Fetch the annotation information
+  
+```{r}
+
+```
+
+
+```{r}
+# save object from code chunk above
+saveRDS(genemap, file = "./results/genemap.rds")
+```
+
+# Add annotation to DEG results
+
+Now that we have the differentially expressed genes (DEG), we can use the annotated
+object created earlier, to add gene metadata to the DEG results:
+
+```{r}
+# add the current gene_ids to new columns and remove the GENCODE version
+# Note we add 2 columns (one with GENCODE version and one without it) to preserve
+# version information if needed:
+
+
+# join the DEG list and biomaRt list by "ensembl_gene_id"
+
+# add Ensembl IDs as row names:
+```
+
+
+# Save data outputs
+
+First, let's save our annotated DEG list as csv file:
+
+```{r}
+# save object from code chunk above
+write.csv(Transplant_vs_Naive_annotated, 
+          file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv")
+```
+
+Second, let's save the normalized counts as a csv file. This is critical
+output for data visualization as it contain normalized counts per sample:
+
+```{r}
+# add normalized counts to a new vector:
+
+
+# add annotation
+# NOTE: here we add a new column names using the `mutate` function
+# as an alternative to the approach shown in the DEG results
+
+
+```
+
+```{r}
+# save object from code chunk above
+write.csv(normalized_counts_annotated,
+          file="./results/Transplant_vs_Naive/normalized_counts.csv",
+          row.names = FALSE)
+```
+
+To simplify the code sections below, we rename the longer variable names to shorter ones:
+(we explicitly named them longer in earlier sections for clarity in the workflow for teaching
+purposes)
+
+```{r}
+T_vs_N_annotated <- Transplant_vs_Naive_annotated
+counts_annotated <- normalized_counts_annotated
+```
+
+# DEG plots
+
+In the sections below, note that we apply an absolute log2 fold change cut-off in
+addition to adjusted p-values to define DEGs.
+
+## Volcano plot
+
+```{r fig.height=10, fig.width=10}
+
+```
+
+
+## Visualize selected set of genes
+
+Apply standard DEG filters `adj.P.Val <= 0.05, logFC <= -1 | logFC >= 1`.
+
+```{r}
+
+```
+
+
+```{r}
+# Get all DE genes
+
+# Scale counts for visualization
+
+# Add annotation
+
+
+# Plot as heatmap
+
+```
+
+
+**Challenge: Plot top 10 DEGs by both direction**
+
+
+```{r fig.height=8, fig.width=8}
+# Get top 20 DE genes
+# Select top 10 up-regulated genes
+
+
+# Select top 10 down-regulated genes
+
+
+# Scale counts for visualization
+
+
+# Add annotation
+
+
+# Plot as heatmap
+
+```
+
+
+
+**Challenge: Plot top 10 DEGs by gene names**
+
+
+```{r}
+
+```
+
+```{r}
+# Get top 10 DE genes
+
+# Scale counts for visualization
+
+# Add annotation
+
+
+# Plot as heatmap
+
+```
+
+
+# Plot selected genes
+
+
+## Box plot
+
+```{r}
+# Define the genes of interest.
+
+```
+
+```{r}
+
+```
+
+Now, create a single faceted plot. 
+
+
+```{r}
+
+```
+
+## count plot
+
+
+```{r}
+
+```
+
+
+# Glimma report
+
+
+### MA Plot
+
+
+```{r}
+# first choose selected annotation to be present in report
+# (we choose a subset to make visualization easier/reduce # of cols)
+
+```
+
+```{r}
+# use the original DESeq2 res. obj since row order is the same across all to facilitate
+# NOTE: basemean are shown in the natural log scale in the report
+
+file_name <- paste0("./results/Transplant_vs_Naive/Glimma_ma_plot.html")
+    
+```
+
+
+## session info
+
+```{r}
+sessionInfo()
+```

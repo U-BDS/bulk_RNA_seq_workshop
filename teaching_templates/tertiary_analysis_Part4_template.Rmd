@@ -1,0 +1,183 @@
+---
+title: "RNASeq Tertiary Analysis: Part 4"
+author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages loaded globabally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+
+# pathway analysis
+library(clusterProfiler)
+library(msigdbr)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(EnhancedVolcano)
+library(ComplexUpset)
+library(ComplexHeatmap)
+library(RColorBrewer)
+```
+
+# Gene Set Enrichment Analysis (GSEA)
+
+# Input DEG list
+
+```{r}
+Transplant_vs_Naive_annotated <- read.csv(file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_annotated_DEGlist.csv",
+                                          row.names = 1)
+```
+
+
+For the purposes of this workshop, we will execute GSEA using the significant DEGs defined by `padj <= 0.05, log2FoldChange <= -1 | log2FoldChange >= 1` to be consistent with GO analysis cutoff.
+
+(Please refer to lecture website on alternative approach of using the full dataset)
+
+```{r}
+
+```
+
+Quick look at #of DEGs.
+
+```{r}
+
+```
+
+Check for duplicated gene_ids
+```{r}
+
+```
+
+## Create log2Fold change ranked vector
+
+```{r}
+
+```
+
+# Get the gene_sets from MSigDB
+
+### MSigDB gene sets
+
+
+```{r}
+
+```
+
+Look different gene set (gs) collections
+
+```{r}
+
+```
+
+
+## get Hallmark gene set
+
+```
+msigdbr(species, category, subcategory)
+```
+
+As an example we will use the `H` category:
+
+```{r}
+
+```
+
+# Run GSEA
+
+
+
+```{r warning=FALSE}
+# Run GSEA
+
+```
+
+## Explore GSEA results
+
+```{r}
+# see head excluding the last collumn for simplicity:
+
+```
+
+## Dot plot
+
+```{r fig.height=8, fig.width=8}
+
+```
+
+
+```{r fig.height=9, fig.width=8}
+
+```
+
+
+## Ridge Plot
+
+```{r}
+
+```
+
+## Additional plots
+
+```{r, warning=FALSE, message=FALSE}
+
+```
+
+
+**Challenge: make the circular network**
+
+```{r fig.height=7, fig.width=10, warning=FALSE,message=FALSE}
+
+```
+
+
+```{r fig.height=4, fig.width=25}
+
+```
+
+#### Most Positive NES
+
+```{r}
+
+```
+
+```{r fig.height=5, fig.width=6}
+
+```
+
+### Most Negative NES
+
+```{r, message=FALSE}
+
+```
+
+```{r fig.height=5, fig.width=6}
+
+```
+
+Write GSEA results to csv
+
+```{r}
+write.csv(gsea_enrichment@result, file = "./results/Transplant_vs_Naive/Transplant_vs_Naive_GSEA_hallmark_padj_fc.csv")
+```
+
+## session info
+
+```{r}
+sessionInfo()
+```

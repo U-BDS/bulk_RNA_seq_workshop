@@ -1,0 +1,242 @@
+---
+title: 'RNASeq Tertiary Analysis: Part 1'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In addition to U-BDS's best practices and code written by U-BDS, sections of the
+teaching material for this workshop (especially tertiary analysis), contains
+materials which have been adapted or modified from the following sources 
+(*we thank the curators and maintainers of all of these resources for their
+wonderful contributions, compiling the best practices, and easy to follow
+training guides for beginners*):
+
+* Beta phase of carpentries meterial: <https://carpentries-incubator.github.io/bioc-rnaseq/index.html>
+* Love MI, Huber W, Anders S (2014). “Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2.” Genome Biology, 15, 550. doi:10.1186/s13059-014-0550-8 ; 
+vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html>
+* Additional references and materials: 
+  * <https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html>
+  * <https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html>
+
+
+# Packages loaded globabally
+
+```{r message=FALSE}
+# Set the seed so our results are reproducible:
+set.seed(2020)
+
+# Required packages
+library(tximport)
+library(DESeq2)
+library(Glimma)
+library(vsn)
+
+# Mouse annotation package we'll use for gene identifier conversion
+library(biomaRt)
+
+# We will need them for data handling
+library(magrittr)
+library(ggrepel)
+library(dplyr)
+library(tidyverse)
+library(readr)
+
+# plotting
+library(ggplot2)
+library(ComplexHeatmap)
+library(RColorBrewer)
+```
+
+### Create `data` and `results` directory
+
+```{r warning=FALSE}
+
+```
+
+# Input data
+
+## The `DESeqDataSet`
+
+
+**Note : For this workshop, we will import the transcript abundance (`quant.sf`) file created by `salmon` in the secondary analysis pipeline (`nf-core`) using `tximport` method. The files are provided to you in the `/data` folder**
+
+**Note: For simplicity and organization, we have renamed the `.sf` files by `${sample_names}_quant.sf`. Please practice caution while updating the file names in your own research projects to avoid sample mix-up (tip: changing file names does not alter the md5sum of the file. Thus, this checker can be applied to ensure there has been no sample mix-ups.**
+
+## salmon, or STAR-salmon files
+
+Locate all the transcript abundance file and prepare them to be imported to `DESeq2`.
+
+```{r prep data for tximport}
+
+```
+
+# `tximport`
+
+
+```{r}
+# First, let's take a peak at the available parameters for the tximport functions
+
+```
+
+```{r}
+# with sensible parameters set, run tximport:
+
+```
+
+# Sample meta data
+
+For this particular study, the sample metadata was acquired from the public
+repository containing the raw data:
+
+```{r}
+# import file containing sample metadata
+
+# change the condition, group, and time to factor
+
+```
+
+# Build a DESeq2DataSet
+
+
+```{r}
+# tximport dds generation
+
+```
+
+## Note on factor levels
+
+
+```{r}
+# see current levels:
+dds$Condition
+```
+
+
+```{r}
+# set reference to Naive
+
+```
+
+# Quality Control
+
+## Filter low abundance genes
+
+
+```{r}
+#----- Counts Pre-filtering based on rowMeans -------
+
+# here we do rowMeans, other approaches are rowSums or min. per sample
+
+```
+
+Note that there has been a notable drop in the number of genes present in this dataset.
+
+> **Discussion Question**
+>
+> Given the drop from ~55k genes to 15k genes. Is this expected for this
+> species (mouse) and tissue type (lung-derived cells)? How many genes are typically
+> expressed in mammalian genomes?
+
+# QC Plots
+
+## Library size differences
+
+
+```{r}
+# Add in the sum of all counts
+
+
+# Plot the libSize by using pipe %>%
+# to extract the colData, turn it into a regular
+# data frame then send to ggplot:
+
+
+# let's take a look at the plot:
+
+
+# reminder on how to save figures:
+
+```
+
+
+### Transform the data
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+## PCA Plot 
+
+```{r}
+
+```
+
+> **Discussion Question**
+>
+> What is your interpratation from the PCA plot above.
+> Does it overall display variance that can be biologically relevant?
+
+
+**Challenge: Add names of samples on PCA plot**
+
+
+```{r}
+
+```
+
+
+
+## Euclidean distance heatmap
+
+
+```{r}
+# dist computes distance with Euclidean method
+
+```
+
+## Interactive QC Plots
+
+Often it is useful to look at interactive plots to directly explore different experimental factors or get insights from someone without coding experience.(particularly useful when there are covariate etc.)
+
+Some useful tools for interactive exploratory data analysis for RNA-seq are [Glimma](https://bioconductor.org/packages/release/bioc/html/Glimma.html) and [iSEE](https://bioconductor.org/packages/release/bioc/html/iSEE.html)
+
+While we will not cover them at this time, we encourage trainees to explore the
+resources above in the future.
+
+# save data
+
+We will save the analyzed datasets for other parts of this workshop.
+
+```{r}
+saveRDS(dds, file = "./results/dds.rds")
+saveRDS(vsd, file = "./results/vsd.rds")
+saveRDS(colData, file = "./results/colData.rds")
+saveRDS(txi, file = "./results/txi.rds")
+```
+
+## session info
+
+R's `sessionInfo()` captures the version of all packages loaded in the current
+environment. You may save this to an external file with the following command:
+
+`writeLines(capture.output(sessionInfo()), "./results/sessionInfo.txt")`
+
+In this case, we are displaying it as part of our lesson:
+
+```{r}
+sessionInfo()
+```
