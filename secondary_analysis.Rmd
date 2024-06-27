@@ -4,13 +4,15 @@ author: "Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D."
 ---
 
 <!-- Add some CSS for horizontal scrolling in samplesheet blocks -->
+
+```{=html}
 <style>
   .scrollable-horizontal {
     overflow-x: auto;
     white-space: nowrap;
   }
 </style>
-
+```
 # Introduction to Secondary Analysis
 
 ![<https://www.rna-seqblog.com/learn-more-about-available-bioinformatics-tools-and-pipelines-to-analyze-rna-sequencing-data/>](imgs/primary_secondary_tertiary.jpg)
@@ -45,7 +47,6 @@ We can see that there is a discernible pattern. Each set of four lines is consid
 4.  The **sequence qualities**. These indicate the quality for the base at the same position. These are encoded using characters, and there are ways to convert them back into a numerical value. See the table below for quick guide on the character-score translations. The reason these are stored as characters is again to reduce the amount of space the FASTQ takes up on a file system.
 
 ![<https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/>](imgs/q_scores.png)
-
 
 ### QC-ing FASTQ Files
 
@@ -108,11 +109,11 @@ The rnaseq pipeline developed and published by nf-core will be the pipeline that
 
 This rnaseq pipeline has a lot of tools that are part of it, and a user may choose to run it in default mode (tools that are executed by default), or configure it to run with more or less tools/steps.
 
-_____
+-----
 
 **Note:** Importantly, this pipeline is designed for short-read sequencing (e.g.: Illumina). Long-read bulk RNA-seq requires distinct analytical steps which are linked to the nature of long read vs short read sequencing. While bulk long-read sequencing is beyond to scopre of this workshop, nf-core has pipelines for long-read sequencing (e.g.: for more information see the `nf-core/nanoseq` pipeline).
 
-_____
+-----
 
 RNA-Seq workflows follows generally the below pattern:
 
@@ -215,14 +216,14 @@ The next lines we will add are known as slurm directives. Slurm directives are u
 #SBATCH --error=rnaseq_test.err
 #SBATCH --time=1:00:00
 #SBATCH --partition=express
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1
 ```
 
 To break down each line:
 
 -   `--job-name` : Submitting code on the cluster is called a job. The `job-name` flag assigns a user-generated name to the job to allow for easier tracking. Job names should be short and descriptive in order to assist in determining a job. In this case we will be naming out job `rnaseq_test`
--   `--output` and `--error` : These are for defining files to place the `stdout` and `stderr` output of the command being submitted. Because these jobs are not interactive, if these flags are not defined, the output will be lost. Instead of providing the direct name to these directives, slurm provides file name patterns which can be used. For instance, adding `%j_%x.out` and `%j_%x.err` will generate outputs with the following file name pattern: job id and job name 
+-   `--output` and `--error` : These are for defining files to place the `stdout` and `stderr` output of the command being submitted. Because these jobs are not interactive, if these flags are not defined, the output will be lost. Instead of providing the direct name to these directives, slurm provides file name patterns which can be used. For instance, adding `%j_%x.out` and `%j_%x.err` will generate outputs with the following file name pattern: job id and job name
 -   `--time` : This defines the amount of time you expect a command to run. If a job runs longer than this command, it will be killed by Cheaha.
 -   `--partition` : There are a number of partitions available on Cheaha. The `express` partition is for jobs you expect to run in less than 2 hours. There are also `short`, `medium`, and `long` queues, which have their own maximum run time that can be found in the Cheaha documentation. It is recommended to choose the partition that best fits the needs of your pipeline, as choosing the wrong one can result in your scripts being killed too soon or causing very long pending times.
 -   `--mem-per-cpu` : This defines how much memory a job will take multiplied by the number of cpus requested. There is not good way to determine the memory a job will take ahead of time, so it is very common for this to take some iteration as the script will be killed if it goes over the memory limit specified in this file.
@@ -423,9 +424,12 @@ Next we’ll provide the required parameters. `input` is the path to the samples
 # Read Trimming Options
 trimmer: "trimgalore"
 extra_trimgalore_args: "--illumina"
+min_trimmed_reads: 1
 ```
 
 We are going to use `trim_galore` for the trimmer. The pipeline also provides `fastp` as an option. Neither one of these is necessarily better than the other, `trim_galore` provides a wrapper around an older tool called `cutadapt` and `FASTQC.` Trim_galore will try to guess the adapters it needs to cut, but you can limit this by passing specific parameters. This dataset uses the illumina default adapters, so the `--illumina` flag needs to be passed to the tool.
+
+We will additionally use the `min_trimmed_reads` param. This parameter is used to set what the minimum number of reads a sample will need to have after trimming. The value of this parameter and whether it needs to be used depends on the experiment and on the data being analyzed. We are using this parameter as we are using downsampled files, and will not meet the default value for this parameter.
 
 ```         
 # Alignment Options
@@ -453,13 +457,13 @@ To demonstrate this, let's start by creating a file called `custom.conf`, and ad
 ```         
 process {
     executor = 'slurm'
-    queue = ‘amdhdr-100’
+    queue = ‘amd-hdr100’
 }
 ```
 
 Custom configuration works off the idea of scopes – what this means is users can group settings so they apply to specific pieces of the pipeline.
 
-The above lines of code set the executor to be slurm, and set the queue so that all jobs will be submitted to the `amdhdr-100` partition on cheaha.
+The above lines of code set the executor to be slurm, and set the queue so that all jobs will be submitted to the `amd-hdr100` partition on cheaha.
 
 Another item that can be configured via this method is adding parameters to specific tools in the pipeline. In order to do that, you will need to find the module. For this example, let’s modify the Salmon script. There is a way to do this via the pipeline parameters (with the `extra_salmon_quant_args` parameter), however, this is a good opportunity to show custom configuration to pipeline tools.
 
@@ -518,9 +522,10 @@ The name of the process is at the very top of the file, which is what we need. F
 With the name of the process, let’s go back and open up the custom configuration file using the OnDemand Editor and add the below lines.
 
 ```         
-process{
-withName: ‘.*:SALMON_QUANT’{
-    ext.args = ‘--gcBias --seqBias’
+process {
+  withName: ‘.*:SALMON_QUANT’ {
+      ext.args = ‘--gcBias --seqBias’
+  }
 }
 ```
 
@@ -540,7 +545,7 @@ With all the files created, we can submit the pipeline. We'll create a `run_rnas
 #SBATCH --error=rnaseq_test.err
 #SBATCH --time=1:00:00
 #SBATCH --partition=express
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1
 
 # load environment
