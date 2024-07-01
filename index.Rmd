@@ -8,7 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Overview `r fontawesome::fa("chart-line", fill = "#295135")`
 
-Recent advancements in RNA-Sequencing (RNA-Seq) has led to impactful technological 
+Recent advancements in RNA-sequencing (RNA-Seq) has led to impactful technological 
 breakthroughs in RNA-Seq quantification at high resolution, including single-cell 
 RNA-Seq and spatial transcriptomics. However, bulk RNA-Seq 
 (defined as: RNA-Seq quantification from averaged gene expression ; 
