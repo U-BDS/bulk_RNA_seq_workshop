@@ -12,9 +12,9 @@
 <meta name="author" content="Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D." />
 
 
-<title>RNASeq Secondary Analysis</title>
+<title>RNA-Seq Secondary Analysis</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -340,14 +340,14 @@ div.tocify {
   <a href="secondary_analysis.html">
     <span class="fa fa-database"></span>
      
-    secondary analysis
+    Secondary analysis
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fa fa-chart-simple"></span>
      
-    tertiary analysis
+    Tertiary analysis
      
     <span class="caret"></span>
   </a>
@@ -385,7 +385,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">RNASeq Secondary Analysis</h1>
+<h1 class="title toc-ignore">RNA-Seq Secondary Analysis</h1>
 <h4 class="author">Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov,
 Ph.D.</h4>
 
@@ -790,7 +790,7 @@ command.</p>
 #SBATCH --error=rnaseq_test.err
 #SBATCH --time=1:00:00
 #SBATCH --partition=express
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1</code></pre>
 <p>To break down each line:</p>
 <ul>
@@ -1081,7 +1081,8 @@ GENCODE reference (version M32) in the data downloaded from Globus
 (<code>reference</code> folder).</p>
 <pre><code># Read Trimming Options
 trimmer: &quot;trimgalore&quot;
-extra_trimgalore_args: &quot;--illumina&quot;</code></pre>
+extra_trimgalore_args: &quot;--illumina&quot;
+min_trimmed_reads: 1</code></pre>
 <p>We are going to use <code>trim_galore</code> for the trimmer. The
 pipeline also provides <code>fastp</code> as an option. Neither one of
 these is necessarily better than the other, <code>trim_galore</code>
@@ -1090,6 +1091,12 @@ provides a wrapper around an older tool called <code>cutadapt</code> and
 to cut, but you can limit this by passing specific parameters. This
 dataset uses the illumina default adapters, so the
 <code>--illumina</code> flag needs to be passed to the tool.</p>
+<p>We will additionally use the <code>min_trimmed_reads</code> param.
+This parameter is used to set what the minimum number of reads a sample
+will need to have after trimming. The value of this parameter and
+whether it needs to be used depends on the experiment and on the data
+being analyzed. We are using this parameter as we are using downsampled
+files, and will not meet the default value for this parameter.</p>
 <pre><code># Alignment Options
 aligner: &quot;star_salmon&quot;
 pseudo_aligner: &quot;salmon&quot;</code></pre>
@@ -1126,13 +1133,13 @@ parameters to specific tools in the pipeline.</p>
 <code>custom.conf</code>, and adding the below lines.</p>
 <pre><code>process {
     executor = &#39;slurm&#39;
-    queue = ‘amdhdr-100’
+    queue = ‘amd-hdr100’
 }</code></pre>
 <p>Custom configuration works off the idea of scopes – what this means
 is users can group settings so they apply to specific pieces of the
 pipeline.</p>
 <p>The above lines of code set the executor to be slurm, and set the
-queue so that all jobs will be submitted to the <code>amdhdr-100</code>
+queue so that all jobs will be submitted to the <code>amd-hdr100</code>
 partition on cheaha.</p>
 <p>Another item that can be configured via this method is adding
 parameters to specific tools in the pipeline. In order to do that, you
@@ -1199,9 +1206,10 @@ which is located towards the bottom of the file.</p>
 <p>With the name of the process, let’s go back and open up the custom
 configuration file using the OnDemand Editor and add the below
 lines.</p>
-<pre><code>process{
-withName: ‘.*:SALMON_QUANT’{
-    ext.args = ‘--gcBias --seqBias’
+<pre><code>process {
+  withName: ‘.*:SALMON_QUANT’ {
+      ext.args = ‘--gcBias --seqBias’
+  }
 }</code></pre>
 <p>With this customization, Nextflow will add the two additional flags.
 The flags themselves tell <code>Salmon</code> to correct for gc and
@@ -1231,7 +1239,7 @@ much time you are allocating for the pipeline to run.</p>
 #SBATCH --error=rnaseq_test.err
 #SBATCH --time=1:00:00
 #SBATCH --partition=express
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1
 
 # load environment
