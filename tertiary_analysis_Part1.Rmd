@@ -56,7 +56,6 @@ library(readr)
 
 # plotting
 library(ggplot2)
-library(PCAtools)
 library(ComplexHeatmap)
 library(RColorBrewer)
 ```
