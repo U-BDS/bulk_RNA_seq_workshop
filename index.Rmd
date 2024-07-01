@@ -6,18 +6,20 @@ title: "U-BDS bulk RNA-Seq workshop"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Overview `r fontawesome::fa("chart-line", fill = "#295135")`
+# `r fontawesome::fa("chart-line", fill = "#295135")` Overview 
 
-Recent advancements in RNA-sequencing (RNA-Seq) has led to impactful technological 
+Recent advancements in RNA-sequencing (RNA-Seq) have led to impactful technological 
 breakthroughs in RNA-Seq quantification at high resolution, including single-cell 
 RNA-Seq and spatial transcriptomics. However, bulk RNA-Seq 
 (defined as: RNA-Seq quantification from averaged gene expression ; 
 averaged expression across all cell types from tissue collected without 
 spatial resolution), continues to play an important role in transcriptomics 
 for various reasons, including but not limited to: 
+
 1. High volume of publicly available datasets  (a good starting point for 
 initial hypothesis testing) 
-2. Cost effectivess 3. It has been well standardized over the last decade, 
+2. Cost effectivess 
+3. It has been well standardized over the last decade, 
 and thus, molecular and analysis methods are robust for the scope of the technique.
 
 ## Bulk RNA-Seq as a *foundational block* to transcriptomics analysis 
@@ -47,7 +49,7 @@ prior to attendance.
 
 _____________
 
-# Scope of the workshop `r fontawesome::fa("list", fill = "#295135")`
+# `r fontawesome::fa("list", fill = "#295135")` Scope of the workshop 
 
 This workshop will cover the foundational topics and methods to bulk RNA-Seq analysis, including:
 
@@ -58,16 +60,16 @@ gene expression analysis with `DESeq2`, gene annotation, gene enrichment analysi
 (gene-ontology and gene set enrichment analysis)
 * Fundamentals of data visualization for transcriptomics
 
-# Authors `r fontawesome::fa("chalkboard", fill = "#295135")`
+# `r fontawesome::fa("chalkboard", fill = "#295135")` Authors 
 
 * Austyn Trull
 * Bharat Mishra, PhD
 * Lara Ianov, PhD
 
-A.T., B.H. and L.I. designed workshop content and initial outline. A.T. contributed
-to installation instructions, data management, and secondary analysis materials. B.H.
+A.T., B.M. and L.I. designed workshop content and initial outline. A.T. contributed
+to installation instructions, data management, and secondary analysis materials. B.M.
 contributed to Docker container creation and tertiary analysis materials 
-(including DEG analysis, GO, WGCA, visualization etc.). 
+(including DEG analysis, GSEA, GO, visualization etc.). 
 L.I. supervised all work, reviewed all content and managed website design and deployment.
 
 ## Additional credits
@@ -78,7 +80,7 @@ which have been adapted or modified from the following sources (we thank the
 curators and maintainers of all of these resources for their wonderful contributions,
 compiling the best practices, and easy to follow training guides for beginners):
 
-* Beta phase of carpentries meterial: <https://carpentries-incubator.github.io/bioc-rnaseq/index.html>
+* Beta phase of carpentries material: <https://carpentries-incubator.github.io/bioc-rnaseq/index.html>
 * Love MI, Huber W, Anders S (2014). “Moderated estimation of fold change and dispersion for RNA-Seq data with DESeq2.” Genome Biology, 15, 550. doi:10.1186/s13059-014-0550-8 ; vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html>
 * Additional references and materials: 
   * <https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html>
@@ -99,7 +101,7 @@ A Beginner's Guide to Analysis of RNA Sequencing Data. Am J Respir Cell Mol Biol
 Lastly, we would also like to thank Kristen Coutinho for the dataset suggestion, 
 and preliminary discussions for this workshop.
 
-## Workshop instructors `r fontawesome::fa("chalkboard-user", fill = "#295135")`
+## `r fontawesome::fa("chalkboard-user", fill = "#295135")` Workshop instructors 
 
 * Austyn Trull
 * Bharat Mishra, PhD
