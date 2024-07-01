@@ -56,6 +56,7 @@ library(readr)
 
 # plotting
 library(ggplot2)
+library(PCAtools)
 library(ComplexHeatmap)
 library(RColorBrewer)
 ```
@@ -282,6 +283,23 @@ Note that there has been a notable drop in the number of genes present in this d
 > species (mouse) and tissue type (lung-derived cells)? How many genes are typically
 > expressed in mammalian genomes?
 
+**Challenge: Recreate dds object (called "test_dds") and filter based on a minimum of 5 reads in at least half the samples**
+
+<details><summary>Click here for solution</summary>
+
+```{r}
+test_dds <- DESeqDataSetFromTximport(txi,
+                                colData = colData,
+                                design = ~ Condition)
+
+keep <- rowSums(counts(test_dds) >= 5) >= 4
+test_dds <- test_dds[keep,]
+
+nrow(counts(test_dds))
+```
+
+</details>
+
 # QC Plots
 
 ## Library size differences
@@ -333,7 +351,7 @@ The `vst` is based on the concept of transforming the data such that the varianc
 . Regularized Log Transformation (rlog)
 The `rlog` is an alternative approach that transforms the count data to the `log2` scale while minimizing differences between samples for rows (genes) with small counts. It incorporates a prior on the sample differences, which acts as a regularization or shrinkage step.
 
-Both `vst` and `rlog` produce transformed data on the `log2` scale, normalized for `library size` or other factors. The choice between the two transformations may depend on the specific characteristics of the dataset, such as the range of library sizes or the presence of lowly expressed genes
+Both `vst` and `rlog` produce transformed data on the `log2` scale, normalized for `library size` or other factors. The choice between the two transformations may depend on the specific characteristics of the dataset, such as the range of library sizes or the presence of lowly expressed genes. Both methods contrast with traditional `log2` transformation (even when adjusted for library size by `normTransform`) in that they reduce the high variance inherent in lowly expressed genes.
 
 #### Blind dispersion estimation
 
@@ -344,9 +362,20 @@ Therefore, setting `blind` to `FALSE` still largely avoids using specific inform
 
 
 ```{r}
+# Raw counts
 meanSdPlot(assay(dds), ranks = FALSE)
 ```
 
+```{r}
+# Traditional log2(n + 1) transformation
+ntd <- normTransform(dds)
+ntd
+```
+
+```{r}
+meanSdPlot(assay(ntd))
+```
+Variance decreases as the mean increases.
 
 ```{r}
 vsd <- vst(dds, blind=FALSE)
@@ -355,9 +384,10 @@ vsd
 
 
 ```{r}
-meanSdPlot(assay(vsd), ranks = FALSE)
+# Variance stabilized transformation
+meanSdPlot(assay(vsd))
 ```
-
+Variance is more consistent across all genes.
 
 ## PCA Plot 
 
@@ -366,12 +396,12 @@ Principal component analysis (PCA) is a dimensionality reduction technique that 
 In the plot below, we represent the samples in a two-dimensional principal component space. For each dimension, we indicate the fraction of the total variance represented by that component. By definition, the first principal component (PC1) always captures more variance than subsequent components. The fraction of explained variance measures how much of the 'signal' in the data is retained when projecting samples from the original high-dimensional space to the low-dimensional space for visualization.
 
 Principal component (PC) analysis plot displaying our 8 samples along PC1 and PC2, 
-indicates that there ~83% of variance is explained in PC1 and that ~4% is explained 
+indicates that there ~69% of variance is explained in PC1 and that ~7% is explained 
 in PC2.
 
 ```{r}
 pcaData <- DESeq2::plotPCA(vsd, intgroup = "Condition",
-                           returnData = TRUE)
+                           returnData = TRUE, ntop = length(vsd))
 
 percentVar <- round(100 * attr(pcaData, "percentVar"))
 
@@ -381,8 +411,7 @@ ggplot(pcaData, aes(x = PC1, y = PC2)) +
   ylab(paste0("PC2: ", percentVar[2], "% variance")) +
   coord_fixed() +
   theme(text = element_text(size=20)) +
-  theme_bw(base_size = 16) +
-  scale_y_continuous(limits = c(-6, 6)) 
+  theme_bw(base_size = 16)
 ```
 
 > **Discussion Question**
@@ -405,10 +434,9 @@ ggplot(pcaData, aes(x = PC1, y = PC2)) +
   ylab(paste0("PC2: ", percentVar[2], "% variance")) +
   theme(text = element_text(size=20)) +
   theme_bw(base_size = 16) +
-  scale_y_continuous(limits = c(-6, 6)) +
   geom_text_repel(data = pcaData, 
                   mapping = aes(label = name), 
-                  size = 2,
+                  size = 3,
                   fontface = 'bold.italic', 
                   color = 'black',
                   box.padding = unit(0.2, "lines"),
