@@ -7,7 +7,7 @@ To participate in the workshop, you will need access to the software as describe
 
 ------------------------------------------------------------------------
 
-`r fontawesome::fa("triangle-exclamation", fill = "#d40808")` If you have any questions or issues regarding any of the below instructions, please feel free to attend the office hours dedicated to installation troubleshooting. For information regarding the exact time and Zoom link, please visit: <https://u-bds.github.io/2024-07-09-uab/installation.html>
+> `r fontawesome::fa("triangle-exclamation", fill = "#d40808")` If you have any questions or issues regarding any of the below instructions, please feel free to attend the office hours dedicated to installation troubleshooting. For information regarding the exact time and Zoom link, please visit: <https://u-bds.github.io/2024-07-09-uab/installation.html>
 
 ------------------------------------------------------------------------
 
@@ -118,7 +118,7 @@ Please only complete this step **AFTER** successfully installing R and Rstudio a
 1.  Open RStudio
 2.  In the central panel (known as the `Source Code Panel`), type the below commands:
 
-```         
+```
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install(c("DESeq2", "tximport",
                        "vsn","apeglm", 
