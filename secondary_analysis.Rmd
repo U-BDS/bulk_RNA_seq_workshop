@@ -1,5 +1,5 @@
 ---
-title: "RNASeq Secondary Analysis"
+title: "RNA-Seq Secondary Analysis"
 author: "Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D."
 ---
 
