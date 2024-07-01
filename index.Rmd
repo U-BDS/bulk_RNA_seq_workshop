@@ -96,8 +96,8 @@ in our workshop:
 A Beginner's Guide to Analysis of RNA Sequencing Data. Am J Respir Cell Mol Biol.
 2018 Aug;59(2):145-157. doi: 10.1165/rcmb.2017-0430TR. PMID: 29624415; PMCID: PMC6096346.
 
-Lastly, we would also like to thank Kristen Coutinho for the dataset suggestion, 
-and preliminary discussions for this workshop.
+Lastly, we would also like to thank Kristen Coutinho and the UAB Informatics Club 
+for the dataset suggestion, and preliminary discussions for this workshop.
 
 ## Workshop instructors `r fontawesome::fa("chalkboard-user", fill = "#295135")`
 
