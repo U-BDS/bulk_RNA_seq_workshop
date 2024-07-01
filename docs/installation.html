@@ -340,14 +340,14 @@ div.tocify {
   <a href="secondary_analysis.html">
     <span class="fa fa-database"></span>
      
-    secondary analysis
+    Secondary analysis
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fa fa-chart-simple"></span>
      
-    tertiary analysis
+    Tertiary analysis
      
     <span class="caret"></span>
   </a>
@@ -457,11 +457,12 @@ below command in the terminal window that appeared:
 <li><code>module load Anaconda3</code></li>
 </ul></li>
 <li>Anaconda works by creating isolated environments to install packages
-into. In order to create one of these environments, use the below
-command:
+into. In order to create one of these environments and install Nextflow
+and nf-core, use the below command:
 <ul>
-<li><p><code>conda create -p $USER_SCRATCH/conda_envs/rnaseq_workshop</code></p></li>
-<li><p>Type <code>y</code> when prompted.</p></li>
+<li><p><code>conda create -p $USER_SCRATCH/conda_envs/rnaseq_workshop python=3.12 bioconda::nf-core bioconda::nextflow</code></p></li>
+<li><p>Type <code>y</code> when prompted
+(<code>Proceed ([y]/n)?</code>).</p></li>
 <li><p>This command will create a new conda enviroment called
 <code>rnaseq_workshop</code> in your scratch space on Cheaha and under a
 sub-directory called <code>conda_envs</code>. It is important to name
@@ -472,12 +473,6 @@ purpose.</p></li>
 packages inside the newly created ‘rnaseq_workshop’ environment.
 <ul>
 <li><code>conda activate $USER_SCRATCH/conda_envs/rnaseq_workshop</code></li>
-</ul></li>
-<li>Inside the environment, install Nextflow and nf-core as these will
-be needed in order to run the pipeline
-<ul>
-<li><p><code>conda install bioconda::nf-core</code></p></li>
-<li><p>Be sure to type <code>y</code> when prompted</p></li>
 </ul></li>
 <li>The environment should be created and the packages installed, in
 order to get back out of the environment, we deactivate it
@@ -575,7 +570,7 @@ class="uri">https://carpentries.github.io/workshop-template/install_instructions
 and pre-built packages that ease the burden of analysis. We will be
 using a few of these packages to complete the lesson taught at this
 workshop.</p>
-<p>Please only complete this step <strong>AFTER</strong> successfully
+<p>Please only complete this step <strong>AFTER</strong> successfullyy
 installing R and Rstudio above.</p>
 <ol style="list-style-type: decimal">
 <li>Open RStudio</li>

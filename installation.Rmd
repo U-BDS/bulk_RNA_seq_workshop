@@ -36,19 +36,16 @@ In order to setup the environment to run the pipeline on Cheaha we will be using
 4.  In the new window that appears, click the `Open in Terminal` button in the upper right of the page
 5.  Cheaha comes with a lot of tools and software pre-installed called 'modules'. Anaconda is one of these tools, and we can load it using the below command in the terminal window that appeared:
     -   `module load Anaconda3`
-6.  Anaconda works by creating isolated environments to install packages into. In order to create one of these environments, use the below command:
-    -   `conda create -p $USER_SCRATCH/conda_envs/rnaseq_workshop`
+6.  Anaconda works by creating isolated environments to install packages into. In order to create one of these environments and install Nextflow and nf-core, use the below command:
+    -   `conda create -p $USER_SCRATCH/conda_envs/rnaseq_workshop python=3.12 bioconda::nf-core bioconda::nextflow`
 
-    -   Type `y` when prompted.
+    -   Type `y` when prompted (`Proceed ([y]/n)?`).
 
     -   This command will create a new conda enviroment called `rnaseq_workshop` in your scratch space on Cheaha and under a sub-directory called `conda_envs`. It is important to name your environments as something intuitive to help you remember their purpose.
 7.  We now need to activate the environment so we can begin installing packages inside the newly created 'rnaseq_workshop' environment.
     -   `conda activate $USER_SCRATCH/conda_envs/rnaseq_workshop`
-8.  Inside the environment, install Nextflow and nf-core as these will be needed in order to run the pipeline
-    -   `conda install bioconda::nf-core`
 
-    -   Be sure to type `y` when prompted
-9.  The environment should be created and the packages installed, in order to get back out of the environment, we deactivate it
+8.  The environment should be created and the packages installed, in order to get back out of the environment, we deactivate it
     -   `conda deactivate`
 
 # Globus Account Registration {#globus_account}
