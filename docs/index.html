@@ -11,9 +11,9 @@
 
 
 
-<title>U-BDS bulk RNA-seq workshop</title>
+<title>U-BDS bulk RNA-Seq workshop</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -339,14 +339,14 @@ div.tocify {
   <a href="secondary_analysis.html">
     <span class="fa fa-database"></span>
      
-    secondary analysis
+    Secondary analysis
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fa fa-chart-simple"></span>
      
-    tertiary analysis
+    Tertiary analysis
      
     <span class="caret"></span>
   </a>
@@ -384,38 +384,43 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">U-BDS bulk RNA-seq workshop</h1>
+<h1 class="title toc-ignore">U-BDS bulk RNA-Seq workshop</h1>
 
 </div>
 
 
 <div id="overview" class="section level1">
-<h1>Overview
-<svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/></svg></h1>
-<p>Recent advancements in RNA-sequencing (RNA-seq) has led to impactful
-technological breakthroughs in RNA-seq quantification at high
-resolution, including single-cell RNA-seq and spatial transcriptomics.
-However, bulk RNA-seq (defined as: RNA-seq quantification from averaged
+<h1><svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M64 64c0-17.7-14.3-32-32-32S0 46.3 0 64V400c0 44.2 35.8 80 80 80H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H80c-8.8 0-16-7.2-16-16V64zm406.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L320 210.7l-57.4-57.4c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L240 221.3l57.4 57.4c12.5 12.5 32.8 12.5 45.3 0l128-128z"/></svg>
+Overview</h1>
+<p>Recent advancements in RNA-sequencing (RNA-Seq) have led to impactful
+technological breakthroughs in RNA-Seq quantification at high
+resolution, including single-cell RNA-Seq and spatial transcriptomics.
+However, bulk RNA-Seq (defined as: RNA-Seq quantification from averaged
 gene expression ; averaged expression across all cell types from tissue
 collected without spatial resolution), continues to play an important
 role in transcriptomics for various reasons, including but not limited
-to: 1. High volume of publicly available datasets (a good starting point
-for initial hypothesis testing) 2. Cost effectivess 3. It has been well
-standardized over the last decade, and thus, molecular and analysis
-methods are robust for the scope of the technique.</p>
+to:</p>
+<ol style="list-style-type: decimal">
+<li>High volume of publicly available datasets (a good starting point
+for initial hypothesis testing)</li>
+<li>Cost effectivess</li>
+<li>It has been well standardized over the last decade, and thus,
+molecular and analysis methods are robust for the scope of the
+technique.</li>
+</ol>
 <div
 id="bulk-rna-seq-as-a-foundational-block-to-transcriptomics-analysis"
 class="section level2">
-<h2>Bulk RNA-seq as a <em>foundational block</em> to transcriptomics
+<h2>Bulk RNA-Seq as a <em>foundational block</em> to transcriptomics
 analysis</h2>
 <p>To data scientists seeking to analyze the latest transcriptomics
-approaches (e.g.: single-cell, or spatial), bulk RNA-seq analysis
+approaches (e.g.: single-cell, or spatial), bulk RNA-Seq analysis
 methods are foundational blocks to transcriptomics. For example,
-familiarity with bulk RNA-seq methods is critical for the efficient
+familiarity with bulk RNA-Seq methods is critical for the efficient
 analysis of cell specific pseudobulk data derived from single-cell
 experiments. Furthermore, many enrichment analysis methods and
 visualization approaches are shared or built from classical methods from
-bulk RNA-seq analysis. Thus, familiarity with bulk transcriptomics is a
+bulk RNA-Seq analysis. Thus, familiarity with bulk transcriptomics is a
 critical skill to have for any transcriptomics analysis.</p>
 </div>
 <div id="pre-requirements" class="section level2">
@@ -440,10 +445,10 @@ materials from the links above prior to attendance.</p>
 </div>
 </div>
 <div id="scope-of-the-workshop" class="section level1">
-<h1>Scope of the workshop
-<svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z"/></svg></h1>
+<h1><svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z"/></svg>
+Scope of the workshop</h1>
 <p>This workshop will cover the foundational topics and methods to bulk
-RNA-seq analysis, including:</p>
+RNA-Seq analysis, including:</p>
 <ul>
 <li>Introduction to raw data management and data exploration</li>
 <li>Secondary analysis with <code>nf-core/rnaseq</code></li>
@@ -455,19 +460,19 @@ enrichment analysis)</li>
 </ul>
 </div>
 <div id="authors" class="section level1">
-<h1>Authors
-<svg aria-hidden="true" role="img" viewBox="0 0 576 512" style="height:1em;width:1.12em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M96 32C60.7 32 32 60.7 32 96V384H96V96l384 0V384h64V96c0-35.3-28.7-64-64-64H96zM224 384v32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H544c17.7 0 32-14.3 32-32s-14.3-32-32-32H416V384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32z"/></svg></h1>
+<h1><svg aria-hidden="true" role="img" viewBox="0 0 576 512" style="height:1em;width:1.12em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M96 32C60.7 32 32 60.7 32 96V384H96V96l384 0V384h64V96c0-35.3-28.7-64-64-64H96zM224 384v32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H544c17.7 0 32-14.3 32-32s-14.3-32-32-32H416V384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32z"/></svg>
+Authors</h1>
 <ul>
 <li>Austyn Trull</li>
 <li>Bharat Mishra, PhD</li>
 <li>Lara Ianov, PhD</li>
 </ul>
-<p>A.T., B.H. and L.I. designed workshop content and initial outline.
+<p>A.T., B.M. and L.I. designed workshop content and initial outline.
 A.T. contributed to installation instructions, data management, and
-secondary analysis materials. B.H. contributed to Docker container
-creation and tertiary analysis materials (including DEG analysis, GO,
-WGCA, visualization etc.). L.I. supervised all work, reviewed all
-content and managed website design and deployment.</p>
+secondary analysis materials. B.M. contributed to Docker container
+creation and tertiary analysis materials (including DEG analysis, GSEA,
+GO, visualization etc.). L.I. supervised all work, reviewed all content
+and managed website design and deployment.</p>
 <div id="additional-credits" class="section level2">
 <h2>Additional credits</h2>
 <p>In addition to U-BDS’s best practices and code written by U-BDS,
@@ -477,11 +482,11 @@ the following sources (we thank the curators and maintainers of all of
 these resources for their wonderful contributions, compiling the best
 practices, and easy to follow training guides for beginners):</p>
 <ul>
-<li>Beta phase of carpentries meterial: <a
+<li>Beta phase of carpentries material: <a
 href="https://carpentries-incubator.github.io/bioc-rnaseq/index.html"
 class="uri">https://carpentries-incubator.github.io/bioc-rnaseq/index.html</a></li>
 <li>Love MI, Huber W, Anders S (2014). “Moderated estimation of fold
-change and dispersion for RNA-seq data with DESeq2.” Genome Biology, 15,
+change and dispersion for RNA-Seq data with DESeq2.” Genome Biology, 15,
 550. <a href="doi:10.1186/s13059-014-0550-8"
 class="uri">doi:10.1186/s13059-014-0550-8</a> ; vignette: <a
 href="https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html"
@@ -514,8 +519,8 @@ PMID: 29624415; PMCID: PMC6096346.</li>
 suggestion, and preliminary discussions for this workshop.</p>
 </div>
 <div id="workshop-instructors" class="section level2">
-<h2>Workshop instructors
-<svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M160 64c0-35.3 28.7-64 64-64H576c35.3 0 64 28.7 64 64V352c0 35.3-28.7 64-64 64H336.8c-11.8-25.5-29.9-47.5-52.4-64H384V320c0-17.7 14.3-32 32-32h64c17.7 0 32 14.3 32 32v32h64V64L224 64v49.1C205.2 102.2 183.3 96 160 96V64zm0 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zM133.3 352h53.3C260.3 352 320 411.7 320 485.3c0 14.7-11.9 26.7-26.7 26.7H26.7C11.9 512 0 500.1 0 485.3C0 411.7 59.7 352 133.3 352z"/></svg></h2>
+<h2><svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:#295135;overflow:visible;position:relative;"><path d="M160 64c0-35.3 28.7-64 64-64H576c35.3 0 64 28.7 64 64V352c0 35.3-28.7 64-64 64H336.8c-11.8-25.5-29.9-47.5-52.4-64H384V320c0-17.7 14.3-32 32-32h64c17.7 0 32 14.3 32 32v32h64V64L224 64v49.1C205.2 102.2 183.3 96 160 96V64zm0 64a96 96 0 1 1 0 192 96 96 0 1 1 0-192zM133.3 352h53.3C260.3 352 320 411.7 320 485.3c0 14.7-11.9 26.7-26.7 26.7H26.7C11.9 512 0 500.1 0 485.3C0 411.7 59.7 352 133.3 352z"/></svg>
+Workshop instructors</h2>
 <ul>
 <li>Austyn Trull</li>
 <li>Bharat Mishra, PhD</li>

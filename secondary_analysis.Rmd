@@ -1,5 +1,5 @@
 ---
-title: "RNASeq Secondary Analysis"
+title: "RNA-Seq Secondary Analysis"
 author: "Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D."
 ---
 
@@ -23,7 +23,7 @@ An experiment can typically be broken down into 3 different parts:
 
 -   **Secondary Analysis** - Secondary analysis are the steps in a workflow where FASTQ files are quality-controlled (QC), trimmed, aligned, and quantified. The type of quantification produced differs depending on what kind of analysis you are performing - e.g.: a single-cell analysis would need a feature-barcode matrix, whole genome analysis would work with variant call files. For bulk RNA-seq analyses, the quantification represents expression count files.
 
--   **Tertiary Analysis** - Tertiary analysis takes the output from secondary for additional analysis, visualization and data interpretation. The additional analysis steps may include more QC, data filtering, annotation and experimental specific analysis (driven by study design). A typical bulk RNA-seq analysis, includes differential and co-regulated expression of genes and to infer their biological meaning.
+-   **Tertiary Analysis** - Tertiary analysis takes the output from secondary for additional analysis, visualization and data interpretation. The additional analysis steps may include more QC, data filtering, annotation and experimental specific analysis (driven by study design). A typical bulk RNA-Seq analysis, includes differential and co-regulated expression of genes and to infer their biological meaning.
 
 **The purpose of this workshop will be to provide a more in-depth look at secondary and tertiary analysis from data derived from short read sequencing.**
 
@@ -31,9 +31,9 @@ An experiment can typically be broken down into 3 different parts:
 
 As mentioned previously, secondary analysis starts with a FASTQ file. A FASTQ file is a standard file format for storing the raw sequences and their qualities obtained from primary analysis.
 
-Taking a quick look at the input files provided with the workshop, we can tell it's a FASTQ because it has the `.fq` file extension, but you’ll also see `.fastq` as an alternative extension. The other file extension we see on the files is `.gz`. `gz` indicates that the file is zipped using the gzip tool. Gzip is both the name of the tool and the name for the file compression algorithm. File compression is typically performed to minimize the storage space the file takes up on a file system. This is especially important for FASTQs because they can be very large files. Furthermore, many standard tools for secondary analysis of RNA-seq accept compressed FASTQs (in the gzip format) as input, and thus, the user does not need to de-compress the files prior to starting the analysis.
+Taking a quick look at the input files provided with the workshop, we can tell it's a FASTQ because it has the `.fq` file extension, but you’ll also see `.fastq` as an alternative extension. The other file extension we see on the files is `.gz`. `gz` indicates that the file is zipped using the gzip tool. Gzip is both the name of the tool and the name for the file compression algorithm. File compression is typically performed to minimize the storage space the file takes up on a file system. This is especially important for FASTQs because they can be very large files. Furthermore, many standard tools for secondary analysis of RNA-Seq accept compressed FASTQs (in the gzip format) as input, and thus, the user does not need to de-compress the files prior to starting the analysis.
 
-Let's go ahead and peek at the FASTQ file itself. We'll use `gunzip -c` to produce the file contents to stdout, and we'll just look at the first 10 lines using `head`.
+Let's go ahead and peek at the FASTQ file itself. We'll use `gunzip -c` to produce the file contents to stdout (display output), and we'll just look at the first 10 lines using `head` command.
 
 ```         
 gunzip -c <fastq.name> | head
@@ -46,7 +46,26 @@ We can see that there is a discernible pattern. Each set of four lines is consid
 3.  A **separator**. Starts with a `+` sign. Sometimes this will also have a quality score identifier that matches the sequence identifier, but it's also not uncommon for this to only contain the `+` sign.
 4.  The **sequence qualities**. These indicate the quality for the base at the same position. These are encoded using characters, and there are ways to convert them back into a numerical value. See the table below for quick guide on the character-score translations. The reason these are stored as characters is again to reduce the amount of space the FASTQ takes up on a file system.
 
-![<https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/>](imgs/q_scores.png)
+       
+|   Q-Score |   ASCII Code | Symbol   |   Q-Score |   ASCII Code | Symbol   |   Q-Score |   ASCII Code | Symbol   |
+|-----------|--------------|----------|-----------|--------------|----------|-----------|--------------|----------|
+|         0 |           33 | !        |        14 |           47 | /        |        28 |           61 | =        |
+|         1 |           34 | "        |        15 |           48 | 0        |        29 |           62 | >        |
+|         2 |           35 | #        |        16 |           49 | 1        |        30 |           63 | ?        |
+|         3 |           36 | $        |        17 |           50 | 2        |        31 |           64 | @        |
+|         4 |           37 | %        |        18 |           51 | 3        |        32 |           65 | A        |
+|         5 |           38 | &        |        19 |           52 | 4        |        33 |           66 | B        |
+|         6 |           39 | '        |        20 |           53 | 5        |        34 |           67 | C        |
+|         7 |           40 | (        |        21 |           54 | 6        |        35 |           68 | D        |
+|         8 |           41 | )        |        22 |           55 | 7        |        36 |           69 | E        |
+|         9 |           42 | *        |        23 |           56 | 8        |        37 |           70 | F        |
+|        10 |           43 | +        |        24 |           57 | 9        |        38 |           71 | G        |
+|        11 |           44 | ,        |        25 |           58 | :        |        39 |           72 | H        |
+|        12 |           45 | -        |        26 |           59 | ;        |        40 |           73 | I        |
+|        13 |           46 | .        |        27 |           60 | <        |        41 |           74 | J        |
+
+
+<!-- ![<https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/>](imgs/q_scores.png) -->
 
 ### QC-ing FASTQ Files
 
@@ -99,7 +118,7 @@ md5sum -c md5sum.txt
 
 > **Discussion Question**
 >
-> Has anyone performed any rna-seq analysis? What tools have you used?
+> Has anyone performed any RNA-Seq analysis? What tools have you used?
 
 The FASTQ file on its own doesn’t really tell much information. In order to move forward with our project, these raw base calls need to be converted into raw expression data.
 
@@ -109,11 +128,11 @@ The rnaseq pipeline developed and published by nf-core will be the pipeline that
 
 This rnaseq pipeline has a lot of tools that are part of it, and a user may choose to run it in default mode (tools that are executed by default), or configure it to run with more or less tools/steps.
 
------
+------------------------------------------------------------------------
 
-**Note:** Importantly, this pipeline is designed for short-read sequencing (e.g.: Illumina). Long-read bulk RNA-seq requires distinct analytical steps which are linked to the nature of long read vs short read sequencing. While bulk long-read sequencing is beyond to scopre of this workshop, nf-core has pipelines for long-read sequencing (e.g.: for more information see the `nf-core/nanoseq` pipeline).
+**Note:** Importantly, this pipeline is designed for short-read sequencing (e.g.: Illumina). Long-read bulk RNA-Seq requires distinct analytical steps which are linked to the nature of long read vs short read sequencing. While bulk long-read sequencing is beyond to scopre of this workshop, nf-core has pipelines for long-read sequencing (e.g.: for more information see the `nf-core/nanoseq` pipeline).
 
------
+------------------------------------------------------------------------
 
 RNA-Seq workflows follows generally the below pattern:
 
@@ -128,15 +147,15 @@ Additionally the pipeline also provides support for experimental specific approa
 
 ### Trimming and Filtering
 
-A common initial step in RNA-seq workflows is often read trimming and filtering. A common type of trimming is adapter trimming. Adapters are artificial sequences that are attached to the DNA fragments to be sequenced to ensure that the fragment attaches to the sequencing flow cell. Adapters are normally also sequenced with the fragment, meaning some of the reads may have bases that are not biological and can impact the accuracy of mapping and other downstream analyses. In order to alleviate this concern there are dedicated tools published that will remove adapters (also referred to as “adapter trimming”). Some examples of tools that do this are `TrimGalore`, `BBmap`, or `Trimmomatic.`
+A common initial step in RNA-Seq workflows is often read trimming and filtering. A common type of trimming is adapter trimming. Adapters are artificial sequences that are attached to the DNA fragments to be sequenced to ensure that the fragment attaches to the sequencing flow cell. Adapters are normally also sequenced with the fragment, meaning some of the reads may have bases that are not biological and can impact the accuracy of mapping and other downstream analyses. In order to alleviate this concern there are dedicated tools published that will remove adapters (also referred to as “adapter trimming”). Some examples of tools that do this are `TrimGalore`, `BBmap`, or `Trimmomatic.`
 
 The `nf-core/rnaseq` pipeline additionally supports the removal of contamination with `bbsplit` (e.g.: xenograph experiment, or un-expected genomic contamination), and removal of ribosomal rna using `SortMeRNA`.
 
 ### Alignment
 
-Following trimming is alignment/mapping. With RNA-seq, there is more than one approach to alignment, the and nf-core/rnaseq pipelines supports various methods.
+Following trimming is alignment/mapping. With RNA-Seq, there is more than one approach to alignment, the and nf-core/rnaseq pipelines supports various methods.
 
-Alignment is the process by which a read is mapped to a reference genome. `STAR` is considered the standard aligner for RNA-seq. The reason it is used over traditional mappers such as `bwa` is due to `STAR` being a splice aware aligner, where exon-exon junctions are taken into account at the mapping stage. `STAR` alignment outputs (BAM files) can be critical for use-cases where genome alignment is required such as gene fusion identification, or variant-calling/genome-wide/exome data integration.
+Alignment is the process by which a read is mapped to a reference genome. `STAR` is considered the standard aligner for RNA-Seq. The reason it is used over traditional mappers such as `bwa` is due to `STAR` being a splice aware aligner, where exon-exon junctions are taken into account at the mapping stage. `STAR` alignment outputs (BAM files) can be critical for use-cases where genome alignment is required such as gene fusion identification, or variant-calling/genome-wide/exome data integration.
 
 The second type of alignment/mapping supported is "quasi-mapping"/"pseudo-alignment".
 
@@ -146,13 +165,13 @@ Lastly, `Salmon` and `kallisto` are computationally efficient, leading to rapid 
 
 ### Counting
 
-Feature (gene or transcript) quantification is typically the last analytical step of an RNA-seq pipeline. Importantly, the outputs of `Salmon` and `kallisto` are quantified counts, as opposed to `STAR` which are mapped data (BAM files), where an additional quantification tools is required. In the nf-core/rnaseq pipeline `Salmon` is implemented as the read quantifier from a `STAR` alignment.
+Feature (gene or transcript) quantification is typically the last analytical step of an RNA-Seq pipeline. Importantly, the outputs of `Salmon` and `kallisto` are quantified counts, as opposed to `STAR` which are mapped data (BAM files), where an additional quantification tools is required. In the nf-core/rnaseq pipeline `Salmon` is implemented as the read quantifier from a `STAR` alignment.
 
 The count outputs format typically contains a list of features (genes names or IDs) as rows and their relative abundance as columns for each sample.
 
 ------------------------------------------------------------------------
 
-As discussed earlier, the pipeline we will cover also contains several additional steps for QC and optional steps dependent on design or analytical needs. The primary steps covered in the sections above are the required analytical steps across all bulk RNA-seq analysis.
+As discussed earlier, the pipeline we will cover also contains several additional steps for QC and optional steps dependent on design or analytical needs. The primary steps covered in the sections above are the required analytical steps across all bulk RNA-Seq analysis.
 
 ------------------------------------------------------------------------
 
@@ -233,7 +252,7 @@ We are specifying pretty low memory and time requirements for this job as becaus
 
 Next, we need to load our conda environment created from our installation instructions to ensure that the required software are active. This can be done with the following:
 
-```
+```         
 module load Anaconda3
 conda activate $USER_SCRATCH/conda_envs/rnaseq_workshop
 ```
@@ -260,7 +279,7 @@ The final step is we need to submit our script to cheaha so it can be executed. 
 
 We'll need to start by navigating to our `rnaseq_workshop` directory (NOTE: The `<blazer_id>` in the path should be replaced with your blazer id):
 
-```
+```         
 # Note: /scratch/<blazer_id>/ can be replaced by $USER_SCRATCH variable
 cd /scratch/<blazer_id>/rnaseq_workshop
 ```
@@ -298,10 +317,9 @@ Memory Efficiency: 0.16% of 1.00 GB
 
 Running that command will provide some basic information about the job being queried, you can see how much memory the job used, its walltime, and other information. For this workshop, we are mainly just wanting to check the `State` of the job, and determine when it has changed to `COMPLETED` as in the example, as this means the job has completed successfully.
 
-You may also check the running status of the Nextflow runner's jobs (and the jobs it submits) with the
-following command:
+You may also check the running status of the Nextflow runner's jobs (and the jobs it submits) with the following command:
 
-```
+```         
 squeue -u $USER
 ```
 
@@ -323,7 +341,7 @@ The data comes from the following paper: <https://www.ncbi.nlm.nih.gov/pmc/artic
 
 The data that we will be analyzing is mouse transplant data. The original paper contains 12 samples in total - 4 naive controls, 4 from 2 hours past transplant, and 4 from 24 hours past transplant. For this workshop, we will only be concerned with the controls and the 24 hour samples. We will be using the results from a pipeline run that contained only these samples for the tertiary portion, and will be reviewing the reports for later in this portion of the lesson. In addition, we are going to run down sampled versions of the data for teaching purposes, but the steps we will follow will be largely applicable to the full dataset.
 
-Another point to note is that the paper we are obtaining the data from is a beginner’s guide for RNA-seq published about 10 years ago. Given the timeline, you will note that are some differences from the analysis that was done for the paper versus the analysis done today. The reason is a lot of the tools used by the paper are considered outdated or have been phased out of the field. Bioinformatics and computational biology are fast-paced domains. Thus, it is important to ensure that all analyses are using correct and modern approaches. In summary, always ensure that the tools and pipelines you apply to your analysis are up to date to what is considered best practice in the RNA-seq domain.
+Another point to note is that the paper we are obtaining the data from is a beginner’s guide for RNA-Seq published about 10 years ago. Given the timeline, you will note that are some differences from the analysis that was done for the paper versus the analysis done today. The reason is a lot of the tools used by the paper are considered outdated or have been phased out of the field. Bioinformatics and computational biology are fast-paced domains. Thus, it is important to ensure that all analyses are using correct and modern approaches. In summary, always ensure that the tools and pipelines you apply to your analysis are up to date to what is considered best practice in the RNA-Seq domain.
 
 ### Creating the Samplesheet
 
@@ -363,7 +381,8 @@ for file in input/downsample_fastqs/*.fastq.gz; do echo $file; done >> sampleshe
 
 Open up the samplesheet again. You will see the header and a list of FASTQs. To start modifying it, a sample name needs to be added with some additional commas.
 
-<div class="scrollable-horizontal">
+::: scrollable-horizontal
+```{=html}
 <pre>
 sample,fastq_1,fastq_2,strandedness
 N01_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328050_SRR7457559.fastq.gz,,auto
@@ -375,7 +394,8 @@ R06_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsa
 R07_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328048_SRR7457561.fastq.gz,,auto
 R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/downsample_fastqs/SRX4328047_SRR7457562.fastq.gz,,auto
 </pre>
-</div>
+```
+:::
 
 The sample name is completely up to the user, so pick something that will help with identification for yourself if there is not an already existent sample name. Strandedness we have set to `auto` for the purposes of the workshop, if you know if the data is forward or reverse stranded by all means use that instead.
 
@@ -384,9 +404,14 @@ The sample name is completely up to the user, so pick something that will help w
 > You'll note that we have two commas next to each other in the samplesheet, which means we have left a column empty. The data for this workshop is single-ended, meaning that there is just a single FASTQ for us to analyze per sample. It's also common for data to be paired-ended, which for us would result in a pair of FASTQs for each sample, known as an read 1 and read 2.
 >
 > Can anyone tell me what we would change with this samplesheet if the data was paired-end instead of single-end?
-><details><summary> **Click here for solution**</summary>
+>
+> <details>
+>
+> <summary>**Click here for solution**</summary>
+>
 > We would need to fill in the column that is left blank. The samplesheet headers help guide us in what information needs to be placed in each column. In this case, `fastq_1` would correspond to the read 1 fastq and `fastq_2` would correspond to the read 2 fastq.
-></details>
+>
+> </details>
 
 ### Adding Pipeline Parameters
 
@@ -537,7 +562,7 @@ There are additional ways you can use this config, controlling whether Nextflow 
 
 With all the files created, we can submit the pipeline. We'll create a `run_rnaseq.sh` file, and put the below lines in it. Note we aren't increasing the resources for the job because we are only submitting the Nextflow runner which requires very minimal resources. In general when submitting the Nextflow runner, the main resource that may need increasing is the `--time` flag as that determines how much time you are allocating for the pipeline to run.
 
-```
+```         
 #!/usr/bin/env bash
 
 #SBATCH --job-name=rnaseq_test
@@ -565,13 +590,17 @@ nextflow run nf-core/rnaseq \
 >
 > So we have currently submitted the downsampled data. Can anyone tell me what we would need to change in order to run the full dataset as if we were doing a complete analysis?
 >
-><details><summary> **Click here for solution**</summary>
+> <details>
+>
+> <summary>**Click here for solution**</summary>
 >
 > The files that need to be updated are provided below with a description of what needs to be changed.
 >
 > `samplesheet.csv` needs to have the file paths in the `fastq_1` column to point to the full dataset.
-><div class="scrollable-horizontal">
-><pre>
+>
+> ::: scrollable-horizontal
+> ```{=html}
+> <pre>
 > sample,fastq_1,fastq_2,strandedness
 > N01_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328050_SRR7457559.fastq.gz,,auto
 > N02_AM_Naive,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328049_SRR7457560.fastq.gz,,auto
@@ -581,8 +610,9 @@ nextflow run nf-core/rnaseq \
 > R06_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328057_SRR7457552.fastq.gz,,auto
 > R07_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328048_SRR7457561.fastq.gz,,auto
 > R08_AM_Allo24h,/data/project/U_BDS/Globus_endpoints/rnaseq_workshop/input/fastqs/SRX4328047_SRR7457562.fastq.gz,,auto
-></pre>
-></div>
+> </pre>
+> ```
+> :::
 >
 > `custom.conf` would remove the section we added to route all jobs to the `amdhdr-100` queue. We want the jobs to go to the 'correct' queue since we would be processing the full dataset and may require different resources that would better suit a different queue.
 >
@@ -592,7 +622,8 @@ nextflow run nf-core/rnaseq \
 >    ext.args = ‘--gcBias --seqBias’
 > }
 > ```
-></details>
+>
+> </details>
 
 ## Reviewing Pipeline Results
 
@@ -616,7 +647,7 @@ The rnaseq pipeline produces a lot of output files. Many of them are for qc and 
 
 The first point of review for the pipeline is the multiqc report. MultiQC is a very useful tool that aggregates a number of different tools into a single report, providing a quick way of reviewing the quality of the data to determine if there are any potential concerns.
 
-The first table in the multiqc report is the "General Statistics Table". This provides a high level overview of various metrics, from read counts in the BAM to read counts in the FASTQ. It's a lot of metrics, but this is useful in the accessing if a large amount of data filtration occur. This is also a good place to check if the samples have sufficient sequencing depth. Standard mRNA-sequencing typically requires an average of \~25M reads. This requirement increases for whole-transcriptome (where other RNA species are also quantified). For more reading abour sequencing depth consideration, please visit [this Illumina resource](https://knowledge.illumina.com/library-preparation/rna-library-prep/library-preparation-rna-library-prep-reference_material-list/000001243).
+The first table in the multiqc report is the "General Statistics Table". This provides a high level overview of various metrics, from read counts in the BAM to read counts in the FASTQ. It's a lot of metrics, but this is useful in the accessing if a large amount of data filtration occur. This is also a good place to check if the samples have sufficient sequencing depth. Standard mRNA-Sequencing typically requires an average of \~25M reads. This requirement increases for whole-transcriptome (where other RNA species are also quantified). For more reading abour sequencing depth consideration, please visit [this Illumina resource](https://knowledge.illumina.com/library-preparation/rna-library-prep/library-preparation-rna-library-prep-reference_material-list/000001243).
 
 ![](imgs/multiqc_1.png)
 
@@ -634,7 +665,7 @@ The next three qc reports are very useful for rnaseq. We expect these reads to b
 
 ![](imgs/multiqc_8.png)
 
-`RSeQC` is tool with a lot of quality-control for RNA-seq data. In addition to the above, it also lets us check for duplication levels. The image below is indicative of a good 'normal' plot for this metric.
+`RSeQC` is tool with a lot of quality-control for RNA-Seq data. In addition to the above, it also lets us check for duplication levels. The image below is indicative of a good 'normal' plot for this metric.
 
 ![](imgs/multiqc_9.png)
 
@@ -662,7 +693,7 @@ In addition to `SAMtools`, `STAR` provides its own versions. We again are lookin
 
 `FastQC` is a very common tool used for providing metrics for FASTQ files. There is also a `FastQC` report that gets generated, but its on a per-sample basis and as a result does not aggreate the results like in MultiQC.
 
-We also note that the `FastQC` plot below also qc duplicate rates from the raw data. Bear in mind unless the RNA-seq library preparation protocol implements UMI-tagging, duplicates cannot be removed from RNA-seq data (as it is not possible to differentiate technical/artifact duplicates from biological duplicates derived from the high abundance of RNA molecules / expression).
+We also note that the `FastQC` plot below also qc duplicate rates from the raw data. Bear in mind unless the RNA-Seq library preparation protocol implements UMI-tagging, duplicates cannot be removed from RNA-Seq data (as it is not possible to differentiate technical/artifact duplicates from biological duplicates derived from the high abundance of RNA molecules / expression).
 
 ![](imgs/multiqc_19.png)
 
@@ -788,4 +819,6 @@ As can be seen in the previous command's output, the process names are very long
 
 Running this yields a number of results, but we are able to now validate that we do see the `--gcBias --seqBias` being added to all commands.
 
-Lastly, the various `work` directories are also useful for troubleshooting the pipeline as they contain other "hidden" files (files starting with a `.`) and logs that are useful for the the troubleshooting process.
+Lastly, the various `work` directories are also useful for troubleshooting the pipeline as they contain other "hidden"
+
+files (files starting with a `.`) and logs that are useful for the the troubleshooting process.

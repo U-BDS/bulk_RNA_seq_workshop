@@ -12,9 +12,9 @@
 <meta name="author" content="Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov, Ph.D." />
 
 
-<title>RNASeq Secondary Analysis</title>
+<title>RNA-Seq Secondary Analysis</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -340,14 +340,14 @@ div.tocify {
   <a href="secondary_analysis.html">
     <span class="fa fa-database"></span>
      
-    secondary analysis
+    Secondary analysis
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fa fa-chart-simple"></span>
      
-    tertiary analysis
+    Tertiary analysis
      
     <span class="caret"></span>
   </a>
@@ -385,7 +385,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">RNASeq Secondary Analysis</h1>
+<h1 class="title toc-ignore">RNA-Seq Secondary Analysis</h1>
 <h4 class="author">Austyn Trull, Bharat Mishra, Ph.D., Lara Ianov,
 Ph.D.</h4>
 
@@ -430,7 +430,7 @@ the quantification represents expression count files.</p></li>
 output from secondary for additional analysis, visualization and data
 interpretation. The additional analysis steps may include more QC, data
 filtering, annotation and experimental specific analysis (driven by
-study design). A typical bulk RNA-seq analysis, includes differential
+study design). A typical bulk RNA-Seq analysis, includes differential
 and co-regulated expression of genes and to infer their biological
 meaning.</p></li>
 </ul>
@@ -451,13 +451,14 @@ using the gzip tool. Gzip is both the name of the tool and the name for
 the file compression algorithm. File compression is typically performed
 to minimize the storage space the file takes up on a file system. This
 is especially important for FASTQs because they can be very large files.
-Furthermore, many standard tools for secondary analysis of RNA-seq
+Furthermore, many standard tools for secondary analysis of RNA-Seq
 accept compressed FASTQs (in the gzip format) as input, and thus, the
 user does not need to de-compress the files prior to starting the
 analysis.</p>
 <p>Let’s go ahead and peek at the FASTQ file itself. We’ll use
-<code>gunzip -c</code> to produce the file contents to stdout, and we’ll
-just look at the first 10 lines using <code>head</code>.</p>
+<code>gunzip -c</code> to produce the file contents to stdout (display
+output), and we’ll just look at the first 10 lines using
+<code>head</code> command.</p>
 <pre><code>gunzip -c &lt;fastq.name&gt; | head</code></pre>
 <p>We can see that there is a discernible pattern. Each set of four
 lines is considered a single entry. The four lines are:</p>
@@ -478,13 +479,189 @@ table below for quick guide on the character-score translations. The
 reason these are stored as characters is again to reduce the amount of
 space the FASTQ takes up on a file system.</li>
 </ol>
-<div class="float">
-<img src="imgs/q_scores.png"
-alt="https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/" />
-<div class="figcaption"><a
-href="https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/"
-class="uri">https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/</a></div>
-</div>
+<table style="width:100%;">
+<colgroup>
+<col width="10%" />
+<col width="13%" />
+<col width="9%" />
+<col width="10%" />
+<col width="13%" />
+<col width="9%" />
+<col width="10%" />
+<col width="13%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Q-Score</th>
+<th>ASCII Code</th>
+<th>Symbol</th>
+<th>Q-Score</th>
+<th>ASCII Code</th>
+<th>Symbol</th>
+<th>Q-Score</th>
+<th>ASCII Code</th>
+<th>Symbol</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>33</td>
+<td>!</td>
+<td>14</td>
+<td>47</td>
+<td>/</td>
+<td>28</td>
+<td>61</td>
+<td>=</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>34</td>
+<td>”</td>
+<td>15</td>
+<td>48</td>
+<td>0</td>
+<td>29</td>
+<td>62</td>
+<td>&gt;</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>35</td>
+<td>#</td>
+<td>16</td>
+<td>49</td>
+<td>1</td>
+<td>30</td>
+<td>63</td>
+<td>?</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>36</td>
+<td>$</td>
+<td>17</td>
+<td>50</td>
+<td>2</td>
+<td>31</td>
+<td>64</td>
+<td>@</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>37</td>
+<td>%</td>
+<td>18</td>
+<td>51</td>
+<td>3</td>
+<td>32</td>
+<td>65</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>38</td>
+<td>&amp;</td>
+<td>19</td>
+<td>52</td>
+<td>4</td>
+<td>33</td>
+<td>66</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>39</td>
+<td>’</td>
+<td>20</td>
+<td>53</td>
+<td>5</td>
+<td>34</td>
+<td>67</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>40</td>
+<td>(</td>
+<td>21</td>
+<td>54</td>
+<td>6</td>
+<td>35</td>
+<td>68</td>
+<td>D</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>41</td>
+<td>)</td>
+<td>22</td>
+<td>55</td>
+<td>7</td>
+<td>36</td>
+<td>69</td>
+<td>E</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>42</td>
+<td>*</td>
+<td>23</td>
+<td>56</td>
+<td>8</td>
+<td>37</td>
+<td>70</td>
+<td>F</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>43</td>
+<td>+</td>
+<td>24</td>
+<td>57</td>
+<td>9</td>
+<td>38</td>
+<td>71</td>
+<td>G</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>44</td>
+<td>,</td>
+<td>25</td>
+<td>58</td>
+<td>:</td>
+<td>39</td>
+<td>72</td>
+<td>H</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>45</td>
+<td>-</td>
+<td>26</td>
+<td>59</td>
+<td>;</td>
+<td>40</td>
+<td>73</td>
+<td>I</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>46</td>
+<td>.</td>
+<td>27</td>
+<td>60</td>
+<td>&lt;</td>
+<td>41</td>
+<td>74</td>
+<td>J</td>
+</tr>
+</tbody>
+</table>
+<!-- ![<https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/>](imgs/q_scores.png) -->
 <div id="qc-ing-fastq-files" class="section level3">
 <h3>QC-ing FASTQ Files</h3>
 <p>Before starting an analysis, there are a couple sanity checks that
@@ -559,7 +736,7 @@ facility?</p>
 <h2>Intro to RNA-Seq</h2>
 <blockquote>
 <p><strong>Discussion Question</strong></p>
-<p>Has anyone performed any rna-seq analysis? What tools have you
+<p>Has anyone performed any RNA-Seq analysis? What tools have you
 used?</p>
 </blockquote>
 <p>The FASTQ file on its own doesn’t really tell much information. In
@@ -578,7 +755,7 @@ user may choose to run it in default mode (tools that are executed by
 default), or configure it to run with more or less tools/steps.</p>
 <hr />
 <p><strong>Note:</strong> Importantly, this pipeline is designed for
-short-read sequencing (e.g.: Illumina). Long-read bulk RNA-seq requires
+short-read sequencing (e.g.: Illumina). Long-read bulk RNA-Seq requires
 distinct analytical steps which are linked to the nature of long read vs
 short read sequencing. While bulk long-read sequencing is beyond to
 scopre of this workshop, nf-core has pipelines for long-read sequencing
@@ -604,7 +781,7 @@ Identifier (UMI) tagging for PCR deduplication (an optional molecular
 preparation step).</p>
 <div id="trimming-and-filtering" class="section level3">
 <h3>Trimming and Filtering</h3>
-<p>A common initial step in RNA-seq workflows is often read trimming and
+<p>A common initial step in RNA-Seq workflows is often read trimming and
 filtering. A common type of trimming is adapter trimming. Adapters are
 artificial sequences that are attached to the DNA fragments to be
 sequenced to ensure that the fragment attaches to the sequencing flow
@@ -622,12 +799,12 @@ ribosomal rna using <code>SortMeRNA</code>.</p>
 </div>
 <div id="alignment" class="section level3">
 <h3>Alignment</h3>
-<p>Following trimming is alignment/mapping. With RNA-seq, there is more
+<p>Following trimming is alignment/mapping. With RNA-Seq, there is more
 than one approach to alignment, the and nf-core/rnaseq pipelines
 supports various methods.</p>
 <p>Alignment is the process by which a read is mapped to a reference
 genome. <code>STAR</code> is considered the standard aligner for
-RNA-seq. The reason it is used over traditional mappers such as
+RNA-Seq. The reason it is used over traditional mappers such as
 <code>bwa</code> is due to <code>STAR</code> being a splice aware
 aligner, where exon-exon junctions are taken into account at the mapping
 stage. <code>STAR</code> alignment outputs (BAM files) can be critical
@@ -653,7 +830,7 @@ use.</p>
 <div id="counting" class="section level3">
 <h3>Counting</h3>
 <p>Feature (gene or transcript) quantification is typically the last
-analytical step of an RNA-seq pipeline. Importantly, the outputs of
+analytical step of an RNA-Seq pipeline. Importantly, the outputs of
 <code>Salmon</code> and <code>kallisto</code> are quantified counts, as
 opposed to <code>STAR</code> which are mapped data (BAM files), where an
 additional quantification tools is required. In the nf-core/rnaseq
@@ -666,7 +843,7 @@ sample.</p>
 <p>As discussed earlier, the pipeline we will cover also contains
 several additional steps for QC and optional steps dependent on design
 or analytical needs. The primary steps covered in the sections above are
-the required analytical steps across all bulk RNA-seq analysis.</p>
+the required analytical steps across all bulk RNA-Seq analysis.</p>
 <hr />
 </div>
 </div>
@@ -790,7 +967,7 @@ command.</p>
 #SBATCH --error=rnaseq_test.err
 #SBATCH --time=1:00:00
 #SBATCH --partition=express
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1</code></pre>
 <p>To break down each line:</p>
 <ul>
@@ -946,7 +1123,7 @@ going to run down sampled versions of the data for teaching purposes,
 but the steps we will follow will be largely applicable to the full
 dataset.</p>
 <p>Another point to note is that the paper we are obtaining the data
-from is a beginner’s guide for RNA-seq published about 10 years ago.
+from is a beginner’s guide for RNA-Seq published about 10 years ago.
 Given the timeline, you will note that are some differences from the
 analysis that was done for the paper versus the analysis done today. The
 reason is a lot of the tools used by the paper are considered outdated
@@ -954,7 +1131,7 @@ or have been phased out of the field. Bioinformatics and computational
 biology are fast-paced domains. Thus, it is important to ensure that all
 analyses are using correct and modern approaches. In summary, always
 ensure that the tools and pipelines you apply to your analysis are up to
-date to what is considered best practice in the RNA-seq domain.</p>
+date to what is considered best practice in the RNA-Seq domain.</p>
 </div>
 <div id="creating-the-samplesheet" class="section level3">
 <h3>Creating the Samplesheet</h3>
@@ -1017,16 +1194,17 @@ workshop is single-ended, meaning that there is just a single FASTQ for
 us to analyze per sample. It’s also common for data to be paired-ended,
 which for us would result in a pair of FASTQs for each sample, known as
 an read 1 and read 2.</p>
-Can anyone tell me what we would change with this samplesheet if the
-data was paired-end instead of single-end?
+<p>Can anyone tell me what we would change with this samplesheet if the
+data was paired-end instead of single-end?</p>
 <details>
 <summary>
 <strong>Click here for solution</strong>
 </summary>
-We would need to fill in the column that is left blank. The samplesheet
-headers help guide us in what information needs to be placed in each
-column. In this case, <code>fastq_1</code> would correspond to the read
-1 fastq and <code>fastq_2</code> would correspond to the read 2 fastq.
+<p>We would need to fill in the column that is left blank. The
+samplesheet headers help guide us in what information needs to be placed
+in each column. In this case, <code>fastq_1</code> would correspond to
+the read 1 fastq and <code>fastq_2</code> would correspond to the read 2
+fastq.</p>
 </details>
 </blockquote>
 </div>
@@ -1081,7 +1259,8 @@ GENCODE reference (version M32) in the data downloaded from Globus
 (<code>reference</code> folder).</p>
 <pre><code># Read Trimming Options
 trimmer: &quot;trimgalore&quot;
-extra_trimgalore_args: &quot;--illumina&quot;</code></pre>
+extra_trimgalore_args: &quot;--illumina&quot;
+min_trimmed_reads: 1</code></pre>
 <p>We are going to use <code>trim_galore</code> for the trimmer. The
 pipeline also provides <code>fastp</code> as an option. Neither one of
 these is necessarily better than the other, <code>trim_galore</code>
@@ -1090,6 +1269,12 @@ provides a wrapper around an older tool called <code>cutadapt</code> and
 to cut, but you can limit this by passing specific parameters. This
 dataset uses the illumina default adapters, so the
 <code>--illumina</code> flag needs to be passed to the tool.</p>
+<p>We will additionally use the <code>min_trimmed_reads</code> param.
+This parameter is used to set what the minimum number of reads a sample
+will need to have after trimming. The value of this parameter and
+whether it needs to be used depends on the experiment and on the data
+being analyzed. We are using this parameter as we are using downsampled
+files, and will not meet the default value for this parameter.</p>
 <pre><code># Alignment Options
 aligner: &quot;star_salmon&quot;
 pseudo_aligner: &quot;salmon&quot;</code></pre>
@@ -1126,13 +1311,13 @@ parameters to specific tools in the pipeline.</p>
 <code>custom.conf</code>, and adding the below lines.</p>
 <pre><code>process {
     executor = &#39;slurm&#39;
-    queue = ‘amdhdr-100’
+    queue = ‘amd-hdr100’
 }</code></pre>
 <p>Custom configuration works off the idea of scopes – what this means
 is users can group settings so they apply to specific pieces of the
 pipeline.</p>
 <p>The above lines of code set the executor to be slurm, and set the
-queue so that all jobs will be submitted to the <code>amdhdr-100</code>
+queue so that all jobs will be submitted to the <code>amd-hdr100</code>
 partition on cheaha.</p>
 <p>Another item that can be configured via this method is adding
 parameters to specific tools in the pipeline. In order to do that, you
@@ -1199,9 +1384,10 @@ which is located towards the bottom of the file.</p>
 <p>With the name of the process, let’s go back and open up the custom
 configuration file using the OnDemand Editor and add the below
 lines.</p>
-<pre><code>process{
-withName: ‘.*:SALMON_QUANT’{
-    ext.args = ‘--gcBias --seqBias’
+<pre><code>process {
+  withName: ‘.*:SALMON_QUANT’ {
+      ext.args = ‘--gcBias --seqBias’
+  }
 }</code></pre>
 <p>With this customization, Nextflow will add the two additional flags.
 The flags themselves tell <code>Salmon</code> to correct for gc and
@@ -1231,7 +1417,7 @@ much time you are allocating for the pipeline to run.</p>
 #SBATCH --error=rnaseq_test.err
 #SBATCH --time=1:00:00
 #SBATCH --partition=express
-#SBATCH --mem-per-cpu=1000
+#SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1
 
 # load environment
@@ -1256,8 +1442,8 @@ we were doing a complete analysis?</p>
 </summary>
 <p>The files that need to be updated are provided below with a
 description of what needs to be changed.</p>
-<code>samplesheet.csv</code> needs to have the file paths in the
-<code>fastq_1</code> column to point to the full dataset.
+<p><code>samplesheet.csv</code> needs to have the file paths in the
+<code>fastq_1</code> column to point to the full dataset.</p>
 <div class="scrollable-horizontal">
 <pre>
 sample,fastq_1,fastq_2,strandedness
@@ -1325,7 +1511,7 @@ Table”. This provides a high level overview of various metrics, from
 read counts in the BAM to read counts in the FASTQ. It’s a lot of
 metrics, but this is useful in the accessing if a large amount of data
 filtration occur. This is also a good place to check if the samples have
-sufficient sequencing depth. Standard mRNA-sequencing typically requires
+sufficient sequencing depth. Standard mRNA-Sequencing typically requires
 an average of ~25M reads. This requirement increases for
 whole-transcriptome (where other RNA species are also quantified). For
 more reading abour sequencing depth consideration, please visit <a
@@ -1346,7 +1532,7 @@ sanity checks that our data matches our assumptions.</p>
 <p><img src="imgs/multiqc_6.png" /></p>
 <p><img src="imgs/multiqc_7.png" /></p>
 <p><img src="imgs/multiqc_8.png" /></p>
-<p><code>RSeQC</code> is tool with a lot of quality-control for RNA-seq
+<p><code>RSeQC</code> is tool with a lot of quality-control for RNA-Seq
 data. In addition to the above, it also lets us check for duplication
 levels. The image below is indicative of a good ‘normal’ plot for this
 metric.</p>
@@ -1379,9 +1565,9 @@ for FASTQ files. There is also a <code>FastQC</code> report that gets
 generated, but its on a per-sample basis and as a result does not
 aggreate the results like in MultiQC.</p>
 <p>We also note that the <code>FastQC</code> plot below also qc
-duplicate rates from the raw data. Bear in mind unless the RNA-seq
+duplicate rates from the raw data. Bear in mind unless the RNA-Seq
 library preparation protocol implements UMI-tagging, duplicates cannot
-be removed from RNA-seq data (as it is not possible to differentiate
+be removed from RNA-Seq data (as it is not possible to differentiate
 technical/artifact duplicates from biological duplicates derived from
 the high abundance of RNA molecules / expression).</p>
 <p><img src="imgs/multiqc_19.png" /></p>
@@ -1533,9 +1719,9 @@ string <code>SALMON_QUANT</code> and it can appear anywhere in the
 validate that we do see the <code>--gcBias --seqBias</code> being added
 to all commands.</p>
 <p>Lastly, the various <code>work</code> directories are also useful for
-troubleshooting the pipeline as they contain other “hidden” files (files
-starting with a <code>.</code>) and logs that are useful for the the
-troubleshooting process.</p>
+troubleshooting the pipeline as they contain other “hidden”</p>
+<p>files (files starting with a <code>.</code>) and logs that are useful
+for the the troubleshooting process.</p>
 </div>
 </div>
 </div>
