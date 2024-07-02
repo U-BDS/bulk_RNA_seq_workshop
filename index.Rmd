@@ -1,34 +1,36 @@
 ---
-title: "U-BDS bulk RNA-seq workshop"
+title: "U-BDS bulk RNA-Seq workshop"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Overview `r fontawesome::fa("chart-line", fill = "#295135")`
+# `r fontawesome::fa("chart-line", fill = "#295135")` Overview 
 
-Recent advancements in RNA-sequencing (RNA-seq) has led to impactful technological 
-breakthroughs in RNA-seq quantification at high resolution, including single-cell 
-RNA-seq and spatial transcriptomics. However, bulk RNA-seq 
-(defined as: RNA-seq quantification from averaged gene expression ; 
+Recent advancements in RNA-sequencing (RNA-Seq) have led to impactful technological 
+breakthroughs in RNA-Seq quantification at high resolution, including single-cell 
+RNA-Seq and spatial transcriptomics. However, bulk RNA-Seq 
+(defined as: RNA-Seq quantification from averaged gene expression ; 
 averaged expression across all cell types from tissue collected without 
 spatial resolution), continues to play an important role in transcriptomics 
 for various reasons, including but not limited to: 
+
 1. High volume of publicly available datasets  (a good starting point for 
 initial hypothesis testing) 
-2. Cost effectivess 3. It has been well standardized over the last decade, 
+2. Cost effectivess 
+3. It has been well standardized over the last decade, 
 and thus, molecular and analysis methods are robust for the scope of the technique.
 
-## Bulk RNA-seq as a *foundational block* to transcriptomics analysis 
+## Bulk RNA-Seq as a *foundational block* to transcriptomics analysis 
 
 To data scientists seeking to analyze the latest transcriptomics approaches 
-(e.g.: single-cell, or spatial), bulk RNA-seq analysis methods are foundational 
-blocks to transcriptomics. For example, familiarity with bulk RNA-seq methods is
+(e.g.: single-cell, or spatial), bulk RNA-Seq analysis methods are foundational 
+blocks to transcriptomics. For example, familiarity with bulk RNA-Seq methods is
 critical for the efficient analysis of cell specific pseudobulk data derived from
 single-cell experiments. Furthermore, many enrichment analysis methods and 
 visualization approaches are shared or built from classical methods from bulk
-RNA-seq analysis. Thus, familiarity with bulk transcriptomics is a critical skill
+RNA-Seq analysis. Thus, familiarity with bulk transcriptomics is a critical skill
 to have for any transcriptomics analysis.
 
 ## Pre-requirements
@@ -47,9 +49,9 @@ prior to attendance.
 
 _____________
 
-# Scope of the workshop `r fontawesome::fa("list", fill = "#295135")`
+# `r fontawesome::fa("list", fill = "#295135")` Scope of the workshop 
 
-This workshop will cover the foundational topics and methods to bulk RNA-seq analysis, including:
+This workshop will cover the foundational topics and methods to bulk RNA-Seq analysis, including:
 
 * Introduction to raw data management and data exploration
 * Secondary analysis with `nf-core/rnaseq`
@@ -58,16 +60,16 @@ gene expression analysis with `DESeq2`, gene annotation, gene enrichment analysi
 (gene-ontology and gene set enrichment analysis)
 * Fundamentals of data visualization for transcriptomics
 
-# Authors `r fontawesome::fa("chalkboard", fill = "#295135")`
+# `r fontawesome::fa("chalkboard", fill = "#295135")` Authors 
 
 * Austyn Trull
 * Bharat Mishra, PhD
 * Lara Ianov, PhD
 
-A.T., B.H. and L.I. designed workshop content and initial outline. A.T. contributed
-to installation instructions, data management, and secondary analysis materials. B.H.
+A.T., B.M. and L.I. designed workshop content and initial outline. A.T. contributed
+to installation instructions, data management, and secondary analysis materials. B.M.
 contributed to Docker container creation and tertiary analysis materials 
-(including DEG analysis, GO, WGCA, visualization etc.). 
+(including DEG analysis, GSEA, GO, visualization etc.). 
 L.I. supervised all work, reviewed all content and managed website design and deployment.
 
 ## Additional credits
@@ -78,8 +80,8 @@ which have been adapted or modified from the following sources (we thank the
 curators and maintainers of all of these resources for their wonderful contributions,
 compiling the best practices, and easy to follow training guides for beginners):
 
-* Beta phase of carpentries meterial: <https://carpentries-incubator.github.io/bioc-rnaseq/index.html>
-* Love MI, Huber W, Anders S (2014). “Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2.” Genome Biology, 15, 550. doi:10.1186/s13059-014-0550-8 ; vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html>
+* Beta phase of carpentries material: <https://carpentries-incubator.github.io/bioc-rnaseq/index.html>
+* Love MI, Huber W, Anders S (2014). “Moderated estimation of fold change and dispersion for RNA-Seq data with DESeq2.” Genome Biology, 15, 550. doi:10.1186/s13059-014-0550-8 ; vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html>
 * Additional references and materials: 
   * <https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html>
   * <https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html>
@@ -96,10 +98,10 @@ in our workshop:
 A Beginner's Guide to Analysis of RNA Sequencing Data. Am J Respir Cell Mol Biol.
 2018 Aug;59(2):145-157. doi: 10.1165/rcmb.2017-0430TR. PMID: 29624415; PMCID: PMC6096346.
 
-Lastly, we would also like to thank Kristen Coutinho for the dataset suggestion, 
-and preliminary discussions for this workshop.
+Lastly, we would also like to thank Kristen Coutinho and the UAB Informatics Club 
+for the dataset suggestion, and preliminary discussions for this workshop.
 
-## Workshop instructors `r fontawesome::fa("chalkboard-user", fill = "#295135")`
+## `r fontawesome::fa("chalkboard-user", fill = "#295135")` Workshop instructors 
 
 * Austyn Trull
 * Bharat Mishra, PhD

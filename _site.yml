@@ -9,10 +9,10 @@ navbar:
   - text: "Install instructions"
     icon: fa-computer
     href: installation.html
-  - text: "secondary analysis"
+  - text: "Secondary analysis"
     icon: fa-database
     href: secondary_analysis.html
-  - text: "tertiary analysis"
+  - text: "Tertiary analysis"
     icon: fa-chart-simple
     menu:
       - text: "Part 1"

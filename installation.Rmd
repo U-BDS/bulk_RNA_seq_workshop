@@ -7,7 +7,7 @@ To participate in the workshop, you will need access to the software as describe
 
 ------------------------------------------------------------------------
 
-`r fontawesome::fa("triangle-exclamation", fill = "#d40808")` If you have any questions or issues regarding any of the below instructions, please feel free to attend the office hours dedicated to installation troubleshooting. For information regarding the exact time and Zoom link, please visit: <https://u-bds.github.io/2024-07-09-uab/installation.html>
+> `r fontawesome::fa("triangle-exclamation", fill = "#d40808")` If you have any questions or issues regarding any of the below instructions, please feel free to attend the office hours dedicated to installation troubleshooting. For information regarding the exact time and Zoom link, please visit: <https://u-bds.github.io/2024-07-09-uab/installation.html>
 
 ------------------------------------------------------------------------
 
@@ -36,19 +36,16 @@ In order to setup the environment to run the pipeline on Cheaha we will be using
 4.  In the new window that appears, click the `Open in Terminal` button in the upper right of the page
 5.  Cheaha comes with a lot of tools and software pre-installed called 'modules'. Anaconda is one of these tools, and we can load it using the below command in the terminal window that appeared:
     -   `module load Anaconda3`
-6.  Anaconda works by creating isolated environments to install packages into. In order to create one of these environments, use the below command:
-    -   `conda create -p $USER_SCRATCH/conda_envs/rnaseq_workshop`
+6.  Anaconda works by creating isolated environments to install packages into. In order to create one of these environments and install Nextflow and nf-core, use the below command:
+    -   `conda create -p $USER_SCRATCH/conda_envs/rnaseq_workshop python=3.12 bioconda::nf-core bioconda::nextflow`
 
-    -   Type `y` when prompted.
+    -   Type `y` when prompted (`Proceed ([y]/n)?`).
 
     -   This command will create a new conda enviroment called `rnaseq_workshop` in your scratch space on Cheaha and under a sub-directory called `conda_envs`. It is important to name your environments as something intuitive to help you remember their purpose.
 7.  We now need to activate the environment so we can begin installing packages inside the newly created 'rnaseq_workshop' environment.
     -   `conda activate $USER_SCRATCH/conda_envs/rnaseq_workshop`
-8.  Inside the environment, install Nextflow and nf-core as these will be needed in order to run the pipeline
-    -   `conda install bioconda::nf-core`
 
-    -   Be sure to type `y` when prompted
-9.  The environment should be created and the packages installed, in order to get back out of the environment, we deactivate it
+8.  The environment should be created and the packages installed, in order to get back out of the environment, we deactivate it
     -   `conda deactivate`
 
 # Globus Account Registration {#globus_account}
@@ -116,32 +113,34 @@ Please follow the instructions at this location:
 Please only complete this step **AFTER** successfully installing R and Rstudio above.
 
 1.  Open RStudio
-2.  In the central panel (known as the `Source Code Panel`), type the below commands:
+2.  In the central panel (known as the `Source Code Panel`), type the below command and press the `Enter` key
 
-```         
+```
 install.packages(c("BiocManager", "remotes"))
-BiocManager::install(c("DESeq2", "tximport",
-                       "vsn","apeglm", 
-                       "tidyverse", "SummarizedExperiment", "vidger"))
+```
 
-BiocManager::install(c("biomaRt",
-                       "clusterProfiler",
-                       "msigdbr",
-                       "Glimma", 
-                       "simplifyEnrichment"))
+3.  When you are prompted with `Update all/some/none? [a/s/n]:` , be sure to type `a` and press the `Enter` key.
+4.  Repeat steps 2-3 with the following commands, making sure to run each block one at a time:
 
-BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr",
-                       "ComplexHeatmap","ComplexUpset","EnhancedVolcano",
-                       "RColorBrewer", "hexbin", "cowplot",
-                        "gplots", "ggplot2"))
+```
+BiocManager::install(c("DESeq2", "tximport","vsn","apeglm", "tidyverse", "SummarizedExperiment", "vidger"))
+```
 
+```
+BiocManager::install(c("biomaRt","clusterProfiler","msigdbr","Glimma","simplifyEnrichment"))
+```
+
+```
+BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr","ComplexHeatmap","ComplexUpset","EnhancedVolcano","RColorBrewer", "hexbin", "cowplot","gplots", "ggplot2"))
+```
+
+```
 install.packages(c("gprofiler2", "ggridges", "rmarkdown"))
 ```
 
-3.  Run each command by highlighting each line one at a time and clicking the `Run` button that is located near the top-right of the `Source Code Panel` (NOTE: The exact location may differ dependent on the OS you are using, but the button should still be visible around the `Source Code Panel`). Repeat this for each line that was typed in the above step
-4.  Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
+5.  Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
 
-```         
+```
 library("DESeq2")
 library("tximport")
 library("vsn")
