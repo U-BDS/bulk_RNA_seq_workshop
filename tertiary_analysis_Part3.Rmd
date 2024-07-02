@@ -1,5 +1,5 @@
 ---
-title: "RNASeq Tertiary Analysis: Part 3"
+title: "RNA-Seq Tertiary Analysis: Part 3"
 author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
 
@@ -39,7 +39,7 @@ Gene Ontology (GO) enrichment analysis is a computational method used to identif
 
 How it works:
 
-* Input: You start with a list of genes of interest, often derived from experimental data like differentially expressed genes (DEGs) from a RNA-seq experiment.
+* Input: You start with a list of genes of interest, often derived from experimental data like differentially expressed genes (DEGs) from a RNA-Seq experiment.
 
 * Annotation: Each gene in your list is associated with GO terms that describe its known functions.
 

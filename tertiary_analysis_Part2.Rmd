@@ -1,5 +1,5 @@
 ---
-title: "RNASeq Tertiary Analysis: Part 2"
+title: "RNA-Seq Tertiary Analysis: Part 2"
 author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 ---
 
@@ -57,7 +57,7 @@ The standard differential expression analysis steps in `DESeq2` are wrapped into
 
 * Estimation of size factors: `DESeq2` calculates size factors for each sample to `normalize` the count data and account for differences in library size or sequencing depth.
 
-* Estimation of dispersions: `DESeq2` estimates gene-wise dispersions, which model the relationship between the mean and variance of counts across samples. This accounts for the mean-variance dependency often observed in RNA-seq data.
+* Estimation of dispersions: `DESeq2` estimates gene-wise dispersions, which model the relationship between the mean and variance of counts across samples. This accounts for the mean-variance dependency often observed in RNA-Seq data.
 
 * Fitting the negative binomial generalized linear model: `DESeq2` fits a negative binomial GLM to the count data, using the design formula specified during the creation of the `DESeqDataSet` object.
 
