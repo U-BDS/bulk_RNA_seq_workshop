@@ -430,7 +430,7 @@ the quantification represents expression count files.</p></li>
 output from secondary for additional analysis, visualization and data
 interpretation. The additional analysis steps may include more QC, data
 filtering, annotation and experimental specific analysis (driven by
-study design). A typical bulk RNA-seq analysis, includes differential
+study design). A typical bulk RNA-Seq analysis, includes differential
 and co-regulated expression of genes and to infer their biological
 meaning.</p></li>
 </ul>
@@ -451,7 +451,7 @@ using the gzip tool. Gzip is both the name of the tool and the name for
 the file compression algorithm. File compression is typically performed
 to minimize the storage space the file takes up on a file system. This
 is especially important for FASTQs because they can be very large files.
-Furthermore, many standard tools for secondary analysis of RNA-seq
+Furthermore, many standard tools for secondary analysis of RNA-Seq
 accept compressed FASTQs (in the gzip format) as input, and thus, the
 user does not need to de-compress the files prior to starting the
 analysis.</p>
@@ -736,7 +736,7 @@ facility?</p>
 <h2>Intro to RNA-Seq</h2>
 <blockquote>
 <p><strong>Discussion Question</strong></p>
-<p>Has anyone performed any rna-seq analysis? What tools have you
+<p>Has anyone performed any RNA-Seq analysis? What tools have you
 used?</p>
 </blockquote>
 <p>The FASTQ file on its own doesn’t really tell much information. In
@@ -755,7 +755,7 @@ user may choose to run it in default mode (tools that are executed by
 default), or configure it to run with more or less tools/steps.</p>
 <hr />
 <p><strong>Note:</strong> Importantly, this pipeline is designed for
-short-read sequencing (e.g.: Illumina). Long-read bulk RNA-seq requires
+short-read sequencing (e.g.: Illumina). Long-read bulk RNA-Seq requires
 distinct analytical steps which are linked to the nature of long read vs
 short read sequencing. While bulk long-read sequencing is beyond to
 scopre of this workshop, nf-core has pipelines for long-read sequencing
@@ -781,7 +781,7 @@ Identifier (UMI) tagging for PCR deduplication (an optional molecular
 preparation step).</p>
 <div id="trimming-and-filtering" class="section level3">
 <h3>Trimming and Filtering</h3>
-<p>A common initial step in RNA-seq workflows is often read trimming and
+<p>A common initial step in RNA-Seq workflows is often read trimming and
 filtering. A common type of trimming is adapter trimming. Adapters are
 artificial sequences that are attached to the DNA fragments to be
 sequenced to ensure that the fragment attaches to the sequencing flow
@@ -799,12 +799,12 @@ ribosomal rna using <code>SortMeRNA</code>.</p>
 </div>
 <div id="alignment" class="section level3">
 <h3>Alignment</h3>
-<p>Following trimming is alignment/mapping. With RNA-seq, there is more
+<p>Following trimming is alignment/mapping. With RNA-Seq, there is more
 than one approach to alignment, the and nf-core/rnaseq pipelines
 supports various methods.</p>
 <p>Alignment is the process by which a read is mapped to a reference
 genome. <code>STAR</code> is considered the standard aligner for
-RNA-seq. The reason it is used over traditional mappers such as
+RNA-Seq. The reason it is used over traditional mappers such as
 <code>bwa</code> is due to <code>STAR</code> being a splice aware
 aligner, where exon-exon junctions are taken into account at the mapping
 stage. <code>STAR</code> alignment outputs (BAM files) can be critical
@@ -830,7 +830,7 @@ use.</p>
 <div id="counting" class="section level3">
 <h3>Counting</h3>
 <p>Feature (gene or transcript) quantification is typically the last
-analytical step of an RNA-seq pipeline. Importantly, the outputs of
+analytical step of an RNA-Seq pipeline. Importantly, the outputs of
 <code>Salmon</code> and <code>kallisto</code> are quantified counts, as
 opposed to <code>STAR</code> which are mapped data (BAM files), where an
 additional quantification tools is required. In the nf-core/rnaseq
@@ -843,7 +843,7 @@ sample.</p>
 <p>As discussed earlier, the pipeline we will cover also contains
 several additional steps for QC and optional steps dependent on design
 or analytical needs. The primary steps covered in the sections above are
-the required analytical steps across all bulk RNA-seq analysis.</p>
+the required analytical steps across all bulk RNA-Seq analysis.</p>
 <hr />
 </div>
 </div>
@@ -1123,7 +1123,7 @@ going to run down sampled versions of the data for teaching purposes,
 but the steps we will follow will be largely applicable to the full
 dataset.</p>
 <p>Another point to note is that the paper we are obtaining the data
-from is a beginner’s guide for RNA-seq published about 10 years ago.
+from is a beginner’s guide for RNA-Seq published about 10 years ago.
 Given the timeline, you will note that are some differences from the
 analysis that was done for the paper versus the analysis done today. The
 reason is a lot of the tools used by the paper are considered outdated
@@ -1131,7 +1131,7 @@ or have been phased out of the field. Bioinformatics and computational
 biology are fast-paced domains. Thus, it is important to ensure that all
 analyses are using correct and modern approaches. In summary, always
 ensure that the tools and pipelines you apply to your analysis are up to
-date to what is considered best practice in the RNA-seq domain.</p>
+date to what is considered best practice in the RNA-Seq domain.</p>
 </div>
 <div id="creating-the-samplesheet" class="section level3">
 <h3>Creating the Samplesheet</h3>
@@ -1511,7 +1511,7 @@ Table”. This provides a high level overview of various metrics, from
 read counts in the BAM to read counts in the FASTQ. It’s a lot of
 metrics, but this is useful in the accessing if a large amount of data
 filtration occur. This is also a good place to check if the samples have
-sufficient sequencing depth. Standard mRNA-sequencing typically requires
+sufficient sequencing depth. Standard mRNA-Sequencing typically requires
 an average of ~25M reads. This requirement increases for
 whole-transcriptome (where other RNA species are also quantified). For
 more reading abour sequencing depth consideration, please visit <a
@@ -1532,7 +1532,7 @@ sanity checks that our data matches our assumptions.</p>
 <p><img src="imgs/multiqc_6.png" /></p>
 <p><img src="imgs/multiqc_7.png" /></p>
 <p><img src="imgs/multiqc_8.png" /></p>
-<p><code>RSeQC</code> is tool with a lot of quality-control for RNA-seq
+<p><code>RSeQC</code> is tool with a lot of quality-control for RNA-Seq
 data. In addition to the above, it also lets us check for duplication
 levels. The image below is indicative of a good ‘normal’ plot for this
 metric.</p>
@@ -1565,9 +1565,9 @@ for FASTQ files. There is also a <code>FastQC</code> report that gets
 generated, but its on a per-sample basis and as a result does not
 aggreate the results like in MultiQC.</p>
 <p>We also note that the <code>FastQC</code> plot below also qc
-duplicate rates from the raw data. Bear in mind unless the RNA-seq
+duplicate rates from the raw data. Bear in mind unless the RNA-Seq
 library preparation protocol implements UMI-tagging, duplicates cannot
-be removed from RNA-seq data (as it is not possible to differentiate
+be removed from RNA-Seq data (as it is not possible to differentiate
 technical/artifact duplicates from biological duplicates derived from
 the high abundance of RNA molecules / expression).</p>
 <p><img src="imgs/multiqc_19.png" /></p>
