@@ -14,7 +14,7 @@
 
 <title>RNA-Seq Tertiary Analysis: Part 1</title>
 
-<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -435,10 +435,8 @@ set.seed(2020)
 
 # Required packages
 library(tximport)
-library(DESeq2)</code></pre>
-<pre><code>## Warning: package &#39;DESeq2&#39; was built under R version 4.3.3</code></pre>
-<pre><code>## Warning: package &#39;GenomeInfoDb&#39; was built under R version 4.3.3</code></pre>
-<pre class="r"><code>library(Glimma)
+library(DESeq2)
+library(Glimma)
 library(vsn)
 
 # Mouse annotation package we&#39;ll use for gene identifier conversion
@@ -815,6 +813,22 @@ present in this dataset.</p>
 this species (mouse) and tissue type (lung-derived cells)? How many
 genes are typically expressed in mammalian genomes?</p>
 </blockquote>
+<p><strong>Challenge: Filter the dds object based to include genes with
+5+ reads in at least half the samples</strong></p>
+<details>
+<summary>
+Click here for solution
+</summary>
+<pre class="r"><code>test_dds &lt;- DESeqDataSetFromTximport(txi,
+                                colData = colData,
+                                design = ~ Condition)</code></pre>
+<pre><code>## using counts and average transcript lengths from tximport</code></pre>
+<pre class="r"><code>keep &lt;- rowSums(counts(test_dds) &gt;= 5) &gt;= 4
+test_dds &lt;- test_dds[keep,]
+
+nrow(counts(test_dds))</code></pre>
+<pre><code>## [1] 15688</code></pre>
+</details>
 </div>
 </div>
 <div id="qc-plots" class="section level1">
@@ -849,13 +863,13 @@ libsize_plot &lt;- colData(dds) %&gt;%
 
 # let&#39;s take a look at the plot:
 libsize_plot</code></pre>
-<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <pre class="r"><code># reminder on how to save figures:
 png(&quot;./results/libsize_plot.png&quot;)
 plot(libsize_plot)
 dev.off()</code></pre>
-<pre><code>## quartz_off_screen 
-##                 2</code></pre>
+<pre><code>## png 
+##   2</code></pre>
 <p>Based on the figure above, we can see that there are differences in
 the raw counts across the samples. This is expected, and in the later
 sections the data will be normalized to account for this technical
@@ -882,7 +896,10 @@ differences, which acts as a regularization or shrinkage step.</p>
 on the <code>log2</code> scale, normalized for <code>library size</code>
 or other factors. The choice between the two transformations may depend
 on the specific characteristics of the dataset, such as the range of
-library sizes or the presence of lowly expressed genes</p>
+library sizes or the presence of lowly expressed genes. Both methods
+contrast with traditional <code>log2</code> transformation (even when
+adjusted for library size by <code>normTransform</code>) in that they
+reduce the high variance inherent in lowly expressed genes.</p>
 <div id="blind-dispersion-estimation" class="section level4">
 <h4>Blind dispersion estimation</h4>
 <p>The <code>vst</code> and <code>rlog</code> functions in
@@ -903,9 +920,28 @@ the global dependence of dispersion on the mean for the entire
 experiment. Therefore, setting <code>blind</code> to <code>FALSE</code>
 still largely avoids using specific information about which samples
 belong to which experimental groups during the transformation</p>
-<pre class="r"><code>meanSdPlot(assay(dds), ranks = FALSE)</code></pre>
-<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<pre class="r"><code>vsd &lt;- vst(dds, blind=FALSE)</code></pre>
+<pre class="r"><code># Raw counts
+meanSdPlot(assay(dds), ranks = FALSE)</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code># Traditional log2(n + 1) transformation
+ntd &lt;- normTransform(dds)</code></pre>
+<pre><code>## using &#39;avgTxLength&#39; from assays(dds), correcting for library size</code></pre>
+<pre class="r"><code>ntd</code></pre>
+<pre><code>## class: DESeqTransform 
+## dim: 15486 8 
+## metadata(1): version
+## assays(1): &#39;&#39;
+## rownames(15486): ENSMUSG00000000001.5 ENSMUSG00000000028.16 ...
+##   ENSMUSG00002076763.1 ENSMUSG00002076916.1
+## rowData names(0):
+## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h
+##   R08_AM_Allo24h
+## colData names(7): Condition Group ... Age libSize</code></pre>
+<pre class="r"><code>meanSdPlot(assay(ntd))</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-14-1.png" width="672" />
+Variance decreases as the mean increases.</p>
+<pre class="r"><code># Variance stabilized transformation
+vsd &lt;- vst(dds, blind=FALSE)</code></pre>
 <pre><code>## using &#39;avgTxLength&#39; from assays(dds), correcting for library size</code></pre>
 <pre class="r"><code>vsd</code></pre>
 <pre><code>## class: DESeqTransform 
@@ -918,8 +954,9 @@ belong to which experimental groups during the transformation</p>
 ## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h
 ##   R08_AM_Allo24h
 ## colData names(7): Condition Group ... Age libSize</code></pre>
-<pre class="r"><code>meanSdPlot(assay(vsd), ranks = FALSE)</code></pre>
-<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>meanSdPlot(assay(vsd))</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+Variance is more consistent across all genes.</p>
 </div>
 </div>
 </div>
@@ -940,11 +977,11 @@ much of the ‘signal’ in the data is retained when projecting samples
 from the original high-dimensional space to the low-dimensional space
 for visualization.</p>
 <p>Principal component (PC) analysis plot displaying our 8 samples along
-PC1 and PC2, indicates that there ~83% of variance is explained in PC1
-and that ~4% is explained in PC2.</p>
+PC1 and PC2, indicates that there ~69% of variance is explained in PC1
+and that ~7% is explained in PC2.</p>
 <pre class="r"><code>pcaData &lt;- DESeq2::plotPCA(vsd, intgroup = &quot;Condition&quot;,
-                           returnData = TRUE)</code></pre>
-<pre><code>## using ntop=500 top features by variance</code></pre>
+                           returnData = TRUE, ntop = length(vsd))</code></pre>
+<pre><code>## using ntop=15486 top features by variance</code></pre>
 <pre class="r"><code>percentVar &lt;- round(100 * attr(pcaData, &quot;percentVar&quot;))
 
 ggplot(pcaData, aes(x = PC1, y = PC2)) +
@@ -953,9 +990,8 @@ ggplot(pcaData, aes(x = PC1, y = PC2)) +
   ylab(paste0(&quot;PC2: &quot;, percentVar[2], &quot;% variance&quot;)) +
   coord_fixed() +
   theme(text = element_text(size=20)) +
-  theme_bw(base_size = 16) +
-  scale_y_continuous(limits = c(-6, 6)) </code></pre>
-<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+  theme_bw(base_size = 16)</code></pre>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <blockquote>
 <p><strong>Discussion Question</strong></p>
 <p>What is your interpratation from the PCA plot above. Does it overall
@@ -974,15 +1010,14 @@ Click here for solution
   ylab(paste0(&quot;PC2: &quot;, percentVar[2], &quot;% variance&quot;)) +
   theme(text = element_text(size=20)) +
   theme_bw(base_size = 16) +
-  scale_y_continuous(limits = c(-6, 6)) +
   geom_text_repel(data = pcaData, 
                   mapping = aes(label = name), 
-                  size = 2,
+                  size = 3,
                   fontface = &#39;bold.italic&#39;, 
                   color = &#39;black&#39;,
                   box.padding = unit(0.2, &quot;lines&quot;),
                   point.padding = unit(0.2, &quot;lines&quot;))</code></pre>
-<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 </details>
 </div>
 <div id="euclidean-distance-heatmap" class="section level2">
@@ -1017,7 +1052,7 @@ ComplexHeatmap::Heatmap(
     col = list(condition = c(Naive = &quot;blue&quot;, Transplant = &quot;brown&quot;),
                time = c(&quot;Naive&quot; = &quot;yellow&quot;, &quot;24hr&quot; = &quot;forestgreen&quot;))
     ))</code></pre>
-<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 </div>
 <div id="interactive-qc-plots" class="section level2">
 <h2>Interactive QC Plots</h2>
@@ -1050,19 +1085,24 @@ with the following command:</p>
 <p><code>writeLines(capture.output(sessionInfo()), "./results/sessionInfo.txt")</code></p>
 <p>In this case, we are displaying it as part of our lesson:</p>
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>## R version 4.3.2 (2023-10-31)
-## Platform: aarch64-apple-darwin20 (64-bit)
-## Running under: macOS Sonoma 14.5
+<pre><code>## R version 4.3.3 (2024-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.4 LTS
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
 ## 
 ## locale:
-## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
-## time zone: America/Chicago
-## tzcode source: internal
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
 ## 
 ## attached base packages:
 ## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
@@ -1075,7 +1115,7 @@ with the following command:</p>
 ##  [7] readr_2.1.5                 tidyr_1.3.1                
 ##  [9] tibble_3.2.1                tidyverse_2.0.0            
 ## [11] dplyr_1.1.4                 ggrepel_0.9.5              
-## [13] ggplot2_3.5.1               magrittr_2.0.3             
+## [13] ggplot2_3.5.0               magrittr_2.0.3             
 ## [15] biomaRt_2.58.2              vsn_3.70.0                 
 ## [17] Glimma_2.12.0               DESeq2_1.42.1              
 ## [19] SummarizedExperiment_1.32.0 Biobase_2.62.0             
@@ -1086,38 +1126,38 @@ with the following command:</p>
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] rstudioapi_0.16.0       jsonlite_1.8.8          shape_1.4.6.1          
-##  [4] magick_2.8.3            farver_2.1.2            rmarkdown_2.27         
-##  [7] GlobalOptions_0.1.2     zlibbioc_1.48.2         vctrs_0.6.5            
-## [10] Cairo_1.6-2             memoise_2.0.1           RCurl_1.98-1.14        
-## [13] htmltools_0.5.8.1       S4Arrays_1.2.1          progress_1.2.3         
-## [16] curl_5.2.1              SparseArray_1.2.4       sass_0.4.9             
-## [19] bslib_0.7.0             htmlwidgets_1.6.4       cachem_1.1.0           
-## [22] lifecycle_1.0.4         iterators_1.0.14        pkgconfig_2.0.3        
-## [25] Matrix_1.6-5            R6_2.5.1                fastmap_1.2.0          
-## [28] GenomeInfoDbData_1.2.11 clue_0.3-65             digest_0.6.36          
-## [31] colorspace_2.1-0        AnnotationDbi_1.64.1    RSQLite_2.3.7          
-## [34] filelock_1.0.3          labeling_0.4.3          fansi_1.0.6            
-## [37] timechange_0.3.0        httr_1.4.7              abind_1.4-5            
-## [40] compiler_4.3.2          bit64_4.0.5             withr_3.0.0            
-## [43] doParallel_1.0.17       BiocParallel_1.36.0     DBI_1.2.3              
-## [46] hexbin_1.28.3           highr_0.11              rappdirs_0.3.3         
-## [49] DelayedArray_0.28.0     rjson_0.2.21            tools_4.3.2            
-## [52] glue_1.7.0              cluster_2.1.6           generics_0.1.3         
-## [55] gtable_0.3.5            tzdb_0.4.0              preprocessCore_1.64.0  
-## [58] hms_1.1.3               xml2_1.3.6              utf8_1.2.4             
-## [61] XVector_0.42.0          foreach_1.5.2           pillar_1.9.0           
-## [64] vroom_1.6.5             limma_3.58.1            circlize_0.4.16        
-## [67] BiocFileCache_2.10.2    lattice_0.22-6          bit_4.0.5              
-## [70] tidyselect_1.2.1        locfit_1.5-9.10         Biostrings_2.70.3      
-## [73] knitr_1.47              edgeR_4.0.16            xfun_0.45              
-## [76] statmod_1.5.0           stringi_1.8.4           yaml_2.3.8             
-## [79] evaluate_0.24.0         codetools_0.2-20        BiocManager_1.30.23    
-## [82] cli_3.6.3               affyio_1.72.0           munsell_0.5.1          
-## [85] jquerylib_0.1.4         Rcpp_1.0.12             dbplyr_2.5.0           
-## [88] png_0.1-8               XML_3.99-0.17           parallel_4.3.2         
-## [91] blob_1.2.4              prettyunits_1.2.0       bitops_1.0-7           
-## [94] scales_1.3.0            affy_1.80.0             crayon_1.5.3           
-## [97] GetoptLong_1.0.5        rlang_1.1.4             KEGGREST_1.42.0</code></pre>
+##  [4] farver_2.1.1            rmarkdown_2.26          GlobalOptions_0.1.2    
+##  [7] zlibbioc_1.48.2         vctrs_0.6.5             memoise_2.0.1          
+## [10] RCurl_1.98-1.14         htmltools_0.5.8.1       S4Arrays_1.2.1         
+## [13] progress_1.2.3          curl_5.2.1              SparseArray_1.2.4      
+## [16] sass_0.4.9              bslib_0.7.0             htmlwidgets_1.6.4      
+## [19] cachem_1.0.8            lifecycle_1.0.4         iterators_1.0.14       
+## [22] pkgconfig_2.0.3         Matrix_1.6-5            R6_2.5.1               
+## [25] fastmap_1.1.1           GenomeInfoDbData_1.2.11 clue_0.3-65            
+## [28] digest_0.6.35           colorspace_2.1-0        AnnotationDbi_1.64.1   
+## [31] RSQLite_2.3.6           filelock_1.0.3          labeling_0.4.3         
+## [34] fansi_1.0.6             timechange_0.3.0        httr_1.4.7             
+## [37] abind_1.4-5             compiler_4.3.3          bit64_4.0.5            
+## [40] withr_3.0.0             doParallel_1.0.17       BiocParallel_1.36.0    
+## [43] DBI_1.2.2               hexbin_1.28.3           highr_0.10             
+## [46] rappdirs_0.3.3          DelayedArray_0.28.0     rjson_0.2.21           
+## [49] tools_4.3.3             glue_1.7.0              cluster_2.1.6          
+## [52] generics_0.1.3          gtable_0.3.5            tzdb_0.4.0             
+## [55] preprocessCore_1.64.0   hms_1.1.3               xml2_1.3.6             
+## [58] utf8_1.2.4              XVector_0.42.0          foreach_1.5.2          
+## [61] pillar_1.9.0            vroom_1.6.5             limma_3.58.1           
+## [64] circlize_0.4.16         BiocFileCache_2.10.2    lattice_0.22-6         
+## [67] bit_4.0.5               tidyselect_1.2.1        locfit_1.5-9.9         
+## [70] Biostrings_2.70.3       knitr_1.46              edgeR_4.0.16           
+## [73] xfun_0.43               statmod_1.5.0           stringi_1.8.3          
+## [76] yaml_2.3.8              evaluate_0.23           codetools_0.2-20       
+## [79] BiocManager_1.30.22     cli_3.6.2               affyio_1.72.0          
+## [82] munsell_0.5.1           jquerylib_0.1.4         Rcpp_1.0.12            
+## [85] dbplyr_2.5.0            png_0.1-8               XML_3.99-0.16.1        
+## [88] parallel_4.3.3          blob_1.2.4              prettyunits_1.2.0      
+## [91] bitops_1.0-7            scales_1.3.0            affy_1.80.0            
+## [94] crayon_1.5.2            GetoptLong_1.0.5        rlang_1.1.3            
+## [97] KEGGREST_1.42.0</code></pre>
 </div>
 </div>
 
