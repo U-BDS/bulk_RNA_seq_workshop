@@ -139,6 +139,12 @@ Note that there has been a notable drop in the number of genes present in this d
 > species (mouse) and tissue type (lung-derived cells)? How many genes are typically
 > expressed in mammalian genomes?
 
+**Challenge: Filter the dds object based to include genes with 5+ reads in at least half the samples**
+
+```{r}
+
+```
+
 # QC Plots
 
 ## Library size differences
@@ -165,6 +171,13 @@ Note that there has been a notable drop in the number of genes present in this d
 
 
 ```{r}
+# Raw counts
+
+```
+
+
+```{r}
+# Traditional log2(n + 1) transformation
 
 ```
 
@@ -175,9 +188,14 @@ Note that there has been a notable drop in the number of genes present in this d
 
 
 ```{r}
+# Variance stabilized transformation
 
 ```
 
+
+```{r}
+
+```
 
 ## PCA Plot 
 
