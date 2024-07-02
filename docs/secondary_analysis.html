@@ -456,8 +456,9 @@ accept compressed FASTQs (in the gzip format) as input, and thus, the
 user does not need to de-compress the files prior to starting the
 analysis.</p>
 <p>Let’s go ahead and peek at the FASTQ file itself. We’ll use
-<code>gunzip -c</code> to produce the file contents to stdout, and we’ll
-just look at the first 10 lines using <code>head</code>.</p>
+<code>gunzip -c</code> to produce the file contents to stdout (display
+output), and we’ll just look at the first 10 lines using
+<code>head</code> command.</p>
 <pre><code>gunzip -c &lt;fastq.name&gt; | head</code></pre>
 <p>We can see that there is a discernible pattern. Each set of four
 lines is considered a single entry. The four lines are:</p>
@@ -478,13 +479,189 @@ table below for quick guide on the character-score translations. The
 reason these are stored as characters is again to reduce the amount of
 space the FASTQ takes up on a file system.</li>
 </ol>
-<div class="float">
-<img src="imgs/q_scores.png"
-alt="https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/" />
-<div class="figcaption"><a
-href="https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/"
-class="uri">https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/</a></div>
-</div>
+<table style="width:100%;">
+<colgroup>
+<col width="10%" />
+<col width="13%" />
+<col width="9%" />
+<col width="10%" />
+<col width="13%" />
+<col width="9%" />
+<col width="10%" />
+<col width="13%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Q-Score</th>
+<th>ASCII Code</th>
+<th>Symbol</th>
+<th>Q-Score</th>
+<th>ASCII Code</th>
+<th>Symbol</th>
+<th>Q-Score</th>
+<th>ASCII Code</th>
+<th>Symbol</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>33</td>
+<td>!</td>
+<td>14</td>
+<td>47</td>
+<td>/</td>
+<td>28</td>
+<td>61</td>
+<td>=</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>34</td>
+<td>”</td>
+<td>15</td>
+<td>48</td>
+<td>0</td>
+<td>29</td>
+<td>62</td>
+<td>&gt;</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>35</td>
+<td>#</td>
+<td>16</td>
+<td>49</td>
+<td>1</td>
+<td>30</td>
+<td>63</td>
+<td>?</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>36</td>
+<td>$</td>
+<td>17</td>
+<td>50</td>
+<td>2</td>
+<td>31</td>
+<td>64</td>
+<td>@</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>37</td>
+<td>%</td>
+<td>18</td>
+<td>51</td>
+<td>3</td>
+<td>32</td>
+<td>65</td>
+<td>A</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>38</td>
+<td>&amp;</td>
+<td>19</td>
+<td>52</td>
+<td>4</td>
+<td>33</td>
+<td>66</td>
+<td>B</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>39</td>
+<td>’</td>
+<td>20</td>
+<td>53</td>
+<td>5</td>
+<td>34</td>
+<td>67</td>
+<td>C</td>
+</tr>
+<tr class="even">
+<td>7</td>
+<td>40</td>
+<td>(</td>
+<td>21</td>
+<td>54</td>
+<td>6</td>
+<td>35</td>
+<td>68</td>
+<td>D</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>41</td>
+<td>)</td>
+<td>22</td>
+<td>55</td>
+<td>7</td>
+<td>36</td>
+<td>69</td>
+<td>E</td>
+</tr>
+<tr class="even">
+<td>9</td>
+<td>42</td>
+<td>*</td>
+<td>23</td>
+<td>56</td>
+<td>8</td>
+<td>37</td>
+<td>70</td>
+<td>F</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>43</td>
+<td>+</td>
+<td>24</td>
+<td>57</td>
+<td>9</td>
+<td>38</td>
+<td>71</td>
+<td>G</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td>44</td>
+<td>,</td>
+<td>25</td>
+<td>58</td>
+<td>:</td>
+<td>39</td>
+<td>72</td>
+<td>H</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td>45</td>
+<td>-</td>
+<td>26</td>
+<td>59</td>
+<td>;</td>
+<td>40</td>
+<td>73</td>
+<td>I</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td>46</td>
+<td>.</td>
+<td>27</td>
+<td>60</td>
+<td>&lt;</td>
+<td>41</td>
+<td>74</td>
+<td>J</td>
+</tr>
+</tbody>
+</table>
+<!-- ![<https://www.omixon.com/bioinformatics-for-beginners-file-formats-part-2-short-reads/>](imgs/q_scores.png) -->
 <div id="qc-ing-fastq-files" class="section level3">
 <h3>QC-ing FASTQ Files</h3>
 <p>Before starting an analysis, there are a couple sanity checks that
@@ -1017,16 +1194,17 @@ workshop is single-ended, meaning that there is just a single FASTQ for
 us to analyze per sample. It’s also common for data to be paired-ended,
 which for us would result in a pair of FASTQs for each sample, known as
 an read 1 and read 2.</p>
-Can anyone tell me what we would change with this samplesheet if the
-data was paired-end instead of single-end?
+<p>Can anyone tell me what we would change with this samplesheet if the
+data was paired-end instead of single-end?</p>
 <details>
 <summary>
 <strong>Click here for solution</strong>
 </summary>
-We would need to fill in the column that is left blank. The samplesheet
-headers help guide us in what information needs to be placed in each
-column. In this case, <code>fastq_1</code> would correspond to the read
-1 fastq and <code>fastq_2</code> would correspond to the read 2 fastq.
+<p>We would need to fill in the column that is left blank. The
+samplesheet headers help guide us in what information needs to be placed
+in each column. In this case, <code>fastq_1</code> would correspond to
+the read 1 fastq and <code>fastq_2</code> would correspond to the read 2
+fastq.</p>
 </details>
 </blockquote>
 </div>
@@ -1264,8 +1442,8 @@ we were doing a complete analysis?</p>
 </summary>
 <p>The files that need to be updated are provided below with a
 description of what needs to be changed.</p>
-<code>samplesheet.csv</code> needs to have the file paths in the
-<code>fastq_1</code> column to point to the full dataset.
+<p><code>samplesheet.csv</code> needs to have the file paths in the
+<code>fastq_1</code> column to point to the full dataset.</p>
 <div class="scrollable-horizontal">
 <pre>
 sample,fastq_1,fastq_2,strandedness
@@ -1541,9 +1719,9 @@ string <code>SALMON_QUANT</code> and it can appear anywhere in the
 validate that we do see the <code>--gcBias --seqBias</code> being added
 to all commands.</p>
 <p>Lastly, the various <code>work</code> directories are also useful for
-troubleshooting the pipeline as they contain other “hidden” files (files
-starting with a <code>.</code>) and logs that are useful for the the
-troubleshooting process.</p>
+troubleshooting the pipeline as they contain other “hidden”</p>
+<p>files (files starting with a <code>.</code>) and logs that are useful
+for the the troubleshooting process.</p>
 </div>
 </div>
 </div>
