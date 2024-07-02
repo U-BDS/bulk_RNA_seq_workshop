@@ -113,11 +113,14 @@ Please follow the instructions at this location:
 Please only complete this step **AFTER** successfully installing R and Rstudio above.
 
 1.  Open RStudio
-2.  In the central panel (known as the `Source Code Panel`), type the below commands:
+2.  In the central panel (known as the `Source Code Panel`), type the below command and press the `Enter` key
 
 ```
 install.packages(c("BiocManager", "remotes"))
 ```
+
+3.  When you are prompted with `Update all/some/none? [a/s/n]:` , be sure to type `a` and press the `Enter` key.
+4.  Repeat steps 2-3 with the following commands, making sure to run each block one at a time:
 
 ```
 BiocManager::install(c("DESeq2", "tximport","vsn","apeglm", "tidyverse", "SummarizedExperiment", "vidger"))
@@ -135,13 +138,9 @@ BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr","ComplexHea
 install.packages(c("gprofiler2", "ggridges", "rmarkdown"))
 ```
 
-Note
-: For `Update all/some/none? [a/s/n]: ` choose a
+5.  Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
 
-3.  Run each command by highlighting each line one at a time and clicking the `Run` button that is located near the top-right of the `Source Code Panel` (NOTE: The exact location may differ dependent on the OS you are using, but the button should still be visible around the `Source Code Panel`). Repeat this for each line that was typed in the above step
-4.  Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
-
-```         
+```
 library("DESeq2")
 library("tximport")
 library("vsn")
