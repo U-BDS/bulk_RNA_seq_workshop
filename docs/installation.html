@@ -570,30 +570,24 @@ class="uri">https://carpentries.github.io/workshop-template/install_instructions
 and pre-built packages that ease the burden of analysis. We will be
 using a few of these packages to complete the lesson taught at this
 workshop.</p>
-<p>Please only complete this step <strong>AFTER</strong> successfullyy
+<p>Please only complete this step <strong>AFTER</strong> successfully
 installing R and Rstudio above.</p>
 <ol style="list-style-type: decimal">
 <li>Open RStudio</li>
 <li>In the central panel (known as the <code>Source Code Panel</code>),
 type the below commands:</li>
 </ol>
-<pre><code>install.packages(c(&quot;BiocManager&quot;, &quot;remotes&quot;))
-BiocManager::install(c(&quot;DESeq2&quot;, &quot;tximport&quot;,
-                       &quot;vsn&quot;,&quot;apeglm&quot;, 
-                       &quot;tidyverse&quot;, &quot;SummarizedExperiment&quot;, &quot;vidger&quot;))
-
-BiocManager::install(c(&quot;biomaRt&quot;,
-                       &quot;clusterProfiler&quot;,
-                       &quot;msigdbr&quot;,
-                       &quot;Glimma&quot;, 
-                       &quot;simplifyEnrichment&quot;))
-
-BiocManager::install(c(&quot;enrichplot&quot;, &quot;kableExtra&quot;,&quot;ggrepel&quot;,&quot;ggpubr&quot;,
-                       &quot;ComplexHeatmap&quot;,&quot;ComplexUpset&quot;,&quot;EnhancedVolcano&quot;,
-                       &quot;RColorBrewer&quot;, &quot;hexbin&quot;, &quot;cowplot&quot;,
-                        &quot;gplots&quot;, &quot;ggplot2&quot;))
-
-install.packages(c(&quot;gprofiler2&quot;, &quot;ggridges&quot;, &quot;rmarkdown&quot;))</code></pre>
+<pre><code>install.packages(c(&quot;BiocManager&quot;, &quot;remotes&quot;))</code></pre>
+<pre><code>BiocManager::install(c(&quot;DESeq2&quot;, &quot;tximport&quot;,&quot;vsn&quot;,&quot;apeglm&quot;, &quot;tidyverse&quot;, &quot;SummarizedExperiment&quot;, &quot;vidger&quot;))</code></pre>
+<pre><code>BiocManager::install(c(&quot;biomaRt&quot;,&quot;clusterProfiler&quot;,&quot;msigdbr&quot;,&quot;Glimma&quot;,&quot;simplifyEnrichment&quot;))</code></pre>
+<pre><code>BiocManager::install(c(&quot;enrichplot&quot;, &quot;kableExtra&quot;,&quot;ggrepel&quot;,&quot;ggpubr&quot;,&quot;ComplexHeatmap&quot;,&quot;ComplexUpset&quot;,&quot;EnhancedVolcano&quot;,&quot;RColorBrewer&quot;, &quot;hexbin&quot;, &quot;cowplot&quot;,&quot;gplots&quot;, &quot;ggplot2&quot;))</code></pre>
+<pre><code>install.packages(c(&quot;gprofiler2&quot;, &quot;ggridges&quot;, &quot;rmarkdown&quot;))</code></pre>
+<dl>
+<dt>Note</dt>
+<dd>
+For <code>Update all/some/none? [a/s/n]:</code> choose a
+</dd>
+</dl>
 <ol start="3" style="list-style-type: decimal">
 <li>Run each command by highlighting each line one at a time and
 clicking the <code>Run</code> button that is located near the top-right

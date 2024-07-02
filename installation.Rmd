@@ -117,23 +117,26 @@ Please only complete this step **AFTER** successfully installing R and Rstudio a
 
 ```
 install.packages(c("BiocManager", "remotes"))
-BiocManager::install(c("DESeq2", "tximport",
-                       "vsn","apeglm", 
-                       "tidyverse", "SummarizedExperiment", "vidger"))
+```
 
-BiocManager::install(c("biomaRt",
-                       "clusterProfiler",
-                       "msigdbr",
-                       "Glimma", 
-                       "simplifyEnrichment"))
+```
+BiocManager::install(c("DESeq2", "tximport","vsn","apeglm", "tidyverse", "SummarizedExperiment", "vidger"))
+```
 
-BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr",
-                       "ComplexHeatmap","ComplexUpset","EnhancedVolcano",
-                       "RColorBrewer", "hexbin", "cowplot",
-                        "gplots", "ggplot2"))
+```
+BiocManager::install(c("biomaRt","clusterProfiler","msigdbr","Glimma","simplifyEnrichment"))
+```
 
+```
+BiocManager::install(c("enrichplot", "kableExtra","ggrepel","ggpubr","ComplexHeatmap","ComplexUpset","EnhancedVolcano","RColorBrewer", "hexbin", "cowplot","gplots", "ggplot2"))
+```
+
+```
 install.packages(c("gprofiler2", "ggridges", "rmarkdown"))
 ```
+
+Note
+: For `Update all/some/none? [a/s/n]: ` choose a
 
 3.  Run each command by highlighting each line one at a time and clicking the `Run` button that is located near the top-right of the `Source Code Panel` (NOTE: The exact location may differ dependent on the OS you are using, but the button should still be visible around the `Source Code Panel`). Repeat this for each line that was typed in the above step
 4.  Once installation has completed for all packages, type the below commands to make sure packages installed correctly:
