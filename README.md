@@ -42,8 +42,8 @@ This minimizes differences in the website due to versions among tools.
 * Bharat Mishra, PhD
 * Lara Ianov, PhD
 
-A.T., B.H. and L.I. designed workshop content and initial outline. A.T. contributed
-to installation instructions, data management, and secondary analysis materials. B.H.
+A.T., B.M. and L.I. designed workshop content and initial outline. A.T. contributed
+to installation instructions, data management, and secondary analysis materials. B.M.
 contributed to Docker container creation and tertiary analysis materials 
 (including DEG analysis, GO, WGCA, visualization etc.). 
 L.I. supervised all work, reviewed all content and managed website design and deployment.
