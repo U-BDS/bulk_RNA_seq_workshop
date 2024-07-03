@@ -381,6 +381,8 @@ for file in input/downsample_fastqs/*.fastq.gz; do echo $file; done >> sampleshe
 
 Open up the samplesheet again. You will see the header and a list of FASTQs. To start modifying it, a sample name needs to be added with some additional commas.
 
+**Note**: the path below in the example samplesheet is relative to our own Globus endpoint. You should use the paths from the for loops outputs shown above.
+
 ::: scrollable-horizontal
 ```{=html}
 <pre>
@@ -514,7 +516,7 @@ There’s a lot of files and directories in here, breaking down the directories 
 
 -   `docs` - Contains documentation
 
--   `libs` - Contains groovy libraries for the pipeline to use
+-   `lib` - Contains groovy libraries for the pipeline to use
 
 -   `modules` - Contains the nextflow process files for individual tools. It is further split into ‘local’ modules which are unique to the pipeline and ‘nf-core’ modules which are files that have been obtained from a central repo.
 
@@ -565,9 +567,9 @@ With all the files created, we can submit the pipeline. We'll create a `run_rnas
 ```         
 #!/usr/bin/env bash
 
-#SBATCH --job-name=rnaseq_test
-#SBATCH --output=rnaseq_test.out
-#SBATCH --error=rnaseq_test.err
+#SBATCH --job-name=rnaseq_subsample
+#SBATCH --output=rnaseq_subsample.out
+#SBATCH --error=rnaseq_subsample.err
 #SBATCH --time=1:00:00
 #SBATCH --partition=express
 #SBATCH --mem-per-cpu=5000
