@@ -370,7 +370,7 @@ The next step in creating the samplesheet is to populate it with information. Th
 In order to get the list of fastqs, we'll run the below command.
 
 ```         
-for file in input/downsample/*.fastq.gz; do echo $file; done
+for file in input/downsample_fastqs/*.fastq.gz; do echo $file; done
 ```
 
 That will output all the FASTQs we will be working with. Lets redirect the output to the end of the samplesheet
