@@ -48,6 +48,8 @@ contributed to Docker container creation and tertiary analysis materials
 (including DEG analysis, GO, WGCA, visualization etc.). 
 L.I. supervised all work, reviewed all content and managed website design and deployment.
 
+Nilesh Kumar, PhD and Luke Potter, PhD also provided additional edits and revisions to source material.
+
 ## Additional credits
 
 In addition to U-BDS's best practices and code written by U-BDS, sections of the

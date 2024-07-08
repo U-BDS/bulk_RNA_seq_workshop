@@ -14,7 +14,7 @@
 
 <title>RNA-Seq Tertiary Analysis: Part 4</title>
 
-<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -572,27 +572,27 @@ mapping.</p>
 collections it provides.</p>
 <pre class="r"><code>msigdbr_species()</code></pre>
 <pre><code>## # A tibble: 20 × 2
-##    species_name                    species_common_name                          
-##    &lt;chr&gt;                           &lt;chr&gt;                                        
-##  1 Anolis carolinensis             Carolina anole, green anole                  
-##  2 Bos taurus                      bovine, cattle, cow, dairy cow, domestic cat…
-##  3 Caenorhabditis elegans          &lt;NA&gt;                                         
-##  4 Canis lupus familiaris          dog, dogs                                    
-##  5 Danio rerio                     leopard danio, zebra danio, zebra fish, zebr…
-##  6 Drosophila melanogaster         fruit fly                                    
-##  7 Equus caballus                  domestic horse, equine, horse                
-##  8 Felis catus                     cat, cats, domestic cat                      
-##  9 Gallus gallus                   bantam, chicken, chickens, Gallus domesticus 
-## 10 Homo sapiens                    human                                        
-## 11 Macaca mulatta                  rhesus macaque, rhesus macaques, Rhesus monk…
-## 12 Monodelphis domestica           gray short-tailed opossum                    
-## 13 Mus musculus                    house mouse, mouse                           
-## 14 Ornithorhynchus anatinus        duck-billed platypus, duckbill platypus, pla…
-## 15 Pan troglodytes                 chimpanzee                                   
-## 16 Rattus norvegicus               brown rat, Norway rat, rat, rats             
-## 17 Saccharomyces cerevisiae        baker&#39;s yeast, brewer&#39;s yeast, S. cerevisiae 
-## 18 Schizosaccharomyces pombe 972h- &lt;NA&gt;                                         
-## 19 Sus scrofa                      pig, pigs, swine, wild boar                  
+##    species_name                    species_common_name                                                    
+##    &lt;chr&gt;                           &lt;chr&gt;                                                                  
+##  1 Anolis carolinensis             Carolina anole, green anole                                            
+##  2 Bos taurus                      bovine, cattle, cow, dairy cow, domestic cattle, domestic cow, ox, oxen
+##  3 Caenorhabditis elegans          &lt;NA&gt;                                                                   
+##  4 Canis lupus familiaris          dog, dogs                                                              
+##  5 Danio rerio                     leopard danio, zebra danio, zebra fish, zebrafish                      
+##  6 Drosophila melanogaster         fruit fly                                                              
+##  7 Equus caballus                  domestic horse, equine, horse                                          
+##  8 Felis catus                     cat, cats, domestic cat                                                
+##  9 Gallus gallus                   bantam, chicken, chickens, Gallus domesticus                           
+## 10 Homo sapiens                    human                                                                  
+## 11 Macaca mulatta                  rhesus macaque, rhesus macaques, Rhesus monkey, rhesus monkeys         
+## 12 Monodelphis domestica           gray short-tailed opossum                                              
+## 13 Mus musculus                    house mouse, mouse                                                     
+## 14 Ornithorhynchus anatinus        duck-billed platypus, duckbill platypus, platypus                      
+## 15 Pan troglodytes                 chimpanzee                                                             
+## 16 Rattus norvegicus               brown rat, Norway rat, rat, rats                                       
+## 17 Saccharomyces cerevisiae        baker&#39;s yeast, brewer&#39;s yeast, S. cerevisiae                           
+## 18 Schizosaccharomyces pombe 972h- &lt;NA&gt;                                                                   
+## 19 Sus scrofa                      pig, pigs, swine, wild boar                                            
 ## 20 Xenopus tropicalis              tropical clawed frog, western clawed frog</code></pre>
 <p>Look different gene set (gs) collections</p>
 <pre class="r"><code>msigdbr_collections()</code></pre>
@@ -638,17 +638,15 @@ parameters:</p>
 
 head(mm_hallmark_sets)</code></pre>
 <pre><code>## # A tibble: 6 × 18
-##   gs_cat gs_subcat gs_name               gene_symbol entrez_gene ensembl_gene   
-##   &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;                 &lt;chr&gt;             &lt;int&gt; &lt;chr&gt;          
-## 1 H      &quot;&quot;        HALLMARK_ADIPOGENESIS Abca1             11303 ENSMUSG0000001…
-## 2 H      &quot;&quot;        HALLMARK_ADIPOGENESIS Abcb8             74610 ENSMUSG0000002…
-## 3 H      &quot;&quot;        HALLMARK_ADIPOGENESIS Acaa2             52538 ENSMUSG0000003…
-## 4 H      &quot;&quot;        HALLMARK_ADIPOGENESIS Acadl             11363 ENSMUSG0000002…
-## 5 H      &quot;&quot;        HALLMARK_ADIPOGENESIS Acadm             11364 ENSMUSG0000006…
-## 6 H      &quot;&quot;        HALLMARK_ADIPOGENESIS Acads             11409 ENSMUSG0000002…
-## # ℹ 12 more variables: human_gene_symbol &lt;chr&gt;, human_entrez_gene &lt;int&gt;,
-## #   human_ensembl_gene &lt;chr&gt;, gs_id &lt;chr&gt;, gs_pmid &lt;chr&gt;, gs_geoid &lt;chr&gt;,
-## #   gs_exact_source &lt;chr&gt;, gs_url &lt;chr&gt;, gs_description &lt;chr&gt;, taxon_id &lt;int&gt;,
+##   gs_cat gs_subcat gs_name    gene_symbol entrez_gene ensembl_gene human_gene_symbol human_entrez_gene human_ensembl_gene gs_id gs_pmid
+##   &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;             &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;                         &lt;int&gt; &lt;chr&gt;              &lt;chr&gt; &lt;chr&gt;  
+## 1 H      &quot;&quot;        HALLMARK_… Abca1             11303 ENSMUSG0000… ABCA1                            19 ENSG00000165029    M5905 267710…
+## 2 H      &quot;&quot;        HALLMARK_… Abcb8             74610 ENSMUSG0000… ABCB8                         11194 ENSG00000197150    M5905 267710…
+## 3 H      &quot;&quot;        HALLMARK_… Acaa2             52538 ENSMUSG0000… ACAA2                         10449 ENSG00000167315    M5905 267710…
+## 4 H      &quot;&quot;        HALLMARK_… Acadl             11363 ENSMUSG0000… ACADL                            33 ENSG00000115361    M5905 267710…
+## 5 H      &quot;&quot;        HALLMARK_… Acadm             11364 ENSMUSG0000… ACADM                            34 ENSG00000117054    M5905 267710…
+## 6 H      &quot;&quot;        HALLMARK_… Acads             11409 ENSMUSG0000… ACADS                            35 ENSG00000122971    M5905 267710…
+## # ℹ 7 more variables: gs_geoid &lt;chr&gt;, gs_exact_source &lt;chr&gt;, gs_url &lt;chr&gt;, gs_description &lt;chr&gt;, taxon_id &lt;int&gt;,
 ## #   ortholog_sources &lt;chr&gt;, num_ortholog_sources &lt;dbl&gt;</code></pre>
 </div>
 </div>
@@ -680,41 +678,20 @@ gsea_enrichment &lt;- GSEA(
 <h2>Explore GSEA results</h2>
 <pre class="r"><code># see head excluding the last collumn for simplicity:
 head(gsea_enrichment@result)[,1:(ncol(gsea_enrichment@result)-1)]</code></pre>
-<pre><code>##                                                        ID
-## HALLMARK_G2M_CHECKPOINT           HALLMARK_G2M_CHECKPOINT
-## HALLMARK_E2F_TARGETS                 HALLMARK_E2F_TARGETS
-## HALLMARK_MITOTIC_SPINDLE         HALLMARK_MITOTIC_SPINDLE
-## HALLMARK_ALLOGRAFT_REJECTION HALLMARK_ALLOGRAFT_REJECTION
-## HALLMARK_MTORC1_SIGNALING       HALLMARK_MTORC1_SIGNALING
-## HALLMARK_MYC_TARGETS_V1           HALLMARK_MYC_TARGETS_V1
-##                                               Description setSize
-## HALLMARK_G2M_CHECKPOINT           HALLMARK_G2M_CHECKPOINT      92
-## HALLMARK_E2F_TARGETS                 HALLMARK_E2F_TARGETS     123
-## HALLMARK_MITOTIC_SPINDLE         HALLMARK_MITOTIC_SPINDLE      43
-## HALLMARK_ALLOGRAFT_REJECTION HALLMARK_ALLOGRAFT_REJECTION      37
-## HALLMARK_MTORC1_SIGNALING       HALLMARK_MTORC1_SIGNALING      36
-## HALLMARK_MYC_TARGETS_V1           HALLMARK_MYC_TARGETS_V1      34
-##                              enrichmentScore       NES       pvalue
-## HALLMARK_G2M_CHECKPOINT            0.5867916  3.843762 1.000000e-10
-## HALLMARK_E2F_TARGETS               0.5335361  3.677769 1.000000e-10
-## HALLMARK_MITOTIC_SPINDLE           0.5551506  2.904041 1.653069e-08
-## HALLMARK_ALLOGRAFT_REJECTION      -0.4614127 -2.694386 6.317781e-06
-## HALLMARK_MTORC1_SIGNALING          0.4304638  2.143866 5.807292e-04
-## HALLMARK_MYC_TARGETS_V1            0.4340611  2.120300 1.078202e-03
-##                                  p.adjust       qvalue rank
-## HALLMARK_G2M_CHECKPOINT      4.000000e-10 5.263158e-11  412
-## HALLMARK_E2F_TARGETS         4.000000e-10 5.263158e-11  501
-## HALLMARK_MITOTIC_SPINDLE     4.408185e-08 5.800243e-09  430
-## HALLMARK_ALLOGRAFT_REJECTION 1.263556e-05 1.662574e-06  291
-## HALLMARK_MTORC1_SIGNALING    9.291667e-04 1.222588e-04  612
-## HALLMARK_MYC_TARGETS_V1      1.437603e-03 1.891582e-04  682
-##                                                 leading_edge
-## HALLMARK_G2M_CHECKPOINT       tags=83%, list=35%, signal=58%
-## HALLMARK_E2F_TARGETS          tags=85%, list=42%, signal=55%
-## HALLMARK_MITOTIC_SPINDLE      tags=84%, list=36%, signal=55%
-## HALLMARK_ALLOGRAFT_REJECTION  tags=68%, list=25%, signal=53%
-## HALLMARK_MTORC1_SIGNALING     tags=92%, list=52%, signal=45%
-## HALLMARK_MYC_TARGETS_V1      tags=100%, list=58%, signal=43%</code></pre>
+<pre><code>##                                                        ID                  Description setSize enrichmentScore       NES       pvalue
+## HALLMARK_G2M_CHECKPOINT           HALLMARK_G2M_CHECKPOINT      HALLMARK_G2M_CHECKPOINT      92       0.5867924  3.843796 1.000000e-10
+## HALLMARK_E2F_TARGETS                 HALLMARK_E2F_TARGETS         HALLMARK_E2F_TARGETS     123       0.5335367  3.677797 1.000000e-10
+## HALLMARK_MITOTIC_SPINDLE         HALLMARK_MITOTIC_SPINDLE     HALLMARK_MITOTIC_SPINDLE      43       0.5551511  2.904063 1.117445e-08
+## HALLMARK_ALLOGRAFT_REJECTION HALLMARK_ALLOGRAFT_REJECTION HALLMARK_ALLOGRAFT_REJECTION      37      -0.4614127 -2.694340 5.450376e-06
+## HALLMARK_MTORC1_SIGNALING       HALLMARK_MTORC1_SIGNALING    HALLMARK_MTORC1_SIGNALING      36       0.4302780  2.142952 5.093555e-04
+## HALLMARK_MYC_TARGETS_V1           HALLMARK_MYC_TARGETS_V1      HALLMARK_MYC_TARGETS_V1      34       0.4340611  2.120313 9.326797e-04
+##                                  p.adjust       qvalue rank                    leading_edge
+## HALLMARK_G2M_CHECKPOINT      4.000000e-10 5.263158e-11  412  tags=83%, list=35%, signal=58%
+## HALLMARK_E2F_TARGETS         4.000000e-10 5.263158e-11  501  tags=85%, list=42%, signal=55%
+## HALLMARK_MITOTIC_SPINDLE     2.979853e-08 3.920859e-09  430  tags=84%, list=36%, signal=55%
+## HALLMARK_ALLOGRAFT_REJECTION 1.090075e-05 1.434310e-06  291  tags=68%, list=25%, signal=53%
+## HALLMARK_MTORC1_SIGNALING    8.149687e-04 1.072327e-04  612  tags=92%, list=52%, signal=45%
+## HALLMARK_MYC_TARGETS_V1      1.243573e-03 1.636280e-04  682 tags=100%, list=58%, signal=43%</code></pre>
 </div>
 <div id="dot-plot" class="section level2">
 <h2>Dot plot</h2>
@@ -782,22 +759,14 @@ displayed.</p>
 gsea_result_df %&gt;%
   # This returns the 3 rows with the largest NES values
   dplyr::slice_max(NES, n = 3)</code></pre>
-<pre><code>##                                                ID              Description
-## HALLMARK_G2M_CHECKPOINT   HALLMARK_G2M_CHECKPOINT  HALLMARK_G2M_CHECKPOINT
-## HALLMARK_E2F_TARGETS         HALLMARK_E2F_TARGETS     HALLMARK_E2F_TARGETS
-## HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE
-##                          setSize enrichmentScore      NES       pvalue
-## HALLMARK_G2M_CHECKPOINT       92       0.5867916 3.843762 1.000000e-10
-## HALLMARK_E2F_TARGETS         123       0.5335361 3.677769 1.000000e-10
-## HALLMARK_MITOTIC_SPINDLE      43       0.5551506 2.904041 1.653069e-08
-##                              p.adjust       qvalue rank
-## HALLMARK_G2M_CHECKPOINT  4.000000e-10 5.263158e-11  412
-## HALLMARK_E2F_TARGETS     4.000000e-10 5.263158e-11  501
-## HALLMARK_MITOTIC_SPINDLE 4.408185e-08 5.800243e-09  430
-##                                            leading_edge
-## HALLMARK_G2M_CHECKPOINT  tags=83%, list=35%, signal=58%
-## HALLMARK_E2F_TARGETS     tags=85%, list=42%, signal=55%
-## HALLMARK_MITOTIC_SPINDLE tags=84%, list=36%, signal=55%
+<pre><code>##                                                ID              Description setSize enrichmentScore      NES       pvalue     p.adjust
+## HALLMARK_G2M_CHECKPOINT   HALLMARK_G2M_CHECKPOINT  HALLMARK_G2M_CHECKPOINT      92       0.5867924 3.843796 1.000000e-10 4.000000e-10
+## HALLMARK_E2F_TARGETS         HALLMARK_E2F_TARGETS     HALLMARK_E2F_TARGETS     123       0.5335367 3.677797 1.000000e-10 4.000000e-10
+## HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE      43       0.5551511 2.904063 1.117445e-08 2.979853e-08
+##                                qvalue rank                   leading_edge
+## HALLMARK_G2M_CHECKPOINT  5.263158e-11  412 tags=83%, list=35%, signal=58%
+## HALLMARK_E2F_TARGETS     5.263158e-11  501 tags=85%, list=42%, signal=55%
+## HALLMARK_MITOTIC_SPINDLE 3.920859e-09  430 tags=84%, list=36%, signal=55%
 ##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               core_enrichment
 ## HALLMARK_G2M_CHECKPOINT                                                                                                                                                                                     Ttk/Rad54l/Cdkn3/Exo1/Kif4/Cdc6/Pbk/Stil/Cdk1/Ccnf/Chek1/Cdc45/Knl1/Ccna2/Mcm5/Plk1/Bub1/Birc5/Aurkb/Top2a/Bard1/Mybl2/Ube2c/Hmgb3/Nusap1/Aurka/Mki67/Tacc3/Espl1/Prc1/Mcm2/Hmmr/Kif15/Lmnb1/Mcm6/Kif11/Pole/Chaf1a/Ndc80/Cdkn2c/Fbxo5/Tpx2/Kif2c/Gins2/Racgap1/Ccnb2/Traip/Mcm3/Smc2/Nek2/Cenpe/Stmn1/Polq/Kif20b/Troap/Rpa2/Sqle/Orc6/Cenpa/Ezh2/Cdc20/Plk4/Nasp/Incenp/Cdc7/Mad2l1/Cks1b/Kpna2/Cenpf/Suv39h1/Kif23/Brca2/Prim2/Kif22/Tmpo/E2f2
 ## HALLMARK_E2F_TARGETS     Cenpm/Rrm2/Cdkn3/Kif4/Cdca3/Rad51ap1/E2f8/Asf1b/Spc24/Cdk1/Melk/Spc25/Chek1/Ccne1/Mcm5/Plk1/Gins1/Hells/Birc5/Aurkb/Top2a/Lig1/Brca1/Bard1/Mybl2/Dscc1/Hmgb3/Aurka/Mki67/Tacc3/Espl1/Cdca8/Trip13/Mcm2/Hmmr/Kif18b/Tcf19/Lmnb1/Mcm6/Pole/Cdkn2c/Kif2c/Tipin/Depdc1a/Dlgap5/Cit/Racgap1/Rad51c/Ccnb2/Spag5/Mcm3/Tk1/Ung/Cenpe/Ncapd2/Stmn1/Timeless/Mxd3/Dut/Ube2t/Mcm7/Cbx5/Rpa2/Mms22l/Wee1/Mcm4/Psmc3ip/Rfc3/Orc6/Diaph3/Cdkn2a/Ezh2/Cdc20/Hmgb2/Plk4/Dek/Atad2/Nasp/Mad2l1/Ctps/Cks1b/Kpna2/Pcna/Tubg1/Dnmt1/Suv39h1/Brca2/Prim2/Anp32e/Kif22/Tmpo/Rfc2/Ran/Ranbp1/Mthfd2/Shmt1/Dck/Bub1b/Pold2/Tubb5/Gins3/Rpa1/Cdk4/Chek2/Paics
@@ -816,26 +785,14 @@ most_positive_nes_plot</code></pre>
 <pre class="r"><code>gsea_result_df %&gt;%
   # This returns the 3 rows with the largest NES values
   dplyr::slice_min(NES, n = 3)</code></pre>
-<pre><code>##                                                            ID
-## HALLMARK_ALLOGRAFT_REJECTION     HALLMARK_ALLOGRAFT_REJECTION
-## HALLMARK_INFLAMMATORY_RESPONSE HALLMARK_INFLAMMATORY_RESPONSE
-## HALLMARK_MYC_TARGETS_V1               HALLMARK_MYC_TARGETS_V1
-##                                                   Description setSize
-## HALLMARK_ALLOGRAFT_REJECTION     HALLMARK_ALLOGRAFT_REJECTION      37
-## HALLMARK_INFLAMMATORY_RESPONSE HALLMARK_INFLAMMATORY_RESPONSE      30
-## HALLMARK_MYC_TARGETS_V1               HALLMARK_MYC_TARGETS_V1      34
-##                                enrichmentScore       NES       pvalue
-## HALLMARK_ALLOGRAFT_REJECTION        -0.4614127 -2.694386 6.317781e-06
-## HALLMARK_INFLAMMATORY_RESPONSE      -0.3417413 -1.861534 7.967521e-03
-## HALLMARK_MYC_TARGETS_V1              0.4340611  2.120300 1.078202e-03
-##                                    p.adjust       qvalue rank
-## HALLMARK_ALLOGRAFT_REJECTION   1.263556e-05 1.662574e-06  291
-## HALLMARK_INFLAMMATORY_RESPONSE 9.105738e-03 1.198123e-03  448
-## HALLMARK_MYC_TARGETS_V1        1.437603e-03 1.891582e-04  682
-##                                                   leading_edge
-## HALLMARK_ALLOGRAFT_REJECTION    tags=68%, list=25%, signal=53%
-## HALLMARK_INFLAMMATORY_RESPONSE  tags=70%, list=38%, signal=45%
-## HALLMARK_MYC_TARGETS_V1        tags=100%, list=58%, signal=43%
+<pre><code>##                                                            ID                    Description setSize enrichmentScore       NES
+## HALLMARK_ALLOGRAFT_REJECTION     HALLMARK_ALLOGRAFT_REJECTION   HALLMARK_ALLOGRAFT_REJECTION      37      -0.4614127 -2.694340
+## HALLMARK_INFLAMMATORY_RESPONSE HALLMARK_INFLAMMATORY_RESPONSE HALLMARK_INFLAMMATORY_RESPONSE      30      -0.3418102 -1.861881
+## HALLMARK_MYC_TARGETS_V1               HALLMARK_MYC_TARGETS_V1        HALLMARK_MYC_TARGETS_V1      34       0.4340611  2.120313
+##                                      pvalue     p.adjust       qvalue rank                    leading_edge
+## HALLMARK_ALLOGRAFT_REJECTION   5.450376e-06 1.090075e-05 1.434310e-06  291  tags=68%, list=25%, signal=53%
+## HALLMARK_INFLAMMATORY_RESPONSE 8.626892e-03 9.859305e-03 1.297277e-03  448  tags=70%, list=38%, signal=45%
+## HALLMARK_MYC_TARGETS_V1        9.326797e-04 1.243573e-03 1.636280e-04  682 tags=100%, list=58%, signal=43%
 ##                                                                                                                                                                                                         core_enrichment
 ## HALLMARK_ALLOGRAFT_REJECTION                                                       Zap70/Ltb/Cd28/Cd8b1/Prkcb/H2-Ob/Cd3g/Lck/Ets1/H2-DMa/Itk/Il1b/Stat4/Cd8a/Cd79a/Prf1/Cd3d/Gzmb/Gzma/Il2rb/Thy1/Ncr1/Ereg/Tgfb2/Stab1
 ## HALLMARK_INFLAMMATORY_RESPONSE                                                               Il18r1/Fpr1/Calcrl/Ccrl2/Ptafr/Sgms2/Cd69/Cd55/Kcna3/Cd14/Lck/Scarf1/Btg2/Csf3r/Abca1/Il1b/Gabbr1/Il2rb/Rasgrp1/Ereg/Stab1
@@ -860,73 +817,68 @@ most_negative_nes_plot</code></pre>
 <h2>session info</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.3.3 (2024-02-29)
-## Platform: aarch64-apple-darwin20 (64-bit)
-## Running under: macOS Sonoma 14.2.1
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.4 LTS
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
 ## 
 ## locale:
-## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
-## time zone: America/Chicago
-## tzcode source: internal
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
 ## 
 ## attached base packages:
-## [1] grid      stats     graphics  grDevices utils     datasets  methods  
-## [8] base     
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] RColorBrewer_1.1-3     ComplexHeatmap_2.18.0  ComplexUpset_1.3.3    
-##  [4] EnhancedVolcano_1.20.0 lubridate_1.9.3        forcats_1.0.0         
-##  [7] stringr_1.5.1          purrr_1.0.2            readr_2.1.5           
-## [10] tidyr_1.3.1            tibble_3.2.1           tidyverse_2.0.0       
-## [13] dplyr_1.1.4            ggrepel_0.9.5          ggplot2_3.5.1         
-## [16] magrittr_2.0.3         msigdbr_7.5.1          clusterProfiler_4.10.1
+##  [1] msigdbr_7.5.1               clusterProfiler_4.10.1      gprofiler2_0.2.3            ComplexUpset_1.3.3         
+##  [5] EnhancedVolcano_1.20.0      RColorBrewer_1.1-3          ComplexHeatmap_2.18.0       lubridate_1.9.3            
+##  [9] forcats_1.0.0               stringr_1.5.1               purrr_1.0.2                 readr_2.1.5                
+## [13] tidyr_1.3.1                 tibble_3.2.1                tidyverse_2.0.0             dplyr_1.1.4                
+## [17] ggrepel_0.9.5               ggplot2_3.5.0               magrittr_2.0.3              biomaRt_2.58.2             
+## [21] vsn_3.70.0                  Glimma_2.12.0               DESeq2_1.42.1               SummarizedExperiment_1.32.0
+## [25] Biobase_2.62.0              MatrixGenerics_1.14.0       matrixStats_1.3.0           GenomicRanges_1.54.1       
+## [29] GenomeInfoDb_1.38.8         IRanges_2.36.0              S4Vectors_0.40.2            BiocGenerics_0.48.1        
+## [33] tximport_1.30.0            
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] shape_1.4.6.1           rstudioapi_0.16.0       jsonlite_1.8.8         
-##   [4] farver_2.1.2            rmarkdown_2.27          GlobalOptions_0.1.2    
-##   [7] fs_1.6.4                zlibbioc_1.48.2         vctrs_0.6.5            
-##  [10] memoise_2.0.1           RCurl_1.98-1.14         ggtree_3.10.1          
-##  [13] htmltools_0.5.8.1       gridGraphics_0.5-1      sass_0.4.9             
-##  [16] bslib_0.7.0             plyr_1.8.9              cachem_1.1.0           
-##  [19] igraph_2.0.3            iterators_1.0.14        lifecycle_1.0.4        
-##  [22] pkgconfig_2.0.3         Matrix_1.6-5            R6_2.5.1               
-##  [25] fastmap_1.2.0           gson_0.1.0              clue_0.3-65            
-##  [28] GenomeInfoDbData_1.2.11 digest_0.6.36           aplot_0.2.3            
-##  [31] enrichplot_1.22.0       ggnewscale_0.4.10       colorspace_2.1-0       
-##  [34] patchwork_1.2.0         AnnotationDbi_1.64.1    S4Vectors_0.40.2       
-##  [37] RSQLite_2.3.7           labeling_0.4.3          fansi_1.0.6            
-##  [40] timechange_0.3.0        httr_1.4.7              polyclip_1.10-6        
-##  [43] compiler_4.3.3          bit64_4.0.5             withr_3.0.0            
-##  [46] doParallel_1.0.17       BiocParallel_1.36.0     viridis_0.6.5          
-##  [49] DBI_1.2.3               highr_0.11              ggforce_0.4.2          
-##  [52] MASS_7.3-60.0.1         rjson_0.2.21            HDO.db_0.99.1          
-##  [55] tools_4.3.3             ape_5.8                 scatterpie_0.2.3       
-##  [58] glue_1.7.0              nlme_3.1-165            GOSemSim_2.28.1        
-##  [61] shadowtext_0.1.3        cluster_2.1.6           reshape2_1.4.4         
-##  [64] fgsea_1.28.0            generics_0.1.3          gtable_0.3.5           
-##  [67] tzdb_0.4.0              data.table_1.15.4       hms_1.1.3              
-##  [70] tidygraph_1.3.1         utf8_1.2.4              XVector_0.42.0         
-##  [73] BiocGenerics_0.48.1     foreach_1.5.2           pillar_1.9.0           
-##  [76] yulab.utils_0.1.4       babelgene_22.9          circlize_0.4.16        
-##  [79] splines_4.3.3           tweenr_2.0.3            treeio_1.26.0          
-##  [82] lattice_0.22-6          bit_4.0.5               tidyselect_1.2.1       
-##  [85] GO.db_3.18.0            Biostrings_2.70.3       knitr_1.47             
-##  [88] gridExtra_2.3           IRanges_2.36.0          stats4_4.3.3           
-##  [91] xfun_0.45               graphlayouts_1.1.1      Biobase_2.62.0         
-##  [94] matrixStats_1.3.0       stringi_1.8.4           lazyeval_0.2.2         
-##  [97] ggfun_0.1.5             yaml_2.3.8              evaluate_0.24.0        
-## [100] codetools_0.2-20        ggraph_2.2.1            qvalue_2.34.0          
-## [103] ggplotify_0.1.2         cli_3.6.3               munsell_0.5.1          
-## [106] jquerylib_0.1.4         Rcpp_1.0.12             GenomeInfoDb_1.38.8    
-## [109] png_0.1-8               parallel_4.3.3          blob_1.2.4             
-## [112] DOSE_3.28.2             bitops_1.0-7            viridisLite_0.4.2      
-## [115] tidytree_0.4.6          ggridges_0.5.6          scales_1.3.0           
-## [118] crayon_1.5.3            GetoptLong_1.0.5        rlang_1.1.4            
-## [121] cowplot_1.1.3           fastmatch_1.1-4         KEGGREST_1.42.0</code></pre>
+##   [1] splines_4.3.3           later_1.3.2             ggplotify_0.1.2         bitops_1.0-7            filelock_1.0.3         
+##   [6] polyclip_1.10-6         preprocessCore_1.64.0   XML_3.99-0.16.1         lifecycle_1.0.4         edgeR_4.0.16           
+##  [11] doParallel_1.0.17       lattice_0.22-6          vroom_1.6.5             MASS_7.3-60.0.1         crosstalk_1.2.1        
+##  [16] limma_3.58.1            plotly_4.10.4           sass_0.4.9              rmarkdown_2.26          jquerylib_0.1.4        
+##  [21] yaml_2.3.8              httpuv_1.6.15           cowplot_1.1.3           DBI_1.2.2               abind_1.4-5            
+##  [26] zlibbioc_1.48.2         ggraph_2.2.1            RCurl_1.98-1.14         yulab.utils_0.1.4       tweenr_2.0.3           
+##  [31] rappdirs_0.3.3          circlize_0.4.16         GenomeInfoDbData_1.2.11 enrichplot_1.22.0       tidytree_0.4.6         
+##  [36] codetools_0.2-20        DelayedArray_0.28.0     ggforce_0.4.2           DOSE_3.28.2             xml2_1.3.6             
+##  [41] tidyselect_1.2.1        shape_1.4.6.1           aplot_0.2.2             farver_2.1.1            viridis_0.6.5          
+##  [46] BiocFileCache_2.10.2    jsonlite_1.8.8          GetoptLong_1.0.5        tidygraph_1.3.1         ggridges_0.5.6         
+##  [51] iterators_1.0.14        bbmle_1.0.25.1          foreach_1.5.2           ggnewscale_0.4.10       tools_4.3.3            
+##  [56] progress_1.2.3          treeio_1.26.0           Rcpp_1.0.12             glue_1.7.0              gridExtra_2.3          
+##  [61] SparseArray_1.2.4       xfun_0.43               qvalue_2.34.0           withr_3.0.0             numDeriv_2016.8-1.1    
+##  [66] BiocManager_1.30.22     fastmap_1.1.1           fansi_1.0.6             digest_0.6.35           gridGraphics_0.5-1     
+##  [71] timechange_0.3.0        R6_2.5.1                mime_0.12               colorspace_2.1-0        GO.db_3.18.0           
+##  [76] RSQLite_2.3.6           utf8_1.2.4              generics_0.1.3          hexbin_1.28.3           data.table_1.15.4      
+##  [81] graphlayouts_1.1.1      prettyunits_1.2.0       httr_1.4.7              htmlwidgets_1.6.4       S4Arrays_1.2.1         
+##  [86] scatterpie_0.2.2        pkgconfig_2.0.3         gtable_0.3.5            blob_1.2.4              XVector_0.42.0         
+##  [91] shadowtext_0.1.3        htmltools_0.5.8.1       fgsea_1.28.0            clue_0.3-65             scales_1.3.0           
+##  [96] png_0.1-8               ggfun_0.1.4             knitr_1.46              rstudioapi_0.16.0       reshape2_1.4.4         
+## [101] tzdb_0.4.0              rjson_0.2.21            nlme_3.1-164            coda_0.19-4.1           curl_5.2.1             
+## [106] bdsmatrix_1.3-7         cachem_1.0.8            GlobalOptions_0.1.2     parallel_4.3.3          HDO.db_0.99.1          
+## [111] AnnotationDbi_1.64.1    apeglm_1.24.0           pillar_1.9.0            vctrs_0.6.5             promises_1.3.0         
+## [116] dbplyr_2.5.0            xtable_1.8-4            cluster_2.1.6           evaluate_0.23           mvtnorm_1.2-4          
+## [121] cli_3.6.2               locfit_1.5-9.9          compiler_4.3.3          rlang_1.1.3             crayon_1.5.2           
+## [126] labeling_0.4.3          emdbook_1.3.13          affy_1.80.0             plyr_1.8.9              fs_1.6.3               
+## [131] stringi_1.8.3           viridisLite_0.4.2       BiocParallel_1.36.0     babelgene_22.9          munsell_0.5.1          
+## [136] Biostrings_2.70.3       lazyeval_0.2.2          GOSemSim_2.28.1         Matrix_1.6-5            hms_1.1.3              
+## [141] patchwork_1.2.0         bit64_4.0.5             KEGGREST_1.42.0         statmod_1.5.0           shiny_1.8.1.1          
+## [146] highr_0.10              fontawesome_0.5.2       igraph_2.0.3            memoise_2.0.1           affyio_1.72.0          
+## [151] bslib_0.7.0             ggtree_3.10.1           fastmatch_1.1-4         bit_4.0.5               gson_0.1.0             
+## [156] ape_5.8</code></pre>
 </div>
 </div>
 
