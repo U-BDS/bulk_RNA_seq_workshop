@@ -72,6 +72,8 @@ contributed to Docker container creation and tertiary analysis materials
 (including DEG analysis, GSEA, GO, visualization etc.). 
 L.I. supervised all work, reviewed all content and managed website design and deployment.
 
+Nilesh Kumar, PhD and Luke Potter, PhD also provided additional edits and revisions to source material.
+
 ## Additional credits
 
 In addition to U-BDS's best practices and code written by U-BDS, sections of the
@@ -81,7 +83,7 @@ curators and maintainers of all of these resources for their wonderful contribut
 compiling the best practices, and easy to follow training guides for beginners):
 
 * Beta phase of carpentries material: <https://carpentries-incubator.github.io/bioc-rnaseq/index.html>
-* Love MI, Huber W, Anders S (2014). “Moderated estimation of fold change and dispersion for RNA-Seq data with DESeq2.” Genome Biology, 15, 550. doi:10.1186/s13059-014-0550-8 ; vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html>
+* Love MI, Huber W, Anders S (2014). “Moderated estimation of fold change and dispersion for RNA-Seq data with DESeq2.” Genome Biology, 15, 550. <https://doi.org/10.1186/s13059-014-0550-8> ; vignette: <https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html>
 * Additional references and materials: 
   * <https://alexslemonade.github.io/refinebio-examples/03-rnaseq/00-intro-to-rnaseq.html>
   * <https://bioc.ism.ac.jp/packages/3.7/bioc/vignettes/enrichplot/inst/doc/enrichplot.html>

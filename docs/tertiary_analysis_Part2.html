@@ -14,7 +14,7 @@
 
 <title>RNA-Seq Tertiary Analysis: Part 2</title>
 
-<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -568,32 +568,19 @@ Transplant_vs_Naive</code></pre>
 <pre><code>## log2 fold change (MAP): Condition Transplant vs Naive 
 ## Wald test p-value: Condition Transplant vs Naive 
 ## DataFrame with 15486 rows and 5 columns
-##                         baseMean log2FoldChange     lfcSE      pvalue
-##                        &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;   &lt;numeric&gt;
-## ENSMUSG00000000001.5  3992.86278     0.00063763 0.0559028 9.92683e-01
-## ENSMUSG00000000028.16  584.56681     2.40697733 0.1753700 5.17428e-44
-## ENSMUSG00000000037.18    7.49848    -0.13626169 0.3776449 4.39381e-01
-## ENSMUSG00000000056.8   366.29757     0.33061464 0.1533012 1.96559e-02
-## ENSMUSG00000000058.7  2117.12191    -0.13734295 0.0768850 6.85395e-02
-## ...                          ...            ...       ...         ...
-## ENSMUSG00002076377.1    118.0144     1.19874095  0.478207 0.000935118
-## ENSMUSG00002076457.1     12.1973    -0.05208992  0.359533 0.761654504
-## ENSMUSG00002076463.1     52.4421     0.29617535  0.262898 0.154408446
-## ENSMUSG00002076763.1     18.2897    -0.00998566  0.317344 0.958042773
-## ENSMUSG00002076916.1     48.3010     0.05373479  0.278437 0.793762229
-##                              padj
-##                         &lt;numeric&gt;
-## ENSMUSG00000000001.5  9.95285e-01
-## ENSMUSG00000000028.16 3.72959e-42
-## ENSMUSG00000000037.18 5.86031e-01
-## ENSMUSG00000000056.8  4.91078e-02
-## ENSMUSG00000000058.7  1.38344e-01
-## ...                           ...
-## ENSMUSG00002076377.1   0.00338278
-## ENSMUSG00002076457.1   0.84851370
-## ENSMUSG00002076463.1   0.26704230
-## ENSMUSG00002076763.1   0.97478956
-## ENSMUSG00002076916.1   0.86958682</code></pre>
+##                         baseMean log2FoldChange     lfcSE      pvalue        padj
+##                        &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;   &lt;numeric&gt;   &lt;numeric&gt;
+## ENSMUSG00000000001.5  3992.86278     0.00063763 0.0559028 9.92683e-01 9.95285e-01
+## ENSMUSG00000000028.16  584.56681     2.40697733 0.1753700 5.17428e-44 3.72959e-42
+## ENSMUSG00000000037.18    7.49848    -0.13626169 0.3776449 4.39381e-01 5.86031e-01
+## ENSMUSG00000000056.8   366.29757     0.33061464 0.1533012 1.96559e-02 4.91078e-02
+## ENSMUSG00000000058.7  2117.12191    -0.13734295 0.0768850 6.85395e-02 1.38344e-01
+## ...                          ...            ...       ...         ...         ...
+## ENSMUSG00002076377.1    118.0144     1.19874095  0.478207 0.000935118  0.00338278
+## ENSMUSG00002076457.1     12.1973    -0.05208992  0.359533 0.761654504  0.84851370
+## ENSMUSG00002076463.1     52.4421     0.29617535  0.262898 0.154408446  0.26704230
+## ENSMUSG00002076763.1     18.2897    -0.00998566  0.317344 0.958042773  0.97478956
+## ENSMUSG00002076916.1     48.3010     0.05373479  0.278437 0.793762229  0.86958682</code></pre>
 </div>
 </div>
 <div id="explore-the-deseq2-result" class="section level1">
@@ -710,22 +697,14 @@ head(Transplant_vs_Naive)</code></pre>
 <pre><code>## log2 fold change (MAP): Condition Transplant vs Naive 
 ## Wald test p-value: Condition Transplant vs Naive 
 ## DataFrame with 6 rows and 5 columns
-##                        baseMean log2FoldChange     lfcSE       pvalue
-##                       &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;    &lt;numeric&gt;
-## ENSMUSG00000020649.12   3044.32        2.64171 0.0792717 1.64953e-244
-## ENSMUSG00000040204.7    2289.67        3.06535 0.1037299 4.37636e-193
-## ENSMUSG00000027342.15   6740.49        1.49248 0.0515139 1.42499e-185
-## ENSMUSG00000020914.18   7125.77        2.30060 0.0856849 5.38773e-160
-## ENSMUSG00000005470.9    1164.67        2.47450 0.0951897 5.21848e-150
-## ENSMUSG00000006678.7    1092.42        1.78528 0.0687794 1.26120e-149
-##                               padj
-##                          &lt;numeric&gt;
-## ENSMUSG00000020649.12 2.54441e-240
-## ENSMUSG00000040204.7  3.37526e-189
-## ENSMUSG00000027342.15 7.32683e-182
-## ENSMUSG00000020914.18 2.07764e-156
-## ENSMUSG00000005470.9  1.60990e-146
-## ENSMUSG00000006678.7  3.24234e-146</code></pre>
+##                        baseMean log2FoldChange     lfcSE       pvalue         padj
+##                       &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;    &lt;numeric&gt;    &lt;numeric&gt;
+## ENSMUSG00000020649.12   3044.32        2.64171 0.0792717 1.64953e-244 2.54441e-240
+## ENSMUSG00000040204.7    2289.67        3.06535 0.1037299 4.37636e-193 3.37526e-189
+## ENSMUSG00000027342.15   6740.49        1.49248 0.0515139 1.42499e-185 7.32684e-182
+## ENSMUSG00000020914.18   7125.77        2.30101 0.0856891 5.38773e-160 2.07764e-156
+## ENSMUSG00000005470.9    1164.67        2.47450 0.0951897 5.21848e-150 1.60990e-146
+## ENSMUSG00000006678.7    1092.42        1.78528 0.0687794 1.26120e-149 3.24234e-146</code></pre>
 </div>
 </div>
 <div id="make-annotation-object" class="section level1">
@@ -746,50 +725,28 @@ package to fetch the annotations.</p>
 ensure we select the correct one for our data:</p>
 <pre class="r"><code># check available urls (current and archives):
 listEnsemblArchives()</code></pre>
-<pre><code>##              name     date                                 url version
-## 1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37
-## 2     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112
-## 3     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111
-## 4     Ensembl 110 Jul 2023 https://jul2023.archive.ensembl.org     110
-## 5     Ensembl 109 Feb 2023 https://feb2023.archive.ensembl.org     109
-## 6     Ensembl 108 Oct 2022 https://oct2022.archive.ensembl.org     108
-## 7     Ensembl 107 Jul 2022 https://jul2022.archive.ensembl.org     107
-## 8     Ensembl 106 Apr 2022 https://apr2022.archive.ensembl.org     106
-## 9     Ensembl 105 Dec 2021 https://dec2021.archive.ensembl.org     105
-## 10    Ensembl 104 May 2021 https://may2021.archive.ensembl.org     104
-## 11    Ensembl 103 Feb 2021 https://feb2021.archive.ensembl.org     103
-## 12    Ensembl 102 Nov 2020 https://nov2020.archive.ensembl.org     102
-## 13    Ensembl 101 Aug 2020 https://aug2020.archive.ensembl.org     101
-## 14    Ensembl 100 Apr 2020 https://apr2020.archive.ensembl.org     100
-## 15     Ensembl 99 Jan 2020 https://jan2020.archive.ensembl.org      99
-## 16     Ensembl 98 Sep 2019 https://sep2019.archive.ensembl.org      98
-## 17     Ensembl 97 Jul 2019 https://jul2019.archive.ensembl.org      97
-## 18     Ensembl 80 May 2015 https://may2015.archive.ensembl.org      80
-## 19     Ensembl 77 Oct 2014 https://oct2014.archive.ensembl.org      77
-## 20     Ensembl 75 Feb 2014 https://feb2014.archive.ensembl.org      75
-## 21     Ensembl 54 May 2009 https://may2009.archive.ensembl.org      54
-##    current_release
-## 1                 
-## 2                *
-## 3                 
-## 4                 
-## 5                 
-## 6                 
-## 7                 
-## 8                 
-## 9                 
-## 10                
-## 11                
-## 12                
-## 13                
-## 14                
-## 15                
-## 16                
-## 17                
-## 18                
-## 19                
-## 20                
-## 21</code></pre>
+<pre><code>##              name     date                                 url version current_release
+## 1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37                
+## 2     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112               *
+## 3     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111                
+## 4     Ensembl 110 Jul 2023 https://jul2023.archive.ensembl.org     110                
+## 5     Ensembl 109 Feb 2023 https://feb2023.archive.ensembl.org     109                
+## 6     Ensembl 108 Oct 2022 https://oct2022.archive.ensembl.org     108                
+## 7     Ensembl 107 Jul 2022 https://jul2022.archive.ensembl.org     107                
+## 8     Ensembl 106 Apr 2022 https://apr2022.archive.ensembl.org     106                
+## 9     Ensembl 105 Dec 2021 https://dec2021.archive.ensembl.org     105                
+## 10    Ensembl 104 May 2021 https://may2021.archive.ensembl.org     104                
+## 11    Ensembl 103 Feb 2021 https://feb2021.archive.ensembl.org     103                
+## 12    Ensembl 102 Nov 2020 https://nov2020.archive.ensembl.org     102                
+## 13    Ensembl 101 Aug 2020 https://aug2020.archive.ensembl.org     101                
+## 14    Ensembl 100 Apr 2020 https://apr2020.archive.ensembl.org     100                
+## 15     Ensembl 99 Jan 2020 https://jan2020.archive.ensembl.org      99                
+## 16     Ensembl 98 Sep 2019 https://sep2019.archive.ensembl.org      98                
+## 17     Ensembl 97 Jul 2019 https://jul2019.archive.ensembl.org      97                
+## 18     Ensembl 80 May 2015 https://may2015.archive.ensembl.org      80                
+## 19     Ensembl 77 Oct 2014 https://oct2014.archive.ensembl.org      77                
+## 20     Ensembl 75 Feb 2014 https://feb2014.archive.ensembl.org      75                
+## 21     Ensembl 54 May 2009 https://may2009.archive.ensembl.org      54</code></pre>
 <p>We can see from the output above, that the url matching the Ensembl
 109 version is <code>https://feb2023.archive.ensembl.org</code>. Thus,
 we set the hosting url below to this specific version.</p>
@@ -829,16 +786,25 @@ gene_ids &lt;- rownames(txi$counts)
 gene_ids &lt;- gsub(&quot;\\.[0-9]+&quot;,&quot;&quot;,gene_ids) 
 
 head(gene_ids)</code></pre>
-<pre><code>## [1] &quot;ENSMUSG00000000001&quot; &quot;ENSMUSG00000000003&quot; &quot;ENSMUSG00000000028&quot;
-## [4] &quot;ENSMUSG00000000031&quot; &quot;ENSMUSG00000000037&quot; &quot;ENSMUSG00000000049&quot;</code></pre>
+<pre><code>## [1] &quot;ENSMUSG00000000001&quot; &quot;ENSMUSG00000000003&quot; &quot;ENSMUSG00000000028&quot; &quot;ENSMUSG00000000031&quot; &quot;ENSMUSG00000000037&quot; &quot;ENSMUSG00000000049&quot;</code></pre>
 <pre class="r"><code># fetch annotations
 genemap &lt;- getBM(attributes = attributes_to_add,
                  filters = &quot;ensembl_gene_id&quot;,
                  values = gene_ids,
                  mart = ensembl,
-                 useCache = FALSE)
-
-head(genemap)</code></pre>
+                 useCache = FALSE)</code></pre>
+<pre><code>## Batch submitting query [======&gt;-------------------------------------------------------------------------------] 8% eta: 14sBatch
+## submitting query [=============&gt;------------------------------------------------------------------------] 17% eta: 11sBatch submitting
+## query [=====================&gt;----------------------------------------------------------------] 25% eta: 9sBatch submitting query
+## [============================&gt;---------------------------------------------------------] 33% eta: 8sBatch submitting query
+## [===================================&gt;--------------------------------------------------] 42% eta: 7sBatch submitting query
+## [==========================================&gt;-------------------------------------------] 50% eta: 6sBatch submitting query
+## [=================================================&gt;------------------------------------] 58% eta: 5sBatch submitting query
+## [========================================================&gt;-----------------------------] 67% eta: 4sBatch submitting query
+## [===============================================================&gt;----------------------] 75% eta: 3sBatch submitting query
+## [=======================================================================&gt;--------------] 83% eta: 2sBatch submitting query
+## [==============================================================================&gt;-------] 92% eta: 1s</code></pre>
+<pre class="r"><code>head(genemap)</code></pre>
 <pre><code>##      ensembl_gene_id external_gene_name   gene_biotype
 ## 1 ENSMUSG00000000001              Gnai3 protein_coding
 ## 2 ENSMUSG00000000003               Pbsn protein_coding
@@ -846,20 +812,20 @@ head(genemap)</code></pre>
 ## 4 ENSMUSG00000000031                H19         lncRNA
 ## 5 ENSMUSG00000000037              Scml2 protein_coding
 ## 6 ENSMUSG00000000049               Apoh protein_coding
-##                                                                                            description
-## 1 guanine nucleotide binding protein (G protein), alpha inhibiting 3 [Source:MGI Symbol;Acc:MGI:95773]
-## 2                                                         probasin [Source:MGI Symbol;Acc:MGI:1860484]
-## 3                                           cell division cycle 45 [Source:MGI Symbol;Acc:MGI:1338073]
-## 4                     H19, imprinted maternally expressed transcript [Source:MGI Symbol;Acc:MGI:95891]
-## 5                                Scm polycomb group protein like 2 [Source:MGI Symbol;Acc:MGI:1340042]
-## 6                                                   apolipoprotein H [Source:MGI Symbol;Acc:MGI:88058]
-##   chromosome_name start_position end_position strand
-## 1               3      108014596    108053462     -1
-## 2               X       76881507     76897229     -1
-## 3              16       18599197     18630737     -1
-## 4               7      142129262    142131886     -1
-## 5               X      159865521    160041209      1
-## 6              11      108234180    108305222      1</code></pre>
+##                                                                                            description chromosome_name start_position
+## 1 guanine nucleotide binding protein (G protein), alpha inhibiting 3 [Source:MGI Symbol;Acc:MGI:95773]               3      108014596
+## 2                                                         probasin [Source:MGI Symbol;Acc:MGI:1860484]               X       76881507
+## 3                                           cell division cycle 45 [Source:MGI Symbol;Acc:MGI:1338073]              16       18599197
+## 4                     H19, imprinted maternally expressed transcript [Source:MGI Symbol;Acc:MGI:95891]               7      142129262
+## 5                                Scm polycomb group protein like 2 [Source:MGI Symbol;Acc:MGI:1340042]               X      159865521
+## 6                                                   apolipoprotein H [Source:MGI Symbol;Acc:MGI:88058]              11      108234180
+##   end_position strand
+## 1    108053462     -1
+## 2     76897229     -1
+## 3     18630737     -1
+## 4    142131886     -1
+## 5    160041209      1
+## 6    108305222      1</code></pre>
 <pre class="r"><code>nrow(genemap)</code></pre>
 <pre><code>## [1] 55891</code></pre>
 <pre class="r"><code>length(gene_ids) == nrow(genemap)</code></pre>
@@ -888,30 +854,18 @@ Transplant_vs_Naive_annotated &lt;- dplyr::left_join(x = as.data.frame(Transplan
 # add Ensembl IDs as row names:
 rownames(Transplant_vs_Naive_annotated) &lt;- Transplant_vs_Naive_annotated$ensembl_gene_id
 head(Transplant_vs_Naive_annotated, 5)</code></pre>
-<pre><code>##                    baseMean log2FoldChange      lfcSE        pvalue
-## ENSMUSG00000020649 3044.320       2.641712 0.07927173 1.649533e-244
-## ENSMUSG00000040204 2289.666       3.065352 0.10372992 4.376356e-193
-## ENSMUSG00000027342 6740.487       1.492478 0.05151393 1.424992e-185
-## ENSMUSG00000020914 7125.770       2.300601 0.08568489 5.387733e-160
-## ENSMUSG00000005470 1164.674       2.474504 0.09518970 5.218481e-150
-##                             padj ensembl_gene_id_version    ensembl_gene_id
-## ENSMUSG00000020649 2.544405e-240   ENSMUSG00000020649.12 ENSMUSG00000020649
-## ENSMUSG00000040204 3.375265e-189    ENSMUSG00000040204.7 ENSMUSG00000040204
-## ENSMUSG00000027342 7.326835e-182   ENSMUSG00000027342.15 ENSMUSG00000027342
-## ENSMUSG00000020914 2.077645e-156   ENSMUSG00000020914.18 ENSMUSG00000020914
-## ENSMUSG00000005470 1.609901e-146    ENSMUSG00000005470.9 ENSMUSG00000005470
-##                    external_gene_name   gene_biotype
-## ENSMUSG00000020649               Rrm2 protein_coding
-## ENSMUSG00000040204              Pclaf protein_coding
-## ENSMUSG00000027342               Pcna protein_coding
-## ENSMUSG00000020914              Top2a protein_coding
-## ENSMUSG00000005470              Asf1b protein_coding
-##                                                                                         description
-## ENSMUSG00000020649                    ribonucleotide reductase M2 [Source:MGI Symbol;Acc:MGI:98181]
-## ENSMUSG00000040204                 PCNA clamp associated factor [Source:MGI Symbol;Acc:MGI:1915276]
-## ENSMUSG00000027342             proliferating cell nuclear antigen [Source:MGI Symbol;Acc:MGI:97503]
-## ENSMUSG00000020914                   topoisomerase (DNA) II alpha [Source:MGI Symbol;Acc:MGI:98790]
-## ENSMUSG00000005470 anti-silencing function 1B histone chaperone [Source:MGI Symbol;Acc:MGI:1914179]
+<pre><code>##                    baseMean log2FoldChange      lfcSE        pvalue          padj ensembl_gene_id_version    ensembl_gene_id
+## ENSMUSG00000020649 3044.320       2.641712 0.07927173 1.649533e-244 2.544405e-240   ENSMUSG00000020649.12 ENSMUSG00000020649
+## ENSMUSG00000040204 2289.666       3.065352 0.10372992 4.376356e-193 3.375265e-189    ENSMUSG00000040204.7 ENSMUSG00000040204
+## ENSMUSG00000027342 6740.487       1.492478 0.05151393 1.424992e-185 7.326835e-182   ENSMUSG00000027342.15 ENSMUSG00000027342
+## ENSMUSG00000020914 7125.770       2.301005 0.08568914 5.387733e-160 2.077644e-156   ENSMUSG00000020914.18 ENSMUSG00000020914
+## ENSMUSG00000005470 1164.674       2.474504 0.09518970 5.218481e-150 1.609901e-146    ENSMUSG00000005470.9 ENSMUSG00000005470
+##                    external_gene_name   gene_biotype                                                                      description
+## ENSMUSG00000020649               Rrm2 protein_coding                    ribonucleotide reductase M2 [Source:MGI Symbol;Acc:MGI:98181]
+## ENSMUSG00000040204              Pclaf protein_coding                 PCNA clamp associated factor [Source:MGI Symbol;Acc:MGI:1915276]
+## ENSMUSG00000027342               Pcna protein_coding             proliferating cell nuclear antigen [Source:MGI Symbol;Acc:MGI:97503]
+## ENSMUSG00000020914              Top2a protein_coding                   topoisomerase (DNA) II alpha [Source:MGI Symbol;Acc:MGI:98790]
+## ENSMUSG00000005470              Asf1b protein_coding anti-silencing function 1B histone chaperone [Source:MGI Symbol;Acc:MGI:1914179]
 ##                    chromosome_name start_position end_position strand
 ## ENSMUSG00000020649              12       24758240     24764145      1
 ## ENSMUSG00000040204               9       65797519     65810548      1
@@ -1187,77 +1141,57 @@ glMDPlot(Transplant_vs_Naive,
 <h2>session info</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.3.3 (2024-02-29)
-## Platform: aarch64-apple-darwin20 (64-bit)
-## Running under: macOS Sonoma 14.2.1
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.4 LTS
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
 ## 
 ## locale:
-## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
-## time zone: America/Chicago
-## tzcode source: internal
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
 ## 
 ## attached base packages:
-## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
-## [8] methods   base     
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] RColorBrewer_1.1-3          ComplexHeatmap_2.18.0      
-##  [3] ComplexUpset_1.3.3          EnhancedVolcano_1.20.0     
-##  [5] lubridate_1.9.3             forcats_1.0.0              
-##  [7] stringr_1.5.1               purrr_1.0.2                
-##  [9] readr_2.1.5                 tidyr_1.3.1                
-## [11] tibble_3.2.1                tidyverse_2.0.0            
-## [13] dplyr_1.1.4                 ggrepel_0.9.5              
-## [15] ggplot2_3.5.1               magrittr_2.0.3             
-## [17] biomaRt_2.58.2              vsn_3.70.0                 
-## [19] Glimma_2.12.0               DESeq2_1.42.1              
-## [21] SummarizedExperiment_1.32.0 Biobase_2.62.0             
-## [23] MatrixGenerics_1.14.0       matrixStats_1.3.0          
-## [25] GenomicRanges_1.54.1        GenomeInfoDb_1.38.8        
-## [27] IRanges_2.36.0              S4Vectors_0.40.2           
+##  [1] ComplexUpset_1.3.3          EnhancedVolcano_1.20.0      RColorBrewer_1.1-3          ComplexHeatmap_2.18.0      
+##  [5] lubridate_1.9.3             forcats_1.0.0               stringr_1.5.1               purrr_1.0.2                
+##  [9] readr_2.1.5                 tidyr_1.3.1                 tibble_3.2.1                tidyverse_2.0.0            
+## [13] dplyr_1.1.4                 ggrepel_0.9.5               ggplot2_3.5.0               magrittr_2.0.3             
+## [17] biomaRt_2.58.2              vsn_3.70.0                  Glimma_2.12.0               DESeq2_1.42.1              
+## [21] SummarizedExperiment_1.32.0 Biobase_2.62.0              MatrixGenerics_1.14.0       matrixStats_1.3.0          
+## [25] GenomicRanges_1.54.1        GenomeInfoDb_1.38.8         IRanges_2.36.0              S4Vectors_0.40.2           
 ## [29] BiocGenerics_0.48.1         tximport_1.30.0            
 ## 
 ## loaded via a namespace (and not attached):
-##   [1] rstudioapi_0.16.0       jsonlite_1.8.8          shape_1.4.6.1          
-##   [4] magick_2.8.3            farver_2.1.2            rmarkdown_2.27         
-##   [7] GlobalOptions_0.1.2     zlibbioc_1.48.2         vctrs_0.6.5            
-##  [10] memoise_2.0.1           RCurl_1.98-1.14         htmltools_0.5.8.1      
-##  [13] S4Arrays_1.2.1          progress_1.2.3          curl_5.2.1             
-##  [16] SparseArray_1.2.4       sass_0.4.9              bslib_0.7.0            
-##  [19] htmlwidgets_1.6.4       plyr_1.8.9              cachem_1.1.0           
-##  [22] lifecycle_1.0.4         iterators_1.0.14        pkgconfig_2.0.3        
-##  [25] Matrix_1.6-5            R6_2.5.1                fastmap_1.2.0          
-##  [28] GenomeInfoDbData_1.2.11 clue_0.3-65             numDeriv_2016.8-1.1    
-##  [31] digest_0.6.36           colorspace_2.1-0        patchwork_1.2.0        
-##  [34] AnnotationDbi_1.64.1    RSQLite_2.3.7           labeling_0.4.3         
-##  [37] filelock_1.0.3          fansi_1.0.6             timechange_0.3.0       
-##  [40] httr_1.4.7              abind_1.4-5             compiler_4.3.3         
-##  [43] bit64_4.0.5             withr_3.0.0             doParallel_1.0.17      
-##  [46] BiocParallel_1.36.0     DBI_1.2.3               highr_0.11             
-##  [49] MASS_7.3-60.0.1         rappdirs_0.3.3          DelayedArray_0.28.0    
-##  [52] rjson_0.2.21            tools_4.3.3             glue_1.7.0             
-##  [55] cluster_2.1.6           generics_0.1.3          gtable_0.3.5           
-##  [58] tzdb_0.4.0              preprocessCore_1.64.0   hms_1.1.3              
-##  [61] xml2_1.3.6              utf8_1.2.4              XVector_0.42.0         
-##  [64] foreach_1.5.2           pillar_1.9.0            emdbook_1.3.13         
-##  [67] limma_3.58.1            circlize_0.4.16         BiocFileCache_2.10.2   
-##  [70] lattice_0.22-6          bit_4.0.5               tidyselect_1.2.1       
-##  [73] locfit_1.5-9.10         Biostrings_2.70.3       knitr_1.47             
-##  [76] edgeR_4.0.16            xfun_0.45               statmod_1.5.0          
-##  [79] stringi_1.8.4           yaml_2.3.8              evaluate_0.24.0        
-##  [82] codetools_0.2-20        bbmle_1.0.25.1          BiocManager_1.30.23    
-##  [85] cli_3.6.3               affyio_1.72.0           munsell_0.5.1          
-##  [88] jquerylib_0.1.4         Rcpp_1.0.12             dbplyr_2.5.0           
-##  [91] coda_0.19-4.1           png_0.1-8               bdsmatrix_1.3-7        
-##  [94] XML_3.99-0.16.1         parallel_4.3.3          blob_1.2.4             
-##  [97] prettyunits_1.2.0       bitops_1.0-7            mvtnorm_1.2-5          
-## [100] apeglm_1.24.0           scales_1.3.0            affy_1.80.0            
-## [103] crayon_1.5.3            GetoptLong_1.0.5        rlang_1.1.4            
-## [106] KEGGREST_1.42.0</code></pre>
+##   [1] rstudioapi_0.16.0       jsonlite_1.8.8          shape_1.4.6.1           farver_2.1.1            rmarkdown_2.26         
+##   [6] GlobalOptions_0.1.2     zlibbioc_1.48.2         vctrs_0.6.5             memoise_2.0.1           RCurl_1.98-1.14        
+##  [11] htmltools_0.5.8.1       S4Arrays_1.2.1          progress_1.2.3          curl_5.2.1              SparseArray_1.2.4      
+##  [16] sass_0.4.9              bslib_0.7.0             htmlwidgets_1.6.4       fontawesome_0.5.2       plyr_1.8.9             
+##  [21] cachem_1.0.8            lifecycle_1.0.4         iterators_1.0.14        pkgconfig_2.0.3         Matrix_1.6-5           
+##  [26] R6_2.5.1                fastmap_1.1.1           GenomeInfoDbData_1.2.11 clue_0.3-65             numDeriv_2016.8-1.1    
+##  [31] digest_0.6.35           colorspace_2.1-0        patchwork_1.2.0         AnnotationDbi_1.64.1    RSQLite_2.3.6          
+##  [36] filelock_1.0.3          labeling_0.4.3          fansi_1.0.6             timechange_0.3.0        httr_1.4.7             
+##  [41] abind_1.4-5             compiler_4.3.3          bit64_4.0.5             withr_3.0.0             doParallel_1.0.17      
+##  [46] BiocParallel_1.36.0     DBI_1.2.2               hexbin_1.28.3           highr_0.10              MASS_7.3-60.0.1        
+##  [51] rappdirs_0.3.3          DelayedArray_0.28.0     rjson_0.2.21            tools_4.3.3             glue_1.7.0             
+##  [56] cluster_2.1.6           generics_0.1.3          gtable_0.3.5            tzdb_0.4.0              preprocessCore_1.64.0  
+##  [61] hms_1.1.3               xml2_1.3.6              utf8_1.2.4              XVector_0.42.0          foreach_1.5.2          
+##  [66] pillar_1.9.0            emdbook_1.3.13          vroom_1.6.5             limma_3.58.1            circlize_0.4.16        
+##  [71] BiocFileCache_2.10.2    lattice_0.22-6          bit_4.0.5               tidyselect_1.2.1        locfit_1.5-9.9         
+##  [76] Biostrings_2.70.3       knitr_1.46              edgeR_4.0.16            xfun_0.43               statmod_1.5.0          
+##  [81] stringi_1.8.3           yaml_2.3.8              evaluate_0.23           codetools_0.2-20        bbmle_1.0.25.1         
+##  [86] BiocManager_1.30.22     cli_3.6.2               affyio_1.72.0           munsell_0.5.1           jquerylib_0.1.4        
+##  [91] Rcpp_1.0.12             dbplyr_2.5.0            coda_0.19-4.1           png_0.1-8               bdsmatrix_1.3-7        
+##  [96] XML_3.99-0.16.1         parallel_4.3.3          blob_1.2.4              prettyunits_1.2.0       bitops_1.0-7           
+## [101] mvtnorm_1.2-4           apeglm_1.24.0           scales_1.3.0            affy_1.80.0             crayon_1.5.2           
+## [106] GetoptLong_1.0.5        rlang_1.1.3             KEGGREST_1.42.0</code></pre>
 </div>
 </div>
 

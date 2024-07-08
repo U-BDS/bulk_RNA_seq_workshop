@@ -14,7 +14,7 @@
 
 <title>RNA-Seq Tertiary Analysis: Part 1</title>
 
-<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -549,10 +549,8 @@ head(tx2gene)</code></pre>
 
 myFiles &lt;- dir(&quot;./data&quot;, &quot;.sf$&quot;, full.names = TRUE)
 myFiles</code></pre>
-<pre><code>## [1] &quot;./data/N01_AM_Naive_quant.sf&quot;   &quot;./data/N02_AM_Naive_quant.sf&quot;  
-## [3] &quot;./data/N03_AM_Naive_quant.sf&quot;   &quot;./data/N04_AM_Naive_quant.sf&quot;  
-## [5] &quot;./data/R05_AM_Allo24h_quant.sf&quot; &quot;./data/R06_AM_Allo24h_quant.sf&quot;
-## [7] &quot;./data/R07_AM_Allo24h_quant.sf&quot; &quot;./data/R08_AM_Allo24h_quant.sf&quot;</code></pre>
+<pre><code>## [1] &quot;./data/N01_AM_Naive_quant.sf&quot;   &quot;./data/N02_AM_Naive_quant.sf&quot;   &quot;./data/N03_AM_Naive_quant.sf&quot;   &quot;./data/N04_AM_Naive_quant.sf&quot;  
+## [5] &quot;./data/R05_AM_Allo24h_quant.sf&quot; &quot;./data/R06_AM_Allo24h_quant.sf&quot; &quot;./data/R07_AM_Allo24h_quant.sf&quot; &quot;./data/R08_AM_Allo24h_quant.sf&quot;</code></pre>
 <pre class="r"><code># Adding names for columns:
 
 myFiles_names &lt;- c()
@@ -597,46 +595,21 @@ txi &lt;- tximport(myFiles_names,
 ## summarizing counts
 ## summarizing length</code></pre>
 <pre class="r"><code>names(txi)</code></pre>
-<pre><code>## [1] &quot;abundance&quot;           &quot;counts&quot;              &quot;length&quot;             
-## [4] &quot;countsFromAbundance&quot;</code></pre>
+<pre><code>## [1] &quot;abundance&quot;           &quot;counts&quot;              &quot;length&quot;              &quot;countsFromAbundance&quot;</code></pre>
 <pre class="r"><code>head(txi$counts, 5)</code></pre>
-<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive
-## ENSMUSG00000000001.5          3831         3765         3395         2841
-## ENSMUSG00000000003.16            0            0            0            0
-## ENSMUSG00000000028.16          180          192          173           90
-## ENSMUSG00000000031.18            0            0            0            0
-## ENSMUSG00000000037.18            4            3            9            3
-##                       R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h
-## ENSMUSG00000000001.5        5403.000           4993       4155.000
-## ENSMUSG00000000003.16          0.000              0          0.000
-## ENSMUSG00000000028.16       1326.001           1378       1093.999
-## ENSMUSG00000000031.18          0.000              0          0.000
-## ENSMUSG00000000037.18         12.000             11          7.000
-##                       R08_AM_Allo24h
-## ENSMUSG00000000001.5            4122
-## ENSMUSG00000000003.16              0
-## ENSMUSG00000000028.16            861
-## ENSMUSG00000000031.18              0
-## ENSMUSG00000000037.18             10</code></pre>
+<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h R08_AM_Allo24h
+## ENSMUSG00000000001.5          3831         3765         3395         2841       5403.000           4993       4155.000           4122
+## ENSMUSG00000000003.16            0            0            0            0          0.000              0          0.000              0
+## ENSMUSG00000000028.16          180          192          173           90       1326.001           1378       1093.999            861
+## ENSMUSG00000000031.18            0            0            0            0          0.000              0          0.000              0
+## ENSMUSG00000000037.18            4            3            9            3         12.000             11          7.000             10</code></pre>
 <pre class="r"><code>head(txi$abundance, 5)</code></pre>
-<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive
-## ENSMUSG00000000001.5     98.216401   106.299723    99.267634    95.303118
-## ENSMUSG00000000003.16     0.000000     0.000000     0.000000     0.000000
-## ENSMUSG00000000028.16     6.839288     8.727377     8.015467     4.422736
-## ENSMUSG00000000031.18     0.000000     0.000000     0.000000     0.000000
-## ENSMUSG00000000037.18     0.647132     0.120524     0.343255     0.192976
-##                       R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h
-## ENSMUSG00000000001.5       95.846128      94.673074      92.201307
-## ENSMUSG00000000003.16       0.000000       0.000000       0.000000
-## ENSMUSG00000000028.16      34.996297      38.631371      36.942847
-## ENSMUSG00000000031.18       0.000000       0.000000       0.000000
-## ENSMUSG00000000037.18       0.125222       0.149528       0.176068
-##                       R08_AM_Allo24h
-## ENSMUSG00000000001.5       89.722317
-## ENSMUSG00000000003.16       0.000000
-## ENSMUSG00000000028.16      29.781577
-## ENSMUSG00000000031.18       0.000000
-## ENSMUSG00000000037.18       0.305835</code></pre>
+<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h R08_AM_Allo24h
+## ENSMUSG00000000001.5     98.216401   106.299723    99.267634    95.303118      95.846128      94.673074      92.201307      89.722317
+## ENSMUSG00000000003.16     0.000000     0.000000     0.000000     0.000000       0.000000       0.000000       0.000000       0.000000
+## ENSMUSG00000000028.16     6.839288     8.727377     8.015467     4.422736      34.996297      38.631371      36.942847      29.781577
+## ENSMUSG00000000031.18     0.000000     0.000000     0.000000     0.000000       0.000000       0.000000       0.000000       0.000000
+## ENSMUSG00000000037.18     0.647132     0.120524     0.343255     0.192976       0.125222       0.149528       0.176068       0.305835</code></pre>
 </div>
 <div id="sample-meta-data" class="section level1">
 <h1>Sample meta data</h1>
@@ -720,24 +693,12 @@ dds &lt;- DESeqDataSetFromTximport(txi,
 <pre class="r"><code># dds
 
 head(counts(dds), 5)</code></pre>
-<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive
-## ENSMUSG00000000001.5          3831         3765         3395         2841
-## ENSMUSG00000000003.16            0            0            0            0
-## ENSMUSG00000000028.16          180          192          173           90
-## ENSMUSG00000000031.18            0            0            0            0
-## ENSMUSG00000000037.18            4            3            9            3
-##                       R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h
-## ENSMUSG00000000001.5            5403           4993           4155
-## ENSMUSG00000000003.16              0              0              0
-## ENSMUSG00000000028.16           1326           1378           1094
-## ENSMUSG00000000031.18              0              0              0
-## ENSMUSG00000000037.18             12             11              7
-##                       R08_AM_Allo24h
-## ENSMUSG00000000001.5            4122
-## ENSMUSG00000000003.16              0
-## ENSMUSG00000000028.16            861
-## ENSMUSG00000000031.18              0
-## ENSMUSG00000000037.18             10</code></pre>
+<pre><code>##                       N01_AM_Naive N02_AM_Naive N03_AM_Naive N04_AM_Naive R05_AM_Allo24h R06_AM_Allo24h R07_AM_Allo24h R08_AM_Allo24h
+## ENSMUSG00000000001.5          3831         3765         3395         2841           5403           4993           4155           4122
+## ENSMUSG00000000003.16            0            0            0            0              0              0              0              0
+## ENSMUSG00000000028.16          180          192          173           90           1326           1378           1094            861
+## ENSMUSG00000000031.18            0            0            0            0              0              0              0              0
+## ENSMUSG00000000037.18            4            3            9            3             12             11              7             10</code></pre>
 <div id="note-on-factor-levels" class="section level2">
 <h2>Note on factor levels</h2>
 <p>By default, <code>R</code> automatically assigns a reference level to
@@ -758,8 +719,7 @@ results names after running <code>DESeq</code> or
 <p>Below we demonstrate option #2:</p>
 <pre class="r"><code># see current levels:
 dds$Condition</code></pre>
-<pre><code>## [1] Naive      Naive      Naive      Naive      Transplant Transplant Transplant
-## [8] Transplant
+<pre><code>## [1] Naive      Naive      Naive      Naive      Transplant Transplant Transplant Transplant
 ## Levels: Naive Transplant</code></pre>
 <p>In the output above, we can see that <code>Naive</code> is already
 set as the reference level by alphabetical order. However, it is still
@@ -770,8 +730,7 @@ alphabetical order as it can easily change across experiments.</p>
 dds$Condition &lt;- relevel(dds$Condition, ref = &quot;Naive&quot;)
 
 dds$Condition</code></pre>
-<pre><code>## [1] Naive      Naive      Naive      Naive      Transplant Transplant Transplant
-## [8] Transplant
+<pre><code>## [1] Naive      Naive      Naive      Naive      Transplant Transplant Transplant Transplant
 ## Levels: Naive Transplant</code></pre>
 </div>
 </div>
@@ -868,8 +827,8 @@ libsize_plot</code></pre>
 png(&quot;./results/libsize_plot.png&quot;)
 plot(libsize_plot)
 dev.off()</code></pre>
-<pre><code>## quartz_off_screen 
-##                 2</code></pre>
+<pre><code>## png 
+##   2</code></pre>
 <p>Based on the figure above, we can see that there are differences in
 the raw counts across the samples. This is expected, and in the later
 sections the data will be normalized to account for this technical
@@ -931,11 +890,9 @@ ntd &lt;- normTransform(dds)</code></pre>
 ## dim: 15486 8 
 ## metadata(1): version
 ## assays(1): &#39;&#39;
-## rownames(15486): ENSMUSG00000000001.5 ENSMUSG00000000028.16 ...
-##   ENSMUSG00002076763.1 ENSMUSG00002076916.1
+## rownames(15486): ENSMUSG00000000001.5 ENSMUSG00000000028.16 ... ENSMUSG00002076763.1 ENSMUSG00002076916.1
 ## rowData names(0):
-## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h
-##   R08_AM_Allo24h
+## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h R08_AM_Allo24h
 ## colData names(7): Condition Group ... Age libSize</code></pre>
 <pre class="r"><code>meanSdPlot(assay(ntd))</code></pre>
 <p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-14-1.png" width="672" />
@@ -948,11 +905,9 @@ vsd &lt;- vst(dds, blind=FALSE)</code></pre>
 ## dim: 15486 8 
 ## metadata(1): version
 ## assays(1): &#39;&#39;
-## rownames(15486): ENSMUSG00000000001.5 ENSMUSG00000000028.16 ...
-##   ENSMUSG00002076763.1 ENSMUSG00002076916.1
+## rownames(15486): ENSMUSG00000000001.5 ENSMUSG00000000028.16 ... ENSMUSG00002076763.1 ENSMUSG00002076916.1
 ## rowData names(4): baseMean baseVar allZero dispFit
-## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h
-##   R08_AM_Allo24h
+## colnames(8): N01_AM_Naive N02_AM_Naive ... R07_AM_Allo24h R08_AM_Allo24h
 ## colData names(7): Condition Group ... Age libSize</code></pre>
 <pre class="r"><code>meanSdPlot(assay(vsd))</code></pre>
 <p><img src="tertiary_analysis_Part1_files/figure-html/unnamed-chunk-16-1.png" width="672" />
@@ -1086,73 +1041,54 @@ with the following command:</p>
 <p>In this case, we are displaying it as part of our lesson:</p>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.3.3 (2024-02-29)
-## Platform: aarch64-apple-darwin20 (64-bit)
-## Running under: macOS Sonoma 14.2.1
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 22.04.4 LTS
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
 ## 
 ## locale:
-## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
-## time zone: America/Chicago
-## tzcode source: internal
+## time zone: Etc/UTC
+## tzcode source: system (glibc)
 ## 
 ## attached base packages:
-## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
-## [8] methods   base     
+## [1] grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] RColorBrewer_1.1-3          ComplexHeatmap_2.18.0      
-##  [3] lubridate_1.9.3             forcats_1.0.0              
-##  [5] stringr_1.5.1               purrr_1.0.2                
-##  [7] readr_2.1.5                 tidyr_1.3.1                
-##  [9] tibble_3.2.1                tidyverse_2.0.0            
-## [11] dplyr_1.1.4                 ggrepel_0.9.5              
-## [13] ggplot2_3.5.1               magrittr_2.0.3             
-## [15] biomaRt_2.58.2              vsn_3.70.0                 
-## [17] Glimma_2.12.0               DESeq2_1.42.1              
-## [19] SummarizedExperiment_1.32.0 Biobase_2.62.0             
-## [21] MatrixGenerics_1.14.0       matrixStats_1.3.0          
-## [23] GenomicRanges_1.54.1        GenomeInfoDb_1.38.8        
-## [25] IRanges_2.36.0              S4Vectors_0.40.2           
-## [27] BiocGenerics_0.48.1         tximport_1.30.0            
+##  [1] RColorBrewer_1.1-3          ComplexHeatmap_2.18.0       lubridate_1.9.3             forcats_1.0.0              
+##  [5] stringr_1.5.1               purrr_1.0.2                 readr_2.1.5                 tidyr_1.3.1                
+##  [9] tibble_3.2.1                tidyverse_2.0.0             dplyr_1.1.4                 ggrepel_0.9.5              
+## [13] ggplot2_3.5.0               magrittr_2.0.3              biomaRt_2.58.2              vsn_3.70.0                 
+## [17] Glimma_2.12.0               DESeq2_1.42.1               SummarizedExperiment_1.32.0 Biobase_2.62.0             
+## [21] MatrixGenerics_1.14.0       matrixStats_1.3.0           GenomicRanges_1.54.1        GenomeInfoDb_1.38.8        
+## [25] IRanges_2.36.0              S4Vectors_0.40.2            BiocGenerics_0.48.1         tximport_1.30.0            
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] rstudioapi_0.16.0       jsonlite_1.8.8          shape_1.4.6.1          
-##  [4] magick_2.8.3            farver_2.1.2            rmarkdown_2.27         
-##  [7] GlobalOptions_0.1.2     zlibbioc_1.48.2         vctrs_0.6.5            
-## [10] memoise_2.0.1           RCurl_1.98-1.14         htmltools_0.5.8.1      
-## [13] S4Arrays_1.2.1          progress_1.2.3          curl_5.2.1             
-## [16] SparseArray_1.2.4       sass_0.4.9              bslib_0.7.0            
-## [19] htmlwidgets_1.6.4       cachem_1.1.0            lifecycle_1.0.4        
-## [22] iterators_1.0.14        pkgconfig_2.0.3         Matrix_1.6-5           
-## [25] R6_2.5.1                fastmap_1.2.0           GenomeInfoDbData_1.2.11
-## [28] clue_0.3-65             digest_0.6.36           colorspace_2.1-0       
-## [31] AnnotationDbi_1.64.1    RSQLite_2.3.7           filelock_1.0.3         
-## [34] labeling_0.4.3          fansi_1.0.6             timechange_0.3.0       
-## [37] httr_1.4.7              abind_1.4-5             compiler_4.3.3         
-## [40] bit64_4.0.5             withr_3.0.0             doParallel_1.0.17      
-## [43] BiocParallel_1.36.0     DBI_1.2.3               hexbin_1.28.3          
-## [46] highr_0.11              rappdirs_0.3.3          DelayedArray_0.28.0    
-## [49] rjson_0.2.21            tools_4.3.3             glue_1.7.0             
-## [52] cluster_2.1.6           generics_0.1.3          gtable_0.3.5           
-## [55] tzdb_0.4.0              preprocessCore_1.64.0   hms_1.1.3              
-## [58] xml2_1.3.6              utf8_1.2.4              XVector_0.42.0         
-## [61] foreach_1.5.2           pillar_1.9.0            vroom_1.6.5            
-## [64] limma_3.58.1            circlize_0.4.16         BiocFileCache_2.10.2   
-## [67] lattice_0.22-6          bit_4.0.5               tidyselect_1.2.1       
-## [70] locfit_1.5-9.10         Biostrings_2.70.3       knitr_1.47             
-## [73] edgeR_4.0.16            xfun_0.45               statmod_1.5.0          
-## [76] stringi_1.8.4           yaml_2.3.8              evaluate_0.24.0        
-## [79] codetools_0.2-20        BiocManager_1.30.23     cli_3.6.3              
-## [82] affyio_1.72.0           munsell_0.5.1           jquerylib_0.1.4        
-## [85] Rcpp_1.0.12             dbplyr_2.5.0            png_0.1-8              
-## [88] XML_3.99-0.16.1         parallel_4.3.3          blob_1.2.4             
-## [91] prettyunits_1.2.0       bitops_1.0-7            scales_1.3.0           
-## [94] affy_1.80.0             crayon_1.5.3            GetoptLong_1.0.5       
-## [97] rlang_1.1.4             KEGGREST_1.42.0</code></pre>
+##  [1] DBI_1.2.2               bitops_1.0-7            rlang_1.1.3             clue_0.3-65             GetoptLong_1.0.5       
+##  [6] compiler_4.3.3          RSQLite_2.3.6           png_0.1-8               vctrs_0.6.5             pkgconfig_2.0.3        
+## [11] shape_1.4.6.1           crayon_1.5.2            fastmap_1.1.1           dbplyr_2.5.0            XVector_0.42.0         
+## [16] labeling_0.4.3          fontawesome_0.5.2       utf8_1.2.4              rmarkdown_2.26          tzdb_0.4.0             
+## [21] preprocessCore_1.64.0   bit_4.0.5               xfun_0.43               zlibbioc_1.48.2         cachem_1.0.8           
+## [26] jsonlite_1.8.8          progress_1.2.3          blob_1.2.4              highr_0.10              DelayedArray_0.28.0    
+## [31] BiocParallel_1.36.0     prettyunits_1.2.0       parallel_4.3.3          cluster_2.1.6           R6_2.5.1               
+## [36] stringi_1.8.3           bslib_0.7.0             limma_3.58.1            jquerylib_0.1.4         Rcpp_1.0.12            
+## [41] iterators_1.0.14        knitr_1.46              timechange_0.3.0        Matrix_1.6-5            tidyselect_1.2.1       
+## [46] rstudioapi_0.16.0       abind_1.4-5             yaml_2.3.8              doParallel_1.0.17       codetools_0.2-20       
+## [51] affy_1.80.0             curl_5.2.1              lattice_0.22-6          withr_3.0.0             KEGGREST_1.42.0        
+## [56] evaluate_0.23           BiocFileCache_2.10.2    xml2_1.3.6              circlize_0.4.16         Biostrings_2.70.3      
+## [61] filelock_1.0.3          pillar_1.9.0            affyio_1.72.0           BiocManager_1.30.22     foreach_1.5.2          
+## [66] generics_0.1.3          vroom_1.6.5             RCurl_1.98-1.14         hms_1.1.3               munsell_0.5.1          
+## [71] scales_1.3.0            glue_1.7.0              tools_4.3.3             hexbin_1.28.3           locfit_1.5-9.9         
+## [76] XML_3.99-0.16.1         AnnotationDbi_1.64.1    edgeR_4.0.16            colorspace_2.1-0        GenomeInfoDbData_1.2.11
+## [81] cli_3.6.2               rappdirs_0.3.3          fansi_1.0.6             S4Arrays_1.2.1          gtable_0.3.5           
+## [86] sass_0.4.9              digest_0.6.35           SparseArray_1.2.4       farver_2.1.1            rjson_0.2.21           
+## [91] htmlwidgets_1.6.4       memoise_2.0.1           htmltools_0.5.8.1       lifecycle_1.0.4         httr_1.4.7             
+## [96] GlobalOptions_0.1.2     statmod_1.5.0           bit64_4.0.5</code></pre>
 </div>
 </div>
 
