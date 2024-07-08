@@ -8,7 +8,7 @@ author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Packages loaded globabally
+# Packages loaded globally
 
 ```{r message=FALSE}
 # Set the seed so our results are reproducible:
@@ -268,18 +268,15 @@ cnetplot(gsea_enrichment,
 ```
 
 
+
 <details>
+
 
 **Note**: if you would like to display specific hallmakrs in the `cnetplot`, note
 that the `showCategory` parameter also accepts a vector of terms to be displayed.
 
-_____
 
-```{r fig.height=4, fig.width=25}
-heatplot(gsea_enrichment, showCategory = 7, foldChange=lfc_vector)
-```
-
-#### Most Positive NES
+## Most Positive NES
 
 ```{r}
 gsea_result_df <- data.frame(gsea_enrichment@result)
@@ -289,7 +286,8 @@ gsea_result_df %>%
   dplyr::slice_max(NES, n = 3)
 ```
 
-```{r fig.height=5, fig.width=6}
+
+```{r }
 most_positive_nes_plot <- enrichplot::gseaplot(
   gsea_enrichment,
   geneSetID = "HALLMARK_G2M_CHECKPOINT",
@@ -299,7 +297,8 @@ most_positive_nes_plot <- enrichplot::gseaplot(
 most_positive_nes_plot
 ```
 
-### Most Negative NES
+
+## Most Negative NES
 
 ```{r, message=FALSE}
 gsea_result_df %>%
@@ -307,7 +306,7 @@ gsea_result_df %>%
   dplyr::slice_min(NES, n = 3)
 ```
 
-```{r fig.height=5, fig.width=6}
+```{r }
 most_negative_nes_plot <- enrichplot::gseaplot(
   gsea_enrichment,
   geneSetID = "HALLMARK_ALLOGRAFT_REJECTION",
@@ -316,6 +315,13 @@ most_negative_nes_plot <- enrichplot::gseaplot(
 )
 most_negative_nes_plot
 ```
+
+## Heatmap
+
+```{r heatmap, fig.height=4, fig.width=12}
+heatplot(gsea_enrichment, showCategory = 4, foldChange=lfc_vector)
+```
+
 
 Write GSEA results to csv
 
