@@ -14,7 +14,7 @@
 
 <title>RNA-Seq Tertiary Analysis: Part 4</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -392,8 +392,8 @@ Ph.D.</h4>
 </div>
 
 
-<div id="packages-loaded-globabally" class="section level1">
-<h1>Packages loaded globabally</h1>
+<div id="packages-loaded-globally" class="section level1">
+<h1>Packages loaded globally</h1>
 <pre class="r"><code># Set the seed so our results are reproducible:
 set.seed(2020)
 
@@ -695,19 +695,19 @@ head(gsea_enrichment@result)[,1:(ncol(gsea_enrichment@result)-1)]</code></pre>
 ## HALLMARK_MTORC1_SIGNALING       HALLMARK_MTORC1_SIGNALING      36
 ## HALLMARK_MYC_TARGETS_V1           HALLMARK_MYC_TARGETS_V1      34
 ##                              enrichmentScore       NES       pvalue
-## HALLMARK_G2M_CHECKPOINT            0.5867924  3.843796 1.000000e-10
-## HALLMARK_E2F_TARGETS               0.5335367  3.677797 1.000000e-10
-## HALLMARK_MITOTIC_SPINDLE           0.5551511  2.904063 1.117445e-08
-## HALLMARK_ALLOGRAFT_REJECTION      -0.4614127 -2.694340 5.450376e-06
-## HALLMARK_MTORC1_SIGNALING          0.4302780  2.142952 5.093555e-04
-## HALLMARK_MYC_TARGETS_V1            0.4340611  2.120313 9.326797e-04
+## HALLMARK_G2M_CHECKPOINT            0.5867916  3.843762 1.000000e-10
+## HALLMARK_E2F_TARGETS               0.5335361  3.677769 1.000000e-10
+## HALLMARK_MITOTIC_SPINDLE           0.5551506  2.904041 1.653069e-08
+## HALLMARK_ALLOGRAFT_REJECTION      -0.4614127 -2.694386 6.317781e-06
+## HALLMARK_MTORC1_SIGNALING          0.4304638  2.143866 5.807292e-04
+## HALLMARK_MYC_TARGETS_V1            0.4340611  2.120300 1.078202e-03
 ##                                  p.adjust       qvalue rank
 ## HALLMARK_G2M_CHECKPOINT      4.000000e-10 5.263158e-11  412
 ## HALLMARK_E2F_TARGETS         4.000000e-10 5.263158e-11  501
-## HALLMARK_MITOTIC_SPINDLE     2.979853e-08 3.920859e-09  430
-## HALLMARK_ALLOGRAFT_REJECTION 1.090075e-05 1.434310e-06  291
-## HALLMARK_MTORC1_SIGNALING    8.149687e-04 1.072327e-04  612
-## HALLMARK_MYC_TARGETS_V1      1.243573e-03 1.636280e-04  682
+## HALLMARK_MITOTIC_SPINDLE     4.408185e-08 5.800243e-09  430
+## HALLMARK_ALLOGRAFT_REJECTION 1.263556e-05 1.662574e-06  291
+## HALLMARK_MTORC1_SIGNALING    9.291667e-04 1.222588e-04  612
+## HALLMARK_MYC_TARGETS_V1      1.437603e-03 1.891582e-04  682
 ##                                                 leading_edge
 ## HALLMARK_G2M_CHECKPOINT       tags=83%, list=35%, signal=58%
 ## HALLMARK_E2F_TARGETS          tags=85%, list=42%, signal=55%
@@ -774,11 +774,9 @@ Click here for solution
 hallmakrs in the <code>cnetplot</code>, note that the
 <code>showCategory</code> parameter also accepts a vector of terms to be
 displayed.</p>
-<hr />
-<pre class="r"><code>heatplot(gsea_enrichment, showCategory = 7, foldChange=lfc_vector)</code></pre>
-<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-17-1.png" width="2400" /></p>
-<div id="most-positive-nes" class="section level4">
-<h4>Most Positive NES</h4>
+</div>
+<div id="most-positive-nes" class="section level2">
+<h2>Most Positive NES</h2>
 <pre class="r"><code>gsea_result_df &lt;- data.frame(gsea_enrichment@result)
 
 gsea_result_df %&gt;%
@@ -789,13 +787,13 @@ gsea_result_df %&gt;%
 ## HALLMARK_E2F_TARGETS         HALLMARK_E2F_TARGETS     HALLMARK_E2F_TARGETS
 ## HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE HALLMARK_MITOTIC_SPINDLE
 ##                          setSize enrichmentScore      NES       pvalue
-## HALLMARK_G2M_CHECKPOINT       92       0.5867924 3.843796 1.000000e-10
-## HALLMARK_E2F_TARGETS         123       0.5335367 3.677797 1.000000e-10
-## HALLMARK_MITOTIC_SPINDLE      43       0.5551511 2.904063 1.117445e-08
+## HALLMARK_G2M_CHECKPOINT       92       0.5867916 3.843762 1.000000e-10
+## HALLMARK_E2F_TARGETS         123       0.5335361 3.677769 1.000000e-10
+## HALLMARK_MITOTIC_SPINDLE      43       0.5551506 2.904041 1.653069e-08
 ##                              p.adjust       qvalue rank
 ## HALLMARK_G2M_CHECKPOINT  4.000000e-10 5.263158e-11  412
 ## HALLMARK_E2F_TARGETS     4.000000e-10 5.263158e-11  501
-## HALLMARK_MITOTIC_SPINDLE 2.979853e-08 3.920859e-09  430
+## HALLMARK_MITOTIC_SPINDLE 4.408185e-08 5.800243e-09  430
 ##                                            leading_edge
 ## HALLMARK_G2M_CHECKPOINT  tags=83%, list=35%, signal=58%
 ## HALLMARK_E2F_TARGETS     tags=85%, list=42%, signal=55%
@@ -811,10 +809,10 @@ gsea_result_df %&gt;%
   color.line = &quot;#0d76ff&quot;
 )
 most_positive_nes_plot</code></pre>
-<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-19-1.png" width="576" /></p>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 </div>
-<div id="most-negative-nes" class="section level3">
-<h3>Most Negative NES</h3>
+<div id="most-negative-nes" class="section level2">
+<h2>Most Negative NES</h2>
 <pre class="r"><code>gsea_result_df %&gt;%
   # This returns the 3 rows with the largest NES values
   dplyr::slice_min(NES, n = 3)</code></pre>
@@ -827,13 +825,13 @@ most_positive_nes_plot</code></pre>
 ## HALLMARK_INFLAMMATORY_RESPONSE HALLMARK_INFLAMMATORY_RESPONSE      30
 ## HALLMARK_MYC_TARGETS_V1               HALLMARK_MYC_TARGETS_V1      34
 ##                                enrichmentScore       NES       pvalue
-## HALLMARK_ALLOGRAFT_REJECTION        -0.4614127 -2.694340 5.450376e-06
-## HALLMARK_INFLAMMATORY_RESPONSE      -0.3418102 -1.861881 8.626892e-03
-## HALLMARK_MYC_TARGETS_V1              0.4340611  2.120313 9.326797e-04
+## HALLMARK_ALLOGRAFT_REJECTION        -0.4614127 -2.694386 6.317781e-06
+## HALLMARK_INFLAMMATORY_RESPONSE      -0.3417413 -1.861534 7.967521e-03
+## HALLMARK_MYC_TARGETS_V1              0.4340611  2.120300 1.078202e-03
 ##                                    p.adjust       qvalue rank
-## HALLMARK_ALLOGRAFT_REJECTION   1.090075e-05 1.434310e-06  291
-## HALLMARK_INFLAMMATORY_RESPONSE 9.859305e-03 1.297277e-03  448
-## HALLMARK_MYC_TARGETS_V1        1.243573e-03 1.636280e-04  682
+## HALLMARK_ALLOGRAFT_REJECTION   1.263556e-05 1.662574e-06  291
+## HALLMARK_INFLAMMATORY_RESPONSE 9.105738e-03 1.198123e-03  448
+## HALLMARK_MYC_TARGETS_V1        1.437603e-03 1.891582e-04  682
 ##                                                   leading_edge
 ## HALLMARK_ALLOGRAFT_REJECTION    tags=68%, list=25%, signal=53%
 ## HALLMARK_INFLAMMATORY_RESPONSE  tags=70%, list=38%, signal=45%
@@ -849,32 +847,31 @@ most_positive_nes_plot</code></pre>
   color.line = &quot;#0d76ff&quot;
 )
 most_negative_nes_plot</code></pre>
-<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-21-1.png" width="576" /></p>
+<p><img src="tertiary_analysis_Part4_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+</div>
+<div id="heatmap" class="section level2">
+<h2>Heatmap</h2>
+<pre class="r"><code>heatplot(gsea_enrichment, showCategory = 4, foldChange=lfc_vector)</code></pre>
+<p><img src="tertiary_analysis_Part4_files/figure-html/heatmap-1.png" width="1152" /></p>
 <p>Write GSEA results to csv</p>
 <pre class="r"><code>write.csv(gsea_enrichment@result, file = &quot;./results/Transplant_vs_Naive/Transplant_vs_Naive_GSEA_hallmark_padj_fc.csv&quot;)</code></pre>
-</div>
 </div>
 <div id="session-info" class="section level2">
 <h2>session info</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.3.3 (2024-02-29)
-## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 22.04.4 LTS
+## Platform: aarch64-apple-darwin20 (64-bit)
+## Running under: macOS Sonoma 14.2.1
 ## 
 ## Matrix products: default
-## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
 ## 
 ## locale:
-##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
-##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
-##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
-##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
-##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
-## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 ## 
-## time zone: Etc/UTC
-## tzcode source: system (glibc)
+## time zone: America/Chicago
+## tzcode source: internal
 ## 
 ## attached base packages:
 ## [1] grid      stats     graphics  grDevices utils     datasets  methods  
@@ -885,30 +882,30 @@ most_negative_nes_plot</code></pre>
 ##  [4] EnhancedVolcano_1.20.0 lubridate_1.9.3        forcats_1.0.0         
 ##  [7] stringr_1.5.1          purrr_1.0.2            readr_2.1.5           
 ## [10] tidyr_1.3.1            tibble_3.2.1           tidyverse_2.0.0       
-## [13] dplyr_1.1.4            ggrepel_0.9.5          ggplot2_3.5.0         
+## [13] dplyr_1.1.4            ggrepel_0.9.5          ggplot2_3.5.1         
 ## [16] magrittr_2.0.3         msigdbr_7.5.1          clusterProfiler_4.10.1
 ## 
 ## loaded via a namespace (and not attached):
 ##   [1] shape_1.4.6.1           rstudioapi_0.16.0       jsonlite_1.8.8         
-##   [4] farver_2.1.1            rmarkdown_2.26          GlobalOptions_0.1.2    
-##   [7] fs_1.6.3                zlibbioc_1.48.2         vctrs_0.6.5            
+##   [4] farver_2.1.2            rmarkdown_2.27          GlobalOptions_0.1.2    
+##   [7] fs_1.6.4                zlibbioc_1.48.2         vctrs_0.6.5            
 ##  [10] memoise_2.0.1           RCurl_1.98-1.14         ggtree_3.10.1          
 ##  [13] htmltools_0.5.8.1       gridGraphics_0.5-1      sass_0.4.9             
-##  [16] bslib_0.7.0             plyr_1.8.9              cachem_1.0.8           
+##  [16] bslib_0.7.0             plyr_1.8.9              cachem_1.1.0           
 ##  [19] igraph_2.0.3            iterators_1.0.14        lifecycle_1.0.4        
 ##  [22] pkgconfig_2.0.3         Matrix_1.6-5            R6_2.5.1               
-##  [25] fastmap_1.1.1           gson_0.1.0              clue_0.3-65            
-##  [28] GenomeInfoDbData_1.2.11 digest_0.6.35           aplot_0.2.2            
+##  [25] fastmap_1.2.0           gson_0.1.0              clue_0.3-65            
+##  [28] GenomeInfoDbData_1.2.11 digest_0.6.36           aplot_0.2.3            
 ##  [31] enrichplot_1.22.0       ggnewscale_0.4.10       colorspace_2.1-0       
 ##  [34] patchwork_1.2.0         AnnotationDbi_1.64.1    S4Vectors_0.40.2       
-##  [37] RSQLite_2.3.6           labeling_0.4.3          fansi_1.0.6            
+##  [37] RSQLite_2.3.7           labeling_0.4.3          fansi_1.0.6            
 ##  [40] timechange_0.3.0        httr_1.4.7              polyclip_1.10-6        
 ##  [43] compiler_4.3.3          bit64_4.0.5             withr_3.0.0            
 ##  [46] doParallel_1.0.17       BiocParallel_1.36.0     viridis_0.6.5          
-##  [49] DBI_1.2.2               highr_0.10              ggforce_0.4.2          
+##  [49] DBI_1.2.3               highr_0.11              ggforce_0.4.2          
 ##  [52] MASS_7.3-60.0.1         rjson_0.2.21            HDO.db_0.99.1          
-##  [55] tools_4.3.3             ape_5.8                 scatterpie_0.2.2       
-##  [58] glue_1.7.0              nlme_3.1-164            GOSemSim_2.28.1        
+##  [55] tools_4.3.3             ape_5.8                 scatterpie_0.2.3       
+##  [58] glue_1.7.0              nlme_3.1-165            GOSemSim_2.28.1        
 ##  [61] shadowtext_0.1.3        cluster_2.1.6           reshape2_1.4.4         
 ##  [64] fgsea_1.28.0            generics_0.1.3          gtable_0.3.5           
 ##  [67] tzdb_0.4.0              data.table_1.15.4       hms_1.1.3              
@@ -917,18 +914,18 @@ most_negative_nes_plot</code></pre>
 ##  [76] yulab.utils_0.1.4       babelgene_22.9          circlize_0.4.16        
 ##  [79] splines_4.3.3           tweenr_2.0.3            treeio_1.26.0          
 ##  [82] lattice_0.22-6          bit_4.0.5               tidyselect_1.2.1       
-##  [85] GO.db_3.18.0            Biostrings_2.70.3       knitr_1.46             
+##  [85] GO.db_3.18.0            Biostrings_2.70.3       knitr_1.47             
 ##  [88] gridExtra_2.3           IRanges_2.36.0          stats4_4.3.3           
-##  [91] xfun_0.43               graphlayouts_1.1.1      Biobase_2.62.0         
-##  [94] matrixStats_1.3.0       stringi_1.8.3           lazyeval_0.2.2         
-##  [97] ggfun_0.1.4             yaml_2.3.8              evaluate_0.23          
+##  [91] xfun_0.45               graphlayouts_1.1.1      Biobase_2.62.0         
+##  [94] matrixStats_1.3.0       stringi_1.8.4           lazyeval_0.2.2         
+##  [97] ggfun_0.1.5             yaml_2.3.8              evaluate_0.24.0        
 ## [100] codetools_0.2-20        ggraph_2.2.1            qvalue_2.34.0          
-## [103] ggplotify_0.1.2         cli_3.6.2               munsell_0.5.1          
+## [103] ggplotify_0.1.2         cli_3.6.3               munsell_0.5.1          
 ## [106] jquerylib_0.1.4         Rcpp_1.0.12             GenomeInfoDb_1.38.8    
 ## [109] png_0.1-8               parallel_4.3.3          blob_1.2.4             
 ## [112] DOSE_3.28.2             bitops_1.0-7            viridisLite_0.4.2      
 ## [115] tidytree_0.4.6          ggridges_0.5.6          scales_1.3.0           
-## [118] crayon_1.5.2            GetoptLong_1.0.5        rlang_1.1.3            
+## [118] crayon_1.5.3            GetoptLong_1.0.5        rlang_1.1.4            
 ## [121] cowplot_1.1.3           fastmatch_1.1-4         KEGGREST_1.42.0</code></pre>
 </div>
 </div>

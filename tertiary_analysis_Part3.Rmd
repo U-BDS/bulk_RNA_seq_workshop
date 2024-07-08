@@ -8,7 +8,7 @@ author: "Bharat Mishra, Ph.D., Austyn Trull, Lara Ianov, Ph.D."
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Packages loaded globabally
+# Packages loaded globally
 
 ```{r message=FALSE}
 # Set the seed so our results are reproducible:

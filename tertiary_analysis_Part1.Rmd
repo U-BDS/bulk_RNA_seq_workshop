@@ -32,7 +32,7 @@ analysis with `DESeq2`, gene annotation, gene enrichment analysis
 (gene-ontology and gene  set enrichment analysis), and the fundamentals of data 
 visualization for transcriptomics.
 
-# Packages loaded globabally
+# Packages loaded globally
 
 ```{r message=FALSE}
 # Set the seed so our results are reproducible:
