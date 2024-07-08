@@ -233,7 +233,7 @@ The next lines we will add are known as slurm directives. Slurm directives are u
 #SBATCH --job-name=rnaseq_test
 #SBATCH --output=rnaseq_test.out
 #SBATCH --error=rnaseq_test.err
-#SBATCH --time=1:00:00
+#SBATCH --time=2:00:00
 #SBATCH --partition=express
 #SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1
@@ -562,7 +562,7 @@ There are additional ways you can use this config, controlling whether Nextflow 
 
 ### Submitting the pipeline
 
-With all the files created, we can submit the pipeline. We'll create a `run_rnaseq.sh` file, and put the below lines in it. Note we aren't increasing the resources for the job because we are only submitting the Nextflow runner which requires very minimal resources. In general when submitting the Nextflow runner, the main resource that may need increasing is the `--time` flag as that determines how much time you are allocating for the pipeline to run.
+With all the files created, we can submit the pipeline. We'll create a `run_rnaseq.sh` file, and put the below lines in it. Note that while we're increasing the time limit, we aren't increasing any other resources for the job because we are only submitting the Nextflow runner which requires very minimal resources. In general when submitting the Nextflow runner, the main resource that may need increasing is the `--time` flag as that determines how much time you are allocating for the pipeline to run.
 
 ```         
 #!/usr/bin/env bash
@@ -570,8 +570,8 @@ With all the files created, we can submit the pipeline. We'll create a `run_rnas
 #SBATCH --job-name=rnaseq_subsample
 #SBATCH --output=rnaseq_subsample.out
 #SBATCH --error=rnaseq_subsample.err
-#SBATCH --time=1:00:00
-#SBATCH --partition=express
+#SBATCH --time=12:00:00
+#SBATCH --partition=short
 #SBATCH --mem-per-cpu=5000
 #SBATCH --cpus-per-task=1
 
@@ -625,16 +625,16 @@ nextflow run nf-core/rnaseq \
 > }
 > ```
 >
-> `run_rnaseq.sh` would need to increase the time allocation to better fit the analysis. For the downsample, it was set to 1hr so buffing it to 12hr should fit most analyses
+> `run_rnaseq.sh` maintains the same time limit as our downsample data. For most RNA-seq analysis, this is sufficient, but if your pipeline fails due to time limit, simply increase this further.
 > 
 > ``` run_rnaseq.sh
 > #!/usr/bin/env bash
 > 
->#SBATCH --job-name=rnaseq_subsample
->#SBATCH --output=rnaseq_subsample.out
->#SBATCH --error=rnaseq_subsample.err
+>#SBATCH --job-name=rnaseq_full
+>#SBATCH --output=rnaseq_full.out
+>#SBATCH --error=rnaseq_full.err
 >#SBATCH --time=12:00:00
->#SBATCH --partition=medium
+>#SBATCH --partition=short
 >#SBATCH --mem-per-cpu=5000
 >#SBATCH --cpus-per-task=1
 >
@@ -644,7 +644,7 @@ nextflow run nf-core/rnaseq \
 >
 ># run pipeline
 >nextflow run nf-core/rnaseq \
->    --outdir ./subsample_results \
+>    --outdir ./full_results \
 >    -profile cheaha \
 >    -r 3.14.0 \
 >    -params-file ./params.yml \
@@ -652,6 +652,28 @@ nextflow run nf-core/rnaseq \
 > ```
 >
 > </details>
+
+> **Discussion Question**
+>
+> In the runs above, we wrote a custom configuration for the Salmon flags as an demostration of how to pass in tool-specific parameters for nf-core pipelines.
+> This was a good example on how to configure your pipeline in a more advanced manner (e.g.: when no alternative approach exist).
+>
+> However, the pipeline authors have also provided explicit parameters in this pipeline which enables users to accomplish the same task in a more straight-forward manner.
+> From looking at the documentation, what is the alternative approach of providing the `--gcBias --seqBias` parameters to Salmon?
+>
+> <details>
+> <summary>**Click here for solution**</summary>
+> You can add the following to your `params.yml` with the pipeline flag `extra_salmon_quant_args`
+>
+>```
+> extra_salmon_quant_args: "--seqBias --gcBias"
+>```
+>
+> **NOTE**: this option only became available with version >= 3.10. This is a good example of the advantages of always checking the pipeline release notes for updates/improvements and bug fixes.
+>
+> </details>
+
+______
 
 ## Reviewing Pipeline Results
 
