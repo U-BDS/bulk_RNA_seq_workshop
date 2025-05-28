@@ -78,3 +78,11 @@ A Beginner's Guide to Analysis of RNA Sequencing Data. Am J Respir Cell Mol Biol
 
 Lastly, we would also like to thank Kristen Coutinho for the dataset suggestion, 
 and preliminary discussions for this workshop.
+
+## Citation
+
+If these materials are beneficial to your analysis and research, please cite it with the following DOI:
+
+> UAB Biological Data Science Core, Bulk RNA-seq Workshop
+>
+>[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15539954.svg)](https://doi.org/10.5281/zenodo.15539954)
